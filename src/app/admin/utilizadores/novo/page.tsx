@@ -34,15 +34,21 @@ export default function NovoUtilizadorPage() {
     e.preventDefault()
     setError('')
     setLoading(true)
-    const res = await fetch('/api/admin/utilizadores', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    })
-    const data = await res.json()
-    setLoading(false)
-    if (!res.ok) { setError(data.error ?? 'Erro ao criar utilizador'); return }
-    router.push('/admin/utilizadores')
+    try {
+      const res = await fetch('/api/admin/utilizadores', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      let data: { error?: string } = {}
+      try { data = await res.json() } catch { /* ignore parse errors */ }
+      setLoading(false)
+      if (!res.ok) { setError(data.error ?? 'Erro ao criar utilizador'); return }
+      router.push('/admin/utilizadores')
+    } catch {
+      setLoading(false)
+      setError('Erro de ligação. Tenta novamente.')
+    }
   }
 
   return (
