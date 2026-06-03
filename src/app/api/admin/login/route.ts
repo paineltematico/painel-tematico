@@ -21,14 +21,15 @@ export async function POST(request: Request) {
 
   // ── Path A: email + password against admin_users table ───────────────────
   if (email) {
-        const { data: user } = await (supabaseAdmin as any)
+        const { data: user, error: dbError } = await (supabaseAdmin as any)
       .from('admin_users')
       .select('id, email, nome, role, password_hash, ativo')
       .eq('email', email.toLowerCase().trim())
       .single()
 
-    if (!user) {
-      return NextResponse.json({ error: 'Utilizador não encontrado na base de dados' }, { status: 401 })
+    if (dbError || !user) {
+      console.error('[login] db error:', dbError?.message, '| has_key:', !!process.env.SUPABASE_SERVICE_ROLE_KEY, '| email:', email.toLowerCase().trim())
+      return NextResponse.json({ error: dbError ? `Erro de base de dados: ${dbError.message}` : 'Utilizador não encontrado na base de dados' }, { status: 401 })
     }
     if (!user.ativo) {
       return NextResponse.json({ error: 'Conta desativada. Contacte o administrador.' }, { status: 403 })
