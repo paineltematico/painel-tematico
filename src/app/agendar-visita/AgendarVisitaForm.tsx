@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useRef } from 'react'
-import { CheckCircle, Loader2, ChevronLeft, ChevronRight } from 'lucide-react'
+import { useState } from 'react'
+import { CheckCircle, Loader2 } from 'lucide-react'
 
 interface Imovel { id: string; titulo: string; tipologia: string; cidade: string; tipo: string }
 interface Props  { imoveis: Imovel[] }
@@ -58,18 +58,11 @@ export default function AgendarVisitaForm({ imoveis }: Props) {
   const [loading,  setLoading]  = useState(false)
   const [success,  setSuccess]  = useState(false)
   const [error,    setError]    = useState('')
-  const daysRef = useRef<HTMLDivElement>(null)
 
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
     setForm(f => ({ ...f, [k]: e.target.value }))
 
-  const setVal = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }))
-
   const imovelOutro = form.imovel_id === '__outro__'
-
-  const scrollDays = (dir: number) => {
-    daysRef.current?.scrollBy({ left: dir * 220, behavior: 'smooth' })
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -167,80 +160,33 @@ export default function AgendarVisitaForm({ imoveis }: Props) {
         )}
       </SECTION>
 
-      {/* Data e hora — iOS style */}
+      {/* Data e hora */}
       <SECTION title="📅 Data e hora da visita">
-
-        {/* Day picker */}
-        <div>
-          <label className={labelCls}>Dia *</label>
-          <div className="relative">
-            <button type="button" onClick={() => scrollDays(-1)}
-              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center bg-white/90 backdrop-blur-sm border border-[#E8E3E3] rounded-full shadow-sm text-[#475569] hover:text-[#1F3F44] transition-colors">
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <div ref={daysRef} className="flex gap-2 overflow-x-auto scroll-smooth px-10 pb-1 scrollbar-hide"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className={labelCls}>Dia *</label>
+            <select value={form.data_visita} onChange={set('data_visita')} required
+              className={`${inputCls} bg-white`}>
+              <option value="">Escolher dia...</option>
               {DAYS.map(d => (
-                <button
-                  key={d.iso}
-                  type="button"
-                  onClick={() => setVal('data_visita', d.iso)}
-                  className={`flex-shrink-0 flex flex-col items-center px-4 py-3 rounded-2xl border-2 transition-all duration-150 min-w-[72px]
-                    ${form.data_visita === d.iso
-                      ? 'bg-[#1F3F44] border-[#1F3F44] text-white shadow-md scale-105'
-                      : d.isWeekend
-                      ? 'bg-[#fafafa] border-[#e2e8f0] text-[#94a3b8] hover:border-[#00545F]/40'
-                      : 'bg-white border-[#e2e8f0] text-[#1F3F44] hover:border-[#00545F]/60 hover:bg-teal-50/30'
-                    }`}
-                >
-                  <span className="text-xs font-semibold opacity-70 mb-0.5">{d.sub}</span>
-                  <span className="text-sm font-bold leading-tight">{d.label}</span>
-                </button>
+                <option key={d.iso} value={d.iso}>{d.label} · {d.sub}</option>
               ))}
-            </div>
-            <button type="button" onClick={() => scrollDays(1)}
-              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center bg-white/90 backdrop-blur-sm border border-[#E8E3E3] rounded-full shadow-sm text-[#475569] hover:text-[#1F3F44] transition-colors">
-              <ChevronRight className="w-4 h-4" />
-            </button>
+            </select>
+          </div>
+          <div>
+            <label className={labelCls}>Hora *</label>
+            <select value={form.hora_visita} onChange={set('hora_visita')} required
+              className={`${inputCls} bg-white`}>
+              <option value="">Escolher hora...</option>
+              {SLOTS.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
           </div>
         </div>
 
-        {/* Time picker */}
-        <div>
-          <label className={labelCls}>Hora *</label>
-          <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
-            {SLOTS.map(slot => (
-              <button
-                key={slot}
-                type="button"
-                onClick={() => setVal('hora_visita', slot)}
-                className={`py-3 rounded-2xl border-2 text-sm font-semibold transition-all duration-150
-                  ${form.hora_visita === slot
-                    ? 'bg-[#1F3F44] border-[#1F3F44] text-white shadow-md scale-105'
-                    : 'bg-white border-[#e2e8f0] text-[#475569] hover:border-[#00545F]/60 hover:bg-teal-50/30 hover:text-[#1F3F44]'
-                  }`}
-              >
-                {slot}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Resumo seleção */}
-        {form.data_visita && form.hora_visita && (
-          <div className="bg-[#1F3F44]/5 border border-[#1F3F44]/10 rounded-xl px-4 py-3 flex items-center gap-2">
-            <span className="text-lg">📅</span>
-            <p className="text-sm font-semibold text-[#1F3F44]">
-              {DAYS.find(d => d.iso === form.data_visita)?.label} às {form.hora_visita}
-            </p>
-          </div>
-        )}
-
-        {/* Notas */}
         <div>
           <label className={labelCls}>Notas adicionais</label>
-          <textarea value={form.notas} onChange={set('notas')} rows={3}
-            className={`${inputCls} resize-none`} placeholder="Informação extra sobre a visita ou o cliente..." />
+          <textarea value={form.notas} onChange={set('notas')} rows={2}
+            className={`${inputCls} resize-none`} placeholder="Informação extra sobre a visita..." />
         </div>
       </SECTION>
 
