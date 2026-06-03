@@ -137,20 +137,10 @@ export default function AgendarVisitaForm({ imoveis }: Props) {
       </SECTION>
 
       {/* Dados do cliente */}
-      <SECTION title="👥 Dados do cliente">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="sm:col-span-2">
-            <label className={labelCls}>Nome do cliente *</label>
-            <input value={form.cliente_nome} onChange={set('cliente_nome')} required className={inputCls} placeholder="Maria Santos" />
-          </div>
-          <div>
-            <label className={labelCls}>Email do cliente</label>
-            <input type="email" value={form.cliente_email} onChange={set('cliente_email')} className={inputCls} placeholder="maria@email.com" />
-          </div>
-          <div>
-            <label className={labelCls}>Telemóvel do cliente</label>
-            <input type="tel" value={form.cliente_telef} onChange={set('cliente_telef')} className={inputCls} placeholder="+351 9XX XXX XXX" />
-          </div>
+      <SECTION title="👥 Cliente">
+        <div>
+          <label className={labelCls}>Nome ou referência do cliente *</label>
+          <input value={form.cliente_nome} onChange={set('cliente_nome')} required className={inputCls} placeholder="Ex: Maria S. / Ref. 2024-08" />
         </div>
       </SECTION>
 
