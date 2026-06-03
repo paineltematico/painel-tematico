@@ -28,8 +28,7 @@ export async function POST(request: Request) {
       .single()
 
     if (dbError || !user) {
-      console.error('[login] db error:', dbError?.message, '| has_key:', !!process.env.SUPABASE_SERVICE_ROLE_KEY, '| email:', email.toLowerCase().trim())
-      return NextResponse.json({ error: dbError ? `Erro de base de dados: ${dbError.message}` : 'Utilizador não encontrado na base de dados' }, { status: 401 })
+      return NextResponse.json({ error: 'Email ou palavra-passe incorretos' }, { status: 401 })
     }
     if (!user.ativo) {
       return NextResponse.json({ error: 'Conta desativada. Contacte o administrador.' }, { status: 403 })
@@ -37,7 +36,7 @@ export async function POST(request: Request) {
 
     const valid = await verifyPassword(password, user.password_hash as string)
     if (!valid) {
-      return NextResponse.json({ error: 'Palavra-passe incorreta' }, { status: 401 })
+      return NextResponse.json({ error: 'Email ou palavra-passe incorretos' }, { status: 401 })
     }
 
     await (supabaseAdmin as any).from('admin_users').update({ ultimo_login: new Date().toISOString() }).eq('id', user.id)
