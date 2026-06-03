@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import {
   LayoutDashboard, Home, Users, Settings, Building2, FileText,
-  LogOut, Plus, ExternalLink, UserCog, HardHat, UsersRound,
+  LogOut, Plus, ExternalLink, UserCog, HardHat, UsersRound, Handshake,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { AdminRole } from '@/lib/auth'
@@ -27,6 +27,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/admin/blog',        label: 'Blog',         icon: FileText,        permission: 'blog.view' },
   { href: '/admin/construcao',  label: 'Construção',   icon: HardHat,         permission: 'construcao.view' },
   { href: '/admin/equipa',      label: 'Equipa',       icon: UsersRound,      permission: 'equipa.view' },
+  { href: '/admin/parceiros',   label: 'Parceiros',    icon: Handshake,       permission: 'leads.view' },
   { href: '/admin/definicoes',  label: 'Definições',   icon: Settings,        permission: 'definicoes.view' },
   { href: '/admin/utilizadores',label: 'Utilizadores', icon: UserCog,         permission: 'utilizadores.view' },
 ]

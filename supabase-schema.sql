@@ -213,3 +213,44 @@ create table if not exists videos_obra (
 alter table videos_obra enable row level security;
 create policy "videos_public_read" on videos_obra for select using (ativo = true);
 create policy "videos_admin_all"   on videos_obra for all   using (true) with check (true);
+
+-- ─────────────────────────────────────────────
+-- Parceiros (agentes imobiliários externos)
+-- ─────────────────────────────────────────────
+create table if not exists parceiros (
+  id            uuid primary key default gen_random_uuid(),
+  nome          text not null,
+  empresa       text,
+  email         text,
+  telefone      text,
+  ami           text,
+  notas         text,
+  ativo         boolean not null default true,
+  token_visita  text unique default encode(gen_random_bytes(16), 'hex'),
+  created_at    timestamptz not null default now()
+);
+
+create table if not exists visitas_parceiros (
+  id              uuid primary key default gen_random_uuid(),
+  parceiro_id     uuid references parceiros(id) on delete set null,
+  imovel_id       uuid references imoveis(id) on delete set null,
+  imovel_outro    text,
+  cliente_nome    text not null,
+  cliente_email   text,
+  cliente_telef   text,
+  data_visita     date not null,
+  hora_visita     time not null,
+  notas           text,
+  estado          text not null default 'pendente',
+  gcal_event_id   text,
+  created_at      timestamptz not null default now()
+);
+
+alter table parceiros        enable row level security;
+alter table visitas_parceiros enable row level security;
+
+-- Leitura/escrita públicas (página pública de agendamento)
+create policy "parceiros_public_insert" on parceiros        for insert with check (true);
+create policy "parceiros_admin_all"     on parceiros        for all    using (true) with check (true);
+create policy "visitas_public_insert"   on visitas_parceiros for insert with check (true);
+create policy "visitas_admin_all"       on visitas_parceiros for all    using (true) with check (true);
