@@ -68,6 +68,7 @@ export default function AddActivityForm({ leadId }: Props) {
             tipo === 'nota' ? 'Adicione uma nota...' :
             tipo === 'chamada' ? 'Resumo da chamada...' :
             tipo === 'email' ? 'O que foi enviado/discutido...' :
+            tipo === 'reuniao' ? 'O que foi discutido na reunião...' :
             'Notas sobre a visita...'
           }
           className="w-full px-3.5 py-2.5 rounded-xl border border-[#e2e8f0] text-sm focus:outline-none focus:ring-2 focus:ring-[#00545F]/30 focus:border-[#00545F] transition-all resize-none"

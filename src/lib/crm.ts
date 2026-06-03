@@ -33,6 +33,7 @@ export const ATIVIDADE_TIPOS: { value: AtividadeTipo; label: string; icon: strin
   { value: 'chamada',        label: 'Chamada telefónica', icon: '📞' },
   { value: 'email',          label: 'Email enviado',      icon: '✉️' },
   { value: 'visita',         label: 'Visita ao imóvel',   icon: '🏠' },
+  { value: 'reuniao',        label: 'Reunião',            icon: '🤝' },
   { value: 'mudanca_estado', label: 'Estado alterado',    icon: '🔄' },
 ]
 

@@ -65,7 +65,7 @@ export type VideoObra = {
 
 export type LeadEstado = 'novo' | 'contactado' | 'qualificado' | 'visita_agendada' | 'negociacao' | 'reserva' | 'ganho' | 'perdido'
 export type LeadPrioridade = 'baixa' | 'normal' | 'alta'
-export type AtividadeTipo = 'nota' | 'chamada' | 'email' | 'visita' | 'mudanca_estado'
+export type AtividadeTipo = 'nota' | 'chamada' | 'email' | 'visita' | 'reuniao' | 'mudanca_estado'
 export type LeadTemperatura = 'frio' | 'morno' | 'quente' | 'muito_quente'
 
 export type Unidade = {
