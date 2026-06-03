@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 import { hashPassword } from '@/lib/auth'
 import { getCurrentUser } from '@/lib/auth-server'
 import { can } from '@/lib/permissions'
@@ -12,7 +12,7 @@ export async function GET() {
     return NextResponse.json({ error: 'Sem permissão' }, { status: 403 })
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await (supabaseAdmin as any)
     .from('admin_users')
     .select('id, email, nome, role, ativo, ultimo_login, created_at')
     .order('created_at')
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
 
   const password_hash = await hashPassword(password)
 
-  const { data, error } = await supabase.from('admin_users').insert({
+  const { data, error } = await (supabaseAdmin as any).from('admin_users').insert({
     nome,
     email: email.toLowerCase().trim(),
     password_hash,

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 import { hashPassword } from '@/lib/auth'
 import { getCurrentUser } from '@/lib/auth-server'
 import { can } from '@/lib/permissions'
@@ -25,19 +25,21 @@ export async function PATCH(request: Request, { params }: Params) {
 
   // Prevent demoting the only super_admin
   if (body.role && body.role !== 'super_admin') {
-    const { count } = await supabase
+    const { count } = await (supabaseAdmin as any)
       .from('admin_users')
       .select('*', { count: 'exact', head: true })
       .eq('role', 'super_admin')
       .eq('ativo', true)
 
-    const { data: target } = await supabase.from('admin_users').select('role').eq('id', id).single()
+    const { data: target } = await (supabaseAdmin as any)
+      .from('admin_users').select('role').eq('id', id).single()
     if (target?.role === 'super_admin' && (count ?? 0) <= 1) {
       return NextResponse.json({ error: 'Deve existir pelo menos um Super Admin ativo' }, { status: 400 })
     }
   }
 
-  const { data, error } = await supabase.from('admin_users').update(updates).eq('id', id)
+  const { data, error } = await (supabaseAdmin as any)
+    .from('admin_users').update(updates).eq('id', id)
     .select('id, email, nome, role, ativo').single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
@@ -57,7 +59,7 @@ export async function DELETE(_: Request, { params }: Params) {
     return NextResponse.json({ error: 'Não pode eliminar a sua própria conta' }, { status: 400 })
   }
 
-  const { error } = await supabase.from('admin_users').delete().eq('id', id)
+  const { error } = await (supabaseAdmin as any).from('admin_users').delete().eq('id', id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ ok: true })
 }

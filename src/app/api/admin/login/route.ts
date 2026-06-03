@@ -1,14 +1,8 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 import { verifyPassword, createToken, hashPassword, COOKIE_NAME } from '@/lib/auth'
 import type { AdminRole } from '@/lib/auth'
-
-// Service role client — bypasses RLS for auth queries
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
 
 const COOKIE_OPTS = {
   httpOnly: true,
@@ -27,8 +21,7 @@ export async function POST(request: Request) {
 
   // ── Path A: email + password against admin_users table ───────────────────
   if (email) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data: user } = await (supabaseAdmin as any)
+        const { data: user } = await (supabaseAdmin as any)
       .from('admin_users')
       .select('id, email, nome, role, password_hash, ativo')
       .eq('email', email.toLowerCase().trim())
@@ -46,7 +39,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Palavra-passe incorreta' }, { status: 401 })
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await (supabaseAdmin as any).from('admin_users').update({ ultimo_login: new Date().toISOString() }).eq('id', user.id)
 
     const token = createToken({
@@ -93,14 +85,12 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: 'Campos obrigatórios em falta' }, { status: 400 })
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { count } = await (supabaseAdmin as any).from('admin_users').select('*', { count: 'exact', head: true })
   if ((count ?? 0) > 0) {
     return NextResponse.json({ error: 'Utilize o painel de utilizadores para adicionar membros.' }, { status: 409 })
   }
 
   const password_hash = await hashPassword(password)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabaseAdmin as any).from('admin_users').insert({
     nome,
     email: email.toLowerCase().trim(),
