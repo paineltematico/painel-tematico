@@ -35,7 +35,7 @@ export async function POST(request: Request) {
       .single()
 
     if (!user) {
-      return NextResponse.json({ error: 'Email ou palavra-passe incorretos' }, { status: 401 })
+      return NextResponse.json({ error: 'Utilizador não encontrado na base de dados' }, { status: 401 })
     }
     if (!user.ativo) {
       return NextResponse.json({ error: 'Conta desativada. Contacte o administrador.' }, { status: 403 })
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
 
     const valid = await verifyPassword(password, user.password_hash as string)
     if (!valid) {
-      return NextResponse.json({ error: 'Email ou palavra-passe incorretos' }, { status: 401 })
+      return NextResponse.json({ error: 'Palavra-passe incorreta' }, { status: 401 })
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
