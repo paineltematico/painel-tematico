@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Handshake, ExternalLink, Calendar, Building2, Copy, Check, User, ChevronDown, ChevronRight } from 'lucide-react'
+import { Handshake, ExternalLink, Calendar, Building2, Copy, Check, User, ChevronDown, ChevronRight, Plus, X, Loader2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 
 interface Visita {
@@ -45,6 +45,8 @@ const ESTADO_LABELS: Record<string, string> = {
   pendente: 'Pendente', confirmado: 'Confirmado', cancelado: 'Cancelado', realizado: 'Realizado'
 }
 
+const EMPTY_FORM = { nome: '', empresa: '', ami: '', email: '', telefone: '' }
+
 export default function ParceirosPage() {
   const [visitas, setVisitas]       = useState<Visita[]>([])
   const [parceiros, setParceiros]   = useState<Parceiro[]>([])
@@ -52,6 +54,10 @@ export default function ParceirosPage() {
   const [tab, setTab]               = useState<'visitas' | 'parceiros'>('visitas')
   const [expanded, setExpanded]     = useState<string | null>(null)
   const [copied, setCopied]         = useState(false)
+  const [showForm, setShowForm]     = useState(false)
+  const [form, setForm]             = useState(EMPTY_FORM)
+  const [saving, setSaving]         = useState(false)
+  const [formError, setFormError]   = useState('')
 
   const bookingUrl = typeof window !== 'undefined'
     ? `${window.location.origin}/agendar-visita`
@@ -85,6 +91,30 @@ export default function ParceirosPage() {
     setTimeout(() => setCopied(false), 2000)
   }
 
+  const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    setForm(f => ({ ...f, [k]: e.target.value }))
+
+  const createParceiro = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!form.nome.trim()) return
+    setSaving(true)
+    setFormError('')
+    const { data, error } = await supabase.from('parceiros').insert({
+      nome:     form.nome.trim(),
+      empresa:  form.empresa.trim() || null,
+      ami:      form.ami.trim()     || null,
+      email:    form.email.trim()   || null,
+      telefone: form.telefone.trim()|| null,
+      ativo:    true,
+    }).select('*, visitas_parceiros(id)').single()
+    setSaving(false)
+    if (error) { setFormError('Erro ao guardar. Tente novamente.'); return }
+    setParceiros(ps => [data as Parceiro, ...ps])
+    setForm(EMPTY_FORM)
+    setShowForm(false)
+    setTab('parceiros')
+  }
+
   return (
     <div className="max-w-5xl mx-auto">
 
@@ -99,16 +129,92 @@ export default function ParceirosPage() {
             <p className="text-[#64748b] text-sm">{parceiros.length} mediadores · {visitas.length} visitas</p>
           </div>
         </div>
-        <div className="flex items-center gap-2 bg-white border border-[#E8E3E3] rounded-xl px-4 py-2.5">
-          <code className="text-xs text-[#1F3F44] font-mono hidden sm:block">/agendar-visita</code>
-          <button onClick={copyLink} className="flex items-center gap-1.5 text-xs font-semibold text-[#00545F] hover:text-[#006B78] ml-1">
-            {copied ? <><Check className="w-3.5 h-3.5" /> Copiado!</> : <><Copy className="w-3.5 h-3.5" /> Copiar link</>}
+        <div className="flex items-center gap-2 flex-wrap justify-end">
+          <div className="flex items-center gap-2 bg-white border border-[#E8E3E3] rounded-xl px-4 py-2.5">
+            <code className="text-xs text-[#1F3F44] font-mono hidden sm:block">/agendar-visita</code>
+            <button onClick={copyLink} className="flex items-center gap-1.5 text-xs font-semibold text-[#00545F] hover:text-[#006B78] ml-1">
+              {copied ? <><Check className="w-3.5 h-3.5" /> Copiado!</> : <><Copy className="w-3.5 h-3.5" /> Copiar link</>}
+            </button>
+            <a href="/agendar-visita" target="_blank" className="text-[#94a3b8] hover:text-[#1F3F44]">
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          </div>
+          <button
+            onClick={() => { setShowForm(v => !v); setTab('parceiros'); setFormError('') }}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm ${showForm ? 'bg-[#f1f5f9] text-[#64748b] border border-[#E8E3E3]' : 'bg-[#00545F] text-white hover:bg-[#006B78]'}`}
+          >
+            {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+            {showForm ? 'Cancelar' : 'Novo parceiro'}
           </button>
-          <a href="/agendar-visita" target="_blank" className="text-[#94a3b8] hover:text-[#1F3F44]">
-            <ExternalLink className="w-3.5 h-3.5" />
-          </a>
         </div>
       </div>
+
+      {/* New partner inline form */}
+      {showForm && (
+        <div className="bg-white rounded-2xl border border-[#00545F]/20 shadow-sm mb-6 overflow-hidden">
+          <div className="px-6 py-4 bg-[#00545F]/5 border-b border-[#00545F]/10">
+            <h2 className="font-serif font-semibold text-[#1F3F44] text-base">Novo mediador parceiro</h2>
+          </div>
+          <form onSubmit={createParceiro} className="p-6 space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-semibold text-[#475569] uppercase tracking-wider mb-1.5">Nome completo *</label>
+                <input
+                  value={form.nome} onChange={set('nome')} required
+                  placeholder="João Silva"
+                  className="w-full px-4 py-2.5 rounded-xl border border-[#E8E3E3] text-sm text-[#1F3F44] placeholder:text-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-[#00545F]/30 focus:border-[#00545F] transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-[#475569] uppercase tracking-wider mb-1.5">Imobiliária / Empresa</label>
+                <input
+                  value={form.empresa} onChange={set('empresa')}
+                  placeholder="Remax Braga"
+                  className="w-full px-4 py-2.5 rounded-xl border border-[#E8E3E3] text-sm text-[#1F3F44] placeholder:text-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-[#00545F]/30 focus:border-[#00545F] transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-[#475569] uppercase tracking-wider mb-1.5">Código AMI</label>
+                <input
+                  value={form.ami} onChange={set('ami')}
+                  placeholder="12345"
+                  className="w-full px-4 py-2.5 rounded-xl border border-[#E8E3E3] text-sm text-[#1F3F44] placeholder:text-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-[#00545F]/30 focus:border-[#00545F] transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-[#475569] uppercase tracking-wider mb-1.5">Email</label>
+                <input
+                  type="email" value={form.email} onChange={set('email')}
+                  placeholder="joao@remax.pt"
+                  className="w-full px-4 py-2.5 rounded-xl border border-[#E8E3E3] text-sm text-[#1F3F44] placeholder:text-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-[#00545F]/30 focus:border-[#00545F] transition-all"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-[#475569] uppercase tracking-wider mb-1.5">Telemóvel</label>
+                <input
+                  type="tel" value={form.telefone} onChange={set('telefone')}
+                  placeholder="+351 9XX XXX XXX"
+                  className="w-full px-4 py-2.5 rounded-xl border border-[#E8E3E3] text-sm text-[#1F3F44] placeholder:text-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-[#00545F]/30 focus:border-[#00545F] transition-all"
+                />
+              </div>
+            </div>
+            {formError && (
+              <p className="text-red-600 text-sm bg-red-50 border border-red-200 rounded-xl px-4 py-2.5">{formError}</p>
+            )}
+            <div className="flex justify-end gap-3 pt-1">
+              <button type="button" onClick={() => { setShowForm(false); setForm(EMPTY_FORM); setFormError('') }}
+                className="px-5 py-2.5 rounded-xl border border-[#E8E3E3] text-sm text-[#64748b] font-medium hover:bg-[#f8fafc] transition-colors">
+                Cancelar
+              </button>
+              <button type="submit" disabled={saving || !form.nome.trim()}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#00545F] text-white text-sm font-semibold hover:bg-[#006B78] transition-colors disabled:opacity-50 shadow-sm">
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                Criar mediador
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
 
       {/* Stats */}
       <div className="grid grid-cols-4 gap-3 mb-6">
