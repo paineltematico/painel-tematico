@@ -32,7 +32,6 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/admin/parceiros',    label: 'Parceiros',    icon: Handshake,       permission: 'leads.view' },
   { href: '/admin/definicoes',   label: 'Definições',   icon: Settings,        permission: 'definicoes.view' },
   { href: '/admin/utilizadores', label: 'Utilizadores', icon: UserCog,         permission: 'utilizadores.view' },
-  { href: '/admin/permissoes',   label: 'Permissões',   icon: ShieldCheck,     permission: 'utilizadores.edit', superAdminOnly: true },
 ]
 
 interface Props {
@@ -82,12 +81,20 @@ export default function AdminSidebar({ user }: Props) {
           <div className="mt-3">
             <p className="text-white text-sm font-semibold truncate">{user.nome}</p>
             <p className="text-slate-400 text-xs truncate mb-2">{user.email}</p>
-            <span className={cn(
-              'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border',
-              ROLE_COLORS[user.role]
-            )}>
-              {ROLE_LABELS[user.role]}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className={cn(
+                'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border',
+                ROLE_COLORS[user.role]
+              )}>
+                {ROLE_LABELS[user.role]}
+              </span>
+              {user.role === 'super_admin' && (
+                <Link href="/admin/permissoes" title="Gerir permissões"
+                  className="text-purple-300 hover:text-white transition-colors">
+                  <ShieldCheck className="w-4 h-4" />
+                </Link>
+              )}
+            </div>
           </div>
         )}
         {!user && <p className="text-slate-400 text-xs mt-1">Administração</p>}
