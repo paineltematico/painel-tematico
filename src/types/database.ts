@@ -29,7 +29,11 @@ export type Projeto = {
   descricao: string | null
   localizacao: string | null
   cidade: string | null
-  imagem: string | null
+  imagem: string | null        // cover for listing cards
+  imagem_hero: string | null   // full-screen hero on detail page
+  fotos: string[]              // gallery (up to 20 images)
+  plantas: string[]            // floor plan downloads (images or PDFs)
+  videos: string[]             // YouTube / Vimeo URLs
   estado: ProjetoEstado
   unidades_total: number | null
   unidades_disponiveis: number | null
