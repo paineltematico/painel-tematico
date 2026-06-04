@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import { Loader2, Plus, X } from 'lucide-react'
+import { Loader2, Plus, X, Video, Upload } from 'lucide-react'
 import type { Projeto, ProjetoEstado } from '@/types/database'
 import ImageUpload from '@/components/admin/ImageUpload'
 import PlantaUpload from '@/components/admin/PlantaUpload'
@@ -12,7 +12,8 @@ type FormState = {
   nome: string; slug: string; subtitulo: string; descricao: string
   localizacao: string; cidade: string
   imagem: string        // cover for listing cards
-  imagem_hero: string   // full-screen hero
+  imagem_hero: string   // full-screen hero image
+  hero_video: string    // full-screen hero video (MP4/MOV/WEBM)
   fotos: string[]       // gallery
   plantas: string[]     // floor plan downloads
   videos: string[]      // YouTube / Vimeo URLs
@@ -32,6 +33,9 @@ export default function ProjetoForm({ projeto }: { projeto?: Projeto }) {
   const router = useRouter()
   const isEdit = Boolean(projeto)
 
+  const videoInputRef = useRef<HTMLInputElement>(null)
+  const [videoUploading, setVideoUploading] = useState(false)
+
   const [form, setForm] = useState<FormState>({
     nome:                projeto?.nome ?? '',
     slug:                projeto?.slug ?? '',
@@ -41,6 +45,7 @@ export default function ProjetoForm({ projeto }: { projeto?: Projeto }) {
     cidade:              projeto?.cidade ?? '',
     imagem:              projeto?.imagem ?? '',
     imagem_hero:         projeto?.imagem_hero ?? '',
+    hero_video:          projeto?.hero_video ?? '',
     fotos:               projeto?.fotos ?? [],
     plantas:             projeto?.plantas ?? [],
     videos:              projeto?.videos ?? [],
@@ -62,10 +67,25 @@ export default function ProjetoForm({ projeto }: { projeto?: Projeto }) {
     setForm((f) => ({ ...f, nome, ...(!isEdit && { slug: slugify(nome) }) }))
   }
 
-  const addVideo   = () => setForm(f => ({ ...f, videos: [...f.videos, ''] }))
+  const addVideo    = () => setForm(f => ({ ...f, videos: [...f.videos, ''] }))
   const removeVideo = (i: number) => setForm(f => ({ ...f, videos: f.videos.filter((_, j) => j !== i) }))
   const setVideo    = (i: number, val: string) =>
     setForm(f => { const v = [...f.videos]; v[i] = val; return { ...f, videos: v } })
+
+  const uploadHeroVideo = async (file: File) => {
+    if (!['video/mp4', 'video/quicktime', 'video/webm'].includes(file.type)) {
+      setError('Use MP4, MOV ou WEBM para o vídeo hero.'); return
+    }
+    setVideoUploading(true); setError('')
+    const fd = new FormData()
+    fd.append('file', file)
+    fd.append('folder', 'projetos/hero')
+    const res  = await fetch('/api/admin/upload', { method: 'POST', body: fd })
+    const data = await res.json()
+    if (res.ok) setForm(f => ({ ...f, hero_video: data.url }))
+    else setError(data.error ?? 'Erro no upload do vídeo')
+    setVideoUploading(false)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -80,6 +100,7 @@ export default function ProjetoForm({ projeto }: { projeto?: Projeto }) {
         cidade:               form.cidade || null,
         imagem:               form.imagem || null,
         imagem_hero:          form.imagem_hero || null,
+        hero_video:           form.hero_video || null,
         fotos:                form.fotos,
         plantas:              form.plantas,
         videos:               form.videos.filter(v => v.trim()),
@@ -156,15 +177,70 @@ export default function ProjetoForm({ projeto }: { projeto?: Projeto }) {
           />
         </div>
 
-        {/* Hero */}
+        {/* Hero image */}
         <div>
-          <label className={labelCls}>🖼 Imagem Hero <span className="normal-case text-[#94a3b8] font-normal">(fundo da página do projeto — efeito parallax)</span></label>
+          <label className={labelCls}>🖼 Imagem Hero <span className="normal-case text-[#94a3b8] font-normal">(fundo da página — efeito parallax; substituída pelo vídeo se existir)</span></label>
           <ImageUpload
             urls={form.imagem_hero ? [form.imagem_hero] : []}
             onChange={(urls) => setForm(f => ({ ...f, imagem_hero: urls[0] ?? '' }))}
             folder="projetos"
             single
           />
+        </div>
+
+        {/* Hero video */}
+        <div>
+          <label className={labelCls}>
+            🎬 Vídeo Hero
+            <span className="normal-case text-[#94a3b8] font-normal ml-1">(MP4, MOV ou WEBM — tem prioridade sobre a imagem)</span>
+          </label>
+
+          {form.hero_video ? (
+            <div className="relative rounded-xl overflow-hidden border border-[#e2e8f0] bg-black">
+              <video
+                src={form.hero_video}
+                className="w-full max-h-48 object-cover"
+                controls={false}
+                autoPlay muted loop playsInline
+              />
+              <div className="absolute top-2 right-2 flex gap-2">
+                <a href={form.hero_video} target="_blank" rel="noreferrer"
+                  className="text-[10px] font-semibold text-white bg-black/60 px-2 py-1 rounded-full">
+                  Ver
+                </a>
+                <button type="button"
+                  onClick={() => setForm(f => ({ ...f, hero_video: '' }))}
+                  className="text-white bg-red-500/80 hover:bg-red-600 px-2 py-1 rounded-full text-[10px] font-semibold">
+                  Remover
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div
+              onClick={() => !videoUploading && videoInputRef.current?.click()}
+              className="border-2 border-dashed border-[#e2e8f0] rounded-xl p-5 text-center cursor-pointer hover:border-[#00545F] hover:bg-teal-50/20 transition-all"
+            >
+              <input
+                ref={videoInputRef}
+                type="file"
+                accept="video/mp4,video/quicktime,video/webm,.mov"
+                className="hidden"
+                onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadHeroVideo(f); e.target.value = '' }}
+              />
+              {videoUploading ? (
+                <div className="flex items-center justify-center gap-2 text-[#00545F]">
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span className="text-sm">A carregar vídeo…</span>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center gap-1.5">
+                  <Video className="w-6 h-6 text-[#00545F]" />
+                  <p className="text-sm font-semibold text-[#1F3F44]">Carregar vídeo hero</p>
+                  <p className="text-xs text-[#94a3b8]">MP4, MOV ou WEBM · autoplay silencioso em loop</p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

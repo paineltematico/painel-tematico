@@ -30,7 +30,8 @@ export type Projeto = {
   localizacao: string | null
   cidade: string | null
   imagem: string | null        // cover for listing cards
-  imagem_hero: string | null   // full-screen hero on detail page
+  imagem_hero: string | null   // full-screen hero image on detail page
+  hero_video: string | null    // hero video (MP4/MOV/WEBM) — takes priority over imagem_hero
   fotos: string[]              // gallery (up to 20 images)
   plantas: string[]            // floor plan downloads (images or PDFs)
   videos: string[]             // YouTube / Vimeo URLs

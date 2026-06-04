@@ -19,10 +19,14 @@ export async function POST(request: Request) {
 
   if (!file) return NextResponse.json({ error: 'Ficheiro em falta' }, { status: 400 })
 
-  // Validate type (images + PDF for plant downloads)
-  const allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif', 'application/pdf']
+  // Validate type (images + PDF + video)
+  const allowed = [
+    'image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif',
+    'application/pdf',
+    'video/mp4', 'video/quicktime', 'video/webm',
+  ]
   if (!allowed.includes(file.type)) {
-    return NextResponse.json({ error: 'Tipo de ficheiro não suportado. Use JPEG, PNG, WebP ou PDF.' }, { status: 400 })
+    return NextResponse.json({ error: 'Tipo não suportado. Use JPEG, PNG, WebP, PDF, MP4, MOV ou WEBM.' }, { status: 400 })
   }
 
   // Build unique filename

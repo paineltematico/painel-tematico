@@ -35,16 +35,24 @@ export default function ProjetoHero({ projeto, unidadesDisponiveis }: Props) {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  const heroImg = projeto.imagem_hero || projeto.imagem
-  const estado  = ESTADO[projeto.estado]
-  const { Icon } = estado
+  const heroVideo = projeto.hero_video || null
+  const heroImg   = projeto.imagem_hero || projeto.imagem
+  const estado    = ESTADO[projeto.estado]
+  const { Icon }  = estado
 
   return (
     <section className="relative flex items-end overflow-hidden bg-[#0d1f21]"
       style={{ height: '100vh', minHeight: 600 }}>
 
-      {/* Parallax background */}
-      {heroImg && (
+      {/* Video hero (priority) */}
+      {heroVideo ? (
+        <video
+          src={heroVideo}
+          autoPlay muted loop playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+      ) : heroImg ? (
+        /* Parallax image fallback */
         <div
           ref={bgRef}
           className="absolute will-change-transform"
@@ -55,7 +63,7 @@ export default function ProjetoHero({ projeto, unidadesDisponiveis }: Props) {
             backgroundPosition: 'center',
           }}
         />
-      )}
+      ) : null}
 
       {/* Gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/15" />
