@@ -2,8 +2,7 @@
 
 import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
-import { Loader2, Plus, X, Video, Upload } from 'lucide-react'
+import { Loader2, Plus, X, Video } from 'lucide-react'
 import type { Projeto, ProjetoEstado } from '@/types/database'
 import ImageUpload from '@/components/admin/ImageUpload'
 import PlantaUpload from '@/components/admin/PlantaUpload'
@@ -110,13 +109,20 @@ export default function ProjetoForm({ projeto }: { projeto?: Projeto }) {
         ordem:                parseInt(form.ordem) || 0,
         ativo:                form.ativo,
       }
-      if (isEdit) {
-        const { error: err } = await supabase.from('projetos').update(payload).eq('id', projeto!.id)
-        if (err) throw err
-      } else {
-        const { error: err } = await supabase.from('projetos').insert(payload)
-        if (err) throw err
-      }
+
+      const url = isEdit
+        ? `/api/admin/projetos/${projeto!.id}`
+        : '/api/admin/projetos'
+      const method = isEdit ? 'PUT' : 'POST'
+
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error ?? `Erro ${res.status}`)
+
       router.push('/admin/projetos')
       router.refresh()
     } catch (err: unknown) {
