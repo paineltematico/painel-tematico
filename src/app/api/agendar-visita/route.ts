@@ -68,6 +68,7 @@ export async function POST(request: Request) {
 
   if (gcalId && gcalKey) {
     try {
+      console.log('[GCal] A criar evento para', data_visita, hora_visita)
       const eventId = await criarEventoCalendario({
         parceiro: { nome, empresa, ami, email },
         cliente:  { nome: cliente_nome, email: cliente_email, tel: cliente_telef },
@@ -76,13 +77,17 @@ export async function POST(request: Request) {
         hora:     hora_visita,
         notas,
       })
+      console.log('[GCal] Evento criado:', eventId)
       if (eventId) {
         await supabaseAdmin.from('visitas_parceiros').update({ gcal_event_id: eventId }).eq('id', visita.id)
       }
-    } catch (e) {
-      console.error('Google Calendar error:', e)
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e)
+      console.error('[GCal] ERRO:', msg)
       // Não falha — a visita fica registada mesmo sem o calendário
     }
+  } else {
+    console.warn('[GCal] Variáveis não configuradas — gcalId:', !!gcalId, 'gcalKey:', !!gcalKey)
   }
 
   return NextResponse.json({ ok: true, id: visita.id })
