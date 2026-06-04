@@ -5,12 +5,15 @@ import Link from 'next/link'
 import { Shield, Award, MapPin, Hammer, Users, Heart, ChevronDown, ArrowRight } from 'lucide-react'
 import type { MembroEquipa } from '@/types/database'
 import { EditableText } from '@/components/EditableText'
-import { EditableImage } from '@/components/EditableImage'
 
 interface Props {
   equipa: MembroEquipa[]
   sobreTexto: string
   amiNumero: string
+  manifestoCitacao: string
+  historiaP1: string
+  historiaP2: string
+  historiaP3: string
 }
 
 /* ─── data ─── */
@@ -76,7 +79,9 @@ function CountUp({ target, suffix, active }: { target: number; suffix: string; a
 }
 
 /* ─── component ─── */
-export default function SobreClient({ equipa, sobreTexto, amiNumero }: Props) {
+export default function SobreClient({
+  equipa, sobreTexto, amiNumero, manifestoCitacao, historiaP1, historiaP2, historiaP3,
+}: Props) {
   const [manifestoRef, manifestoVis] = useVisible()
   const [statsRef,     statsVis]     = useVisible(0.3)
   const [histRef,      histVis]      = useVisible()
@@ -152,9 +157,11 @@ export default function SobreClient({ equipa, sobreTexto, amiNumero }: Props) {
             <div className="lg:pl-2">
               <p className="font-serif italic font-bold text-[#1F3F44] leading-[1.15]"
                 style={{ fontSize: 'clamp(1.6rem,3.8vw,2.8rem)' }}>
-                "Cada tijolo conta uma história.<br />
-                Cada chave entregue é um sonho{' '}
-                <span className="text-[#00545F]">realizado."</span>
+                <EditableText
+                  settingKey="manifesto_citacao"
+                  value={manifestoCitacao}
+                  multiline
+                />
               </p>
               <div className="mt-7 flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-[#1F3F44] flex items-center justify-center flex-shrink-0">
@@ -229,12 +236,9 @@ export default function SobreClient({ equipa, sobreTexto, amiNumero }: Props) {
                 Nascemos em Braga.<br />Crescemos com as famílias.
               </h2>
               <div className="space-y-4 text-[#64748b] leading-relaxed">
-                <p>A Painel Temático nasceu da vontade de construir de forma diferente — com materiais de excelência, técnicas avançadas e um cuidado genuíno em cada detalhe.</p>
-                <p>Com projetos emblemáticos em Braga e arredores, especializamo-nos em habitação premium acessível. Porque acreditamos que qualidade de vida não deve ser um luxo reservado a poucos.</p>
-                <p>Cada projeto começa com uma pergunta simples:{' '}
-                  <em className="font-medium text-[#1F3F44] not-italic">"onde eu gostaria de viver?"</em>{' '}
-                  E construímos a resposta.
-                </p>
+                <p><EditableText settingKey="sobre_historia_p1" value={historiaP1} multiline /></p>
+                <p><EditableText settingKey="sobre_historia_p2" value={historiaP2} multiline /></p>
+                <p><EditableText settingKey="sobre_historia_p3" value={historiaP3} multiline /></p>
               </div>
               <div className="mt-8">
                 <Link href="/projetos"
@@ -363,19 +367,16 @@ export default function SobreClient({ equipa, sobreTexto, amiNumero }: Props) {
                     transition: `opacity .6s ease ${i * 80}ms, transform .6s ease ${i * 80}ms, box-shadow .3s, translate .3s`,
                   }}>
                   <div className="aspect-[3/4] bg-[#1F3F44] relative overflow-hidden">
-                    <EditableImage
-                      src={membro.foto}
-                      alt={membro.nome}
-                      folder="equipa"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                      saveTarget={{ type: 'record', table: 'equipa', id: membro.id, column: 'foto' }}
-                      placeholder={
-                        <span className="font-serif font-black text-white/15 select-none" style={{ fontSize: '5rem' }}>
-                          {membro.nome.charAt(0)}
-                        </span>
-                      }
-                    />
-                    {/* bio overlay (non-edit mode) */}
+                    {membro.foto
+                      ? <img src={membro.foto} alt={membro.nome} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                      : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <span className="font-serif font-black text-white/15 select-none" style={{ fontSize: '5rem' }}>
+                            {membro.nome.charAt(0)}
+                          </span>
+                        </div>
+                      )}
+                    {/* bio overlay */}
                     {membro.bio && (
                       <div className="absolute inset-0 bg-[#00545F]/85 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6 pointer-events-none">
                         <p className="text-white/90 text-sm leading-relaxed">{membro.bio}</p>

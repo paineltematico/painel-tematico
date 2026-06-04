@@ -27,8 +27,12 @@ export default async function SobreNosPage() {
       <Navbar />
       <SobreClient
         equipa={equipa}
-        sobreTexto={settings.sobre_texto ?? ''}
-        amiNumero={settings.ami_numero ?? ''}
+        sobreTexto={settings.sobre_texto}
+        amiNumero={settings.ami_numero}
+        manifestoCitacao={settings.manifesto_citacao}
+        historiaP1={settings.sobre_historia_p1}
+        historiaP2={settings.sobre_historia_p2}
+        historiaP3={settings.sobre_historia_p3}
       />
       <Footer />
     </>

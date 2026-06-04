@@ -2,13 +2,17 @@ import type { Metadata } from 'next'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import ContactForm from '@/components/ContactForm'
+import { getSettings } from '@/lib/settings'
+import { EditableText } from '@/components/EditableText'
 
 export const metadata: Metadata = {
   title: 'Contacto',
   description: 'Entre em contacto com a Painel Temático. Estamos disponíveis para responder a todas as suas questões.',
 }
 
-export default function ContactoPage() {
+export default async function ContactoPage() {
+  const settings = await getSettings()
+
   return (
     <>
       <Navbar />
@@ -37,8 +41,11 @@ export default function ContactoPage() {
                     Morada
                   </p>
                   <address className="not-italic text-white text-3xl sm:text-4xl font-light leading-snug">
-                    Rua do Carmo, 45,<br />
-                    4700-000 Braga
+                    <EditableText
+                      settingKey="contacto_morada"
+                      value={settings.contacto_morada}
+                      multiline
+                    />
                   </address>
                 </div>
 
@@ -54,10 +61,13 @@ export default function ContactoPage() {
                         Informações &amp; Orçamentos
                       </p>
                       <a
-                        href="mailto:geral@paineltematico.pt"
+                        href={`mailto:${settings.contacto_email}`}
                         className="text-white text-xl sm:text-2xl font-light hover:text-[#4ecdc4] transition-colors duration-200"
                       >
-                        geral@paineltematico.pt
+                        <EditableText
+                          settingKey="contacto_email"
+                          value={settings.contacto_email}
+                        />
                       </a>
                     </div>
 
@@ -66,17 +76,20 @@ export default function ContactoPage() {
                         Comercial
                       </p>
                       <a
-                        href="mailto:comercial@paineltematico.pt"
+                        href={`mailto:${settings.contacto_email_comercial}`}
                         className="text-white text-xl sm:text-2xl font-light hover:text-[#4ecdc4] transition-colors duration-200"
                       >
-                        comercial@paineltematico.pt
+                        <EditableText
+                          settingKey="contacto_email_comercial"
+                          value={settings.contacto_email_comercial}
+                        />
                       </a>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* ── Coluna direita: Telefone ── */}
+              {/* ── Coluna direita: Telefone + Horário ── */}
               <div>
                 <p className="text-[#4ecdc4] text-xs font-semibold uppercase tracking-[0.2em] mb-10">
                   Contacto
@@ -89,10 +102,13 @@ export default function ContactoPage() {
                       Geral
                     </p>
                     <a
-                      href="tel:+351913440800"
+                      href={`tel:${settings.contacto_telefone.replace(/\s/g, '')}`}
                       className="text-white text-4xl sm:text-5xl font-light tracking-tight hover:text-[#4ecdc4] transition-colors duration-200"
                     >
-                      913 440 800
+                      <EditableText
+                        settingKey="contacto_telefone"
+                        value={settings.contacto_telefone}
+                      />
                     </a>
                     <p className="text-white/40 text-sm mt-1">(Chamada para rede móvel)</p>
                   </div>
@@ -101,8 +117,18 @@ export default function ContactoPage() {
                     <p className="text-[#4ecdc4] text-xs uppercase tracking-[0.15em] mb-1">
                       Horário
                     </p>
-                    <p className="text-white text-lg font-light">Seg – Sex: 9h00 – 18h00</p>
-                    <p className="text-white text-lg font-light">Sábado: 10h00 – 13h00</p>
+                    <p className="text-white text-lg font-light">
+                      <EditableText
+                        settingKey="contacto_horario_semana"
+                        value={settings.contacto_horario_semana}
+                      />
+                    </p>
+                    <p className="text-white text-lg font-light">
+                      <EditableText
+                        settingKey="contacto_horario_sabado"
+                        value={settings.contacto_horario_sabado}
+                      />
+                    </p>
                   </div>
 
                 </div>
