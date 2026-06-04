@@ -121,6 +121,12 @@ export default async function HomePage() {
               Ver Imóveis
             </Link>
             <Link
+              href="/visita"
+              className="px-8 py-4 rounded-xl bg-[#00545F] text-white font-semibold text-sm tracking-wide hover:bg-[#006B78] transition-colors shadow-xl border border-[#00545F]/50"
+            >
+              Agendar Visita
+            </Link>
+            <Link
               href="/contacto"
               className="px-8 py-4 rounded-xl border border-white/40 text-white font-semibold text-sm tracking-wide hover:bg-white/10 transition-colors backdrop-blur-sm"
             >
