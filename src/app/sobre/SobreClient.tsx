@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { Shield, Award, MapPin, Hammer, Users, Heart, ChevronDown, ArrowRight } from 'lucide-react'
 import type { MembroEquipa } from '@/types/database'
+import { EditableText } from '@/components/EditableText'
+import { EditableImage } from '@/components/EditableImage'
 
 interface Props {
   equipa: MembroEquipa[]
@@ -113,9 +115,13 @@ export default function SobreClient({ equipa, sobreTexto, amiNumero }: Props) {
             <span className="block" style={{ fontSize: 'clamp(3.2rem,9vw,7.5rem)' }}>casas.</span>
           </h1>
 
-          <p className="mt-8 text-white/55 text-lg sm:text-xl font-light max-w-xl mx-auto leading-relaxed">
-            {sobreTexto || 'Construímos sonhos com rigor, qualidade e transparência — projetos pensados para durar.'}
-          </p>
+          <EditableText
+            settingKey="sobre_texto"
+            value={sobreTexto || 'Construímos sonhos com rigor, qualidade e transparência — projetos pensados para durar.'}
+            as="p"
+            className="mt-8 text-white/55 text-lg sm:text-xl font-light max-w-xl mx-auto leading-relaxed"
+            multiline
+          />
 
           <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/projetos"
@@ -357,18 +363,21 @@ export default function SobreClient({ equipa, sobreTexto, amiNumero }: Props) {
                     transition: `opacity .6s ease ${i * 80}ms, transform .6s ease ${i * 80}ms, box-shadow .3s, translate .3s`,
                   }}>
                   <div className="aspect-[3/4] bg-[#1F3F44] relative overflow-hidden">
-                    {membro.foto
-                      ? <img src={membro.foto} alt={membro.nome} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-                      : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <span className="font-serif font-black text-white/15 select-none" style={{ fontSize: '5rem' }}>
-                            {membro.nome.charAt(0)}
-                          </span>
-                        </div>
-                      )}
-                    {/* bio overlay */}
+                    <EditableImage
+                      src={membro.foto}
+                      alt={membro.nome}
+                      folder="equipa"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      saveTarget={{ type: 'record', table: 'equipa', id: membro.id, column: 'foto' }}
+                      placeholder={
+                        <span className="font-serif font-black text-white/15 select-none" style={{ fontSize: '5rem' }}>
+                          {membro.nome.charAt(0)}
+                        </span>
+                      }
+                    />
+                    {/* bio overlay (non-edit mode) */}
                     {membro.bio && (
-                      <div className="absolute inset-0 bg-[#00545F]/85 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6">
+                      <div className="absolute inset-0 bg-[#00545F]/85 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-6 pointer-events-none">
                         <p className="text-white/90 text-sm leading-relaxed">{membro.bio}</p>
                       </div>
                     )}

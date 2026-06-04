@@ -8,6 +8,7 @@ import ProjetoCard from '@/components/ProjetoCard'
 import ArtigoCard from '@/components/ArtigoCard'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
+import { EditableText } from '@/components/EditableText'
 import type { Projeto, Artigo } from '@/types/database'
 
 async function getFeaturedImoveis() {
@@ -106,10 +107,10 @@ export default async function HomePage() {
 
           {/* Slogan */}
           <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-white leading-tight mb-5 drop-shadow-sm">
-            {settings.hero_linha1}
+            <EditableText settingKey="hero_linha1" value={settings.hero_linha1} />
           </h1>
           <p className="text-white/80 text-lg sm:text-xl font-light tracking-widest uppercase mb-12">
-            {settings.hero_linha2}
+            <EditableText settingKey="hero_linha2" value={settings.hero_linha2} />
           </p>
 
           {/* CTAs */}

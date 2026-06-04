@@ -1,5 +1,9 @@
 import type { Metadata } from 'next'
+import { cookies } from 'next/headers'
 import WhatsAppButton from '@/components/WhatsAppButton'
+import EditModeBar from '@/components/EditModeBar'
+import { EditModeProvider } from '@/context/EditModeContext'
+import { getCurrentUser } from '@/lib/auth-server'
 import localFont from 'next/font/local'
 import { Playfair_Display } from 'next/font/google'
 import './globals.css'
@@ -47,12 +51,20 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // Check if edit mode cookie is set AND the user is actually authenticated
+  const cookieStore = await cookies()
+  const hasEditCookie = cookieStore.get('edit_mode')?.value === '1'
+  const editMode = hasEditCookie ? !!(await getCurrentUser()) : false
+
   return (
     <html lang="pt" className={`${ceraPro.variable} ${playfair.variable}`}>
       <body className="min-h-screen flex flex-col">
-        {children}
-        <WhatsAppButton />
+        <EditModeProvider initialEditMode={editMode}>
+          {children}
+          <WhatsAppButton />
+          <EditModeBar />
+        </EditModeProvider>
       </body>
     </html>
   )
