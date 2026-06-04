@@ -16,25 +16,10 @@ const SECTION = ({ title, children }: { title: string; children: React.ReactNode
   </div>
 )
 
-// Generate next 60 days
-function getDays() {
-  const days = []
-  const today = new Date()
-  const DIAS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
-  const MESES = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
-  for (let i = 0; i < 60; i++) {
-    const d = new Date(today)
-    d.setDate(today.getDate() + i)
-    const iso = d.toISOString().split('T')[0]
-    const label = i === 0 ? 'Hoje' : i === 1 ? 'Amanhã' : `${DIAS[d.getDay()]} ${d.getDate()}`
-    const sub   = i <= 1 ? `${DIAS[d.getDay()]} ${d.getDate()} ${MESES[d.getMonth()]}` : MESES[d.getMonth()]
-    days.push({ iso, label, sub, isWeekend: d.getDay() === 0 || d.getDay() === 6 })
-  }
-  return days
-}
+const MIN_NOTICE_HOURS = 2  // mínimo de horas de antecedência
 
-// Time slots 8:00 → 19:30 every 30 min
-function getSlots() {
+// All time slots 08:00 → 19:00 every 30 min
+function getAllSlots() {
   const slots = []
   for (let h = 8; h <= 19; h++) {
     for (const m of [0, 30]) {
@@ -45,8 +30,41 @@ function getSlots() {
   return slots
 }
 
-const DAYS  = getDays()
-const SLOTS = getSlots()
+const ALL_SLOTS = getAllSlots()
+const TODAY_ISO = new Date().toISOString().split('T')[0]
+
+// Returns available slots for a given date (filters past + near-future slots for today)
+function getAvailableSlots(dateISO: string): string[] {
+  if (dateISO !== TODAY_ISO) return ALL_SLOTS
+  const cutoff = new Date(Date.now() + MIN_NOTICE_HOURS * 60 * 60 * 1000)
+  return ALL_SLOTS.filter(s => {
+    const [h, m] = s.split(':').map(Number)
+    const slotTime = new Date()
+    slotTime.setHours(h, m, 0, 0)
+    return slotTime > cutoff
+  })
+}
+
+// Generate next 60 days (skip today if no slots available)
+function getDays() {
+  const days = []
+  const today = new Date()
+  const DIAS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
+  const MESES = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
+  for (let i = 0; i < 60; i++) {
+    const d = new Date(today)
+    d.setDate(today.getDate() + i)
+    const iso = d.toISOString().split('T')[0]
+    // Skip today if there are no more available slots
+    if (i === 0 && getAvailableSlots(iso).length === 0) continue
+    const label = i === 0 ? 'Hoje' : i === 1 ? 'Amanhã' : `${DIAS[d.getDay()]} ${d.getDate()}`
+    const sub   = i <= 1 ? `${DIAS[d.getDay()]} ${d.getDate()} ${MESES[d.getMonth()]}` : MESES[d.getMonth()]
+    days.push({ iso, label, sub })
+  }
+  return days
+}
+
+const DAYS = getDays()
 
 export default function AgendarVisitaForm({ imoveis }: Props) {
   const [form, setForm] = useState({
@@ -62,6 +80,18 @@ export default function AgendarVisitaForm({ imoveis }: Props) {
   const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
     setForm(f => ({ ...f, [k]: e.target.value }))
 
+  // When date changes, clear hora if it's no longer valid for the new date
+  const handleDateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newDate = e.target.value
+    const slots = getAvailableSlots(newDate)
+    setForm(f => ({
+      ...f,
+      data_visita: newDate,
+      hora_visita: slots.includes(f.hora_visita) ? f.hora_visita : '',
+    }))
+  }
+
+  const availableSlots = form.data_visita ? getAvailableSlots(form.data_visita) : ALL_SLOTS
   const imovelOutro = form.imovel_id === '__outro__'
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -89,7 +119,7 @@ export default function AgendarVisitaForm({ imoveis }: Props) {
         O pedido foi registado. A equipa Painel Temático entrará em contacto para confirmação.
       </p>
       <p className="text-[#1F3F44] font-semibold mt-4">
-        {DAYS.find(d => d.iso === form.data_visita)?.label} às {form.hora_visita}
+        {DAYS.find(d => d.iso === form.data_visita)?.label ?? form.data_visita} às {form.hora_visita}
       </p>
       <button
         onClick={() => { setSuccess(false); setForm({ nome: '', empresa: '', ami: '', email: '', telefone: '', imovel_id: '', imovel_outro: '', cliente_nome: '', cliente_email: '', cliente_telef: '', data_visita: '', hora_visita: '', notas: '' }) }}
@@ -165,7 +195,7 @@ export default function AgendarVisitaForm({ imoveis }: Props) {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className={labelCls}>Dia *</label>
-            <select value={form.data_visita} onChange={set('data_visita')} required
+            <select value={form.data_visita} onChange={handleDateChange} required
               className={`${inputCls} bg-white`}>
               <option value="">Escolher dia...</option>
               {DAYS.map(d => (
@@ -176,9 +206,10 @@ export default function AgendarVisitaForm({ imoveis }: Props) {
           <div>
             <label className={labelCls}>Hora *</label>
             <select value={form.hora_visita} onChange={set('hora_visita')} required
-              className={`${inputCls} bg-white`}>
+              className={`${inputCls} bg-white`}
+              disabled={!form.data_visita}>
               <option value="">Escolher hora...</option>
-              {SLOTS.map(s => <option key={s} value={s}>{s}</option>)}
+              {availableSlots.map(s => <option key={s} value={s}>{s}</option>)}
             </select>
           </div>
         </div>
