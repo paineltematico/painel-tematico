@@ -137,10 +137,6 @@ async function criarEventoCalendario(data: {
       description,
       start: { dateTime: startTime, timeZone: 'Europe/Lisbon' },
       end:   { dateTime: endTime,   timeZone: 'Europe/Lisbon' },
-      attendees: [
-        ...(data.parceiro.email ? [{ email: data.parceiro.email, displayName: data.parceiro.nome }] : []),
-        ...(data.cliente.email  ? [{ email: data.cliente.email,  displayName: data.cliente.nome  }] : []),
-      ],
     },
   })
 
