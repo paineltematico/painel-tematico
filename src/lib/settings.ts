@@ -24,6 +24,15 @@ export type SiteSettings = {
   sobre_historia_p1: string
   sobre_historia_p2: string
   sobre_historia_p3: string
+
+  // Homepage — secção "Porquê nós"
+  home_porque_titulo: string
+  home_card1_titulo: string
+  home_card1_desc: string
+  home_card2_titulo: string
+  home_card2_desc: string
+  home_card3_titulo: string
+  home_card3_desc: string
 }
 
 const DEFAULTS: SiteSettings = {
@@ -50,6 +59,15 @@ const DEFAULTS: SiteSettings = {
   sobre_historia_p1:  'A Painel Temático nasceu da vontade de construir de forma diferente — com materiais de excelência, técnicas avançadas e um cuidado genuíno em cada detalhe.',
   sobre_historia_p2:  'Com projetos emblemáticos em Braga e arredores, especializamo-nos em habitação premium acessível. Porque acreditamos que qualidade de vida não deve ser um luxo reservado a poucos.',
   sobre_historia_p3:  'Cada projeto começa com uma pergunta simples: "onde eu gostaria de viver?" E construímos a resposta.',
+
+  // Homepage — secção "Porquê nós"
+  home_porque_titulo:  'A diferença está nos detalhes',
+  home_card1_titulo:   'Confiança e Transparência',
+  home_card1_desc:     'Processo claro, sem surpresas. Acompanhamos cada etapa com total honestidade e profissionalismo.',
+  home_card2_titulo:   'Conhecimento Local',
+  home_card2_desc:     'Especialistas no mercado português. Sabemos onde estão as melhores oportunidades em cada zona.',
+  home_card3_titulo:   'Valorização do Imóvel',
+  home_card3_desc:     'Estratégias de marketing e networking para vender mais rápido e ao melhor preço de mercado.',
 }
 
 /** Fetch all settings from Supabase, falling back to defaults for missing keys. */

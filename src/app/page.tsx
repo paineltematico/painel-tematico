@@ -235,36 +235,47 @@ export default async function HomePage() {
           <div className="text-center mb-12">
             <p className="text-[#00545F] text-sm font-semibold uppercase tracking-widest mb-2">Porquê a Painel Temático</p>
             <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#1F3F44]">
-              A diferença está nos detalhes
+              <EditableText settingKey="home_porque_titulo" value={settings.home_porque_titulo} />
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                icon: <Shield className="w-7 h-7 text-[#00545F]" />,
-                title: 'Confiança e Transparência',
-                desc: 'Processo claro, sem surpresas. Acompanhamos cada etapa com total honestidade e profissionalismo.',
-              },
-              {
-                icon: <MapPin className="w-7 h-7 text-[#00545F]" />,
-                title: 'Conhecimento Local',
-                desc: 'Especialistas no mercado português. Sabemos onde estão as melhores oportunidades em cada zona.',
-              },
-              {
-                icon: <TrendingUp className="w-7 h-7 text-[#00545F]" />,
-                title: 'Valorização do Imóvel',
-                desc: 'Estratégias de marketing e networking para vender mais rápido e ao melhor preço de mercado.',
-              },
-            ].map((item) => (
-              <div key={item.title} className="bg-white rounded-2xl p-8 border border-[#e2e8f0] hover:shadow-lg transition-shadow">
-                <div className="w-14 h-14 rounded-xl bg-teal-50 flex items-center justify-center mb-5">
-                  {item.icon}
-                </div>
-                <h3 className="font-serif font-semibold text-[#1F3F44] text-xl mb-3">{item.title}</h3>
-                <p className="text-[#64748b] text-sm leading-relaxed">{item.desc}</p>
+            {/* Card 1 */}
+            <div className="bg-white rounded-2xl p-8 border border-[#e2e8f0] hover:shadow-lg transition-shadow">
+              <div className="w-14 h-14 rounded-xl bg-teal-50 flex items-center justify-center mb-5">
+                <Shield className="w-7 h-7 text-[#00545F]" />
               </div>
-            ))}
+              <h3 className="font-serif font-semibold text-[#1F3F44] text-xl mb-3">
+                <EditableText settingKey="home_card1_titulo" value={settings.home_card1_titulo} />
+              </h3>
+              <p className="text-[#64748b] text-sm leading-relaxed">
+                <EditableText settingKey="home_card1_desc" value={settings.home_card1_desc} multiline />
+              </p>
+            </div>
+            {/* Card 2 */}
+            <div className="bg-white rounded-2xl p-8 border border-[#e2e8f0] hover:shadow-lg transition-shadow">
+              <div className="w-14 h-14 rounded-xl bg-teal-50 flex items-center justify-center mb-5">
+                <MapPin className="w-7 h-7 text-[#00545F]" />
+              </div>
+              <h3 className="font-serif font-semibold text-[#1F3F44] text-xl mb-3">
+                <EditableText settingKey="home_card2_titulo" value={settings.home_card2_titulo} />
+              </h3>
+              <p className="text-[#64748b] text-sm leading-relaxed">
+                <EditableText settingKey="home_card2_desc" value={settings.home_card2_desc} multiline />
+              </p>
+            </div>
+            {/* Card 3 */}
+            <div className="bg-white rounded-2xl p-8 border border-[#e2e8f0] hover:shadow-lg transition-shadow">
+              <div className="w-14 h-14 rounded-xl bg-teal-50 flex items-center justify-center mb-5">
+                <TrendingUp className="w-7 h-7 text-[#00545F]" />
+              </div>
+              <h3 className="font-serif font-semibold text-[#1F3F44] text-xl mb-3">
+                <EditableText settingKey="home_card3_titulo" value={settings.home_card3_titulo} />
+              </h3>
+              <p className="text-[#64748b] text-sm leading-relaxed">
+                <EditableText settingKey="home_card3_desc" value={settings.home_card3_desc} multiline />
+              </p>
+            </div>
           </div>
         </div>
       </section>
