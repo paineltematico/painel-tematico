@@ -62,6 +62,20 @@ export async function POST(request: Request) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
+  // Resolver nome do imóvel
+  let imovelNome = imovel_outro || 'Imóvel não especificado'
+  if (imovel_id) {
+    const { data: imovelData } = await supabaseAdmin
+      .from('imoveis')
+      .select('titulo, tipologia, cidade')
+      .eq('id', imovel_id)
+      .single()
+    if (imovelData) {
+      imovelNome = [imovelData.titulo, imovelData.tipologia, imovelData.cidade]
+        .filter(Boolean).join(' · ')
+    }
+  }
+
   // Google Calendar — só se estiver configurado
   const gcalId = process.env.GOOGLE_CALENDAR_ID
   const gcalKey = process.env.GOOGLE_SERVICE_ACCOUNT_KEY
@@ -72,7 +86,7 @@ export async function POST(request: Request) {
       const eventId = await criarEventoCalendario({
         parceiro: { nome, empresa, ami, email },
         cliente:  { nome: cliente_nome, email: cliente_email, tel: cliente_telef },
-        imovel:   imovel_outro || imovel_id || 'Imóvel não especificado',
+        imovel:   imovelNome,
         data:     data_visita,
         hora:     hora_visita,
         notas,
