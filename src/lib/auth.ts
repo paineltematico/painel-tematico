@@ -9,6 +9,8 @@ export interface AdminUser {
   email: string
   nome: string
   role: AdminRole
+  permissions_extra?: string[]
+  permissions_denied?: string[]
 }
 
 export interface SessionPayload extends AdminUser {

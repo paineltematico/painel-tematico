@@ -99,6 +99,18 @@ export function can(role: AdminRole, permission: Permission): boolean {
   return ROLE_PERMISSIONS[role]?.includes(permission) ?? false
 }
 
+/** Checks permission for a specific user, respecting per-user overrides */
+export function canUser(
+  user: { role: AdminRole; permissions_extra?: string[]; permissions_denied?: string[] },
+  permission: Permission
+): boolean {
+  if (user.permissions_denied?.includes(permission)) return false
+  if (user.permissions_extra?.includes(permission))  return true
+  return can(user.role, permission)
+}
+
+export { ROLE_PERMISSIONS }
+
 export function canAll(role: AdminRole, permissions: Permission[]): boolean {
   return permissions.every((p) => can(role, p))
 }

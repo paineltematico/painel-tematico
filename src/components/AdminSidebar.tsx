@@ -5,35 +5,44 @@ import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import {
   LayoutDashboard, Home, Users, Settings, Building2, FileText,
-  LogOut, Plus, ExternalLink, UserCog, HardHat, UsersRound, Handshake,
+  LogOut, Plus, ExternalLink, UserCog, HardHat, UsersRound, Handshake, ShieldCheck,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { AdminRole } from '@/lib/auth'
 import { ROLE_LABELS, ROLE_COLORS } from '@/lib/auth'
-import { can } from '@/lib/permissions'
+import { canUser } from '@/lib/permissions'
+import type { Permission } from '@/lib/permissions'
 
 interface NavItem {
   href: string
   label: string
   icon: React.ElementType
-  permission: string
+  permission: Permission
+  superAdminOnly?: boolean
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: '/admin/dashboard',   label: 'Dashboard',    icon: LayoutDashboard, permission: 'dashboard.view' },
-  { href: '/admin/imoveis',     label: 'Imóveis',      icon: Home,            permission: 'imoveis.view' },
-  { href: '/admin/leads',       label: 'Leads / CRM',  icon: Users,           permission: 'leads.view' },
-  { href: '/admin/projetos',    label: 'Projetos',     icon: Building2,       permission: 'projetos.view' },
-  { href: '/admin/blog',        label: 'Blog',         icon: FileText,        permission: 'blog.view' },
-  { href: '/admin/construcao',  label: 'Construção',   icon: HardHat,         permission: 'construcao.view' },
-  { href: '/admin/equipa',      label: 'Equipa',       icon: UsersRound,      permission: 'equipa.view' },
-  { href: '/admin/parceiros',   label: 'Parceiros',    icon: Handshake,       permission: 'leads.view' },
-  { href: '/admin/definicoes',  label: 'Definições',   icon: Settings,        permission: 'definicoes.view' },
-  { href: '/admin/utilizadores',label: 'Utilizadores', icon: UserCog,         permission: 'utilizadores.view' },
+  { href: '/admin/dashboard',    label: 'Dashboard',    icon: LayoutDashboard, permission: 'dashboard.view' },
+  { href: '/admin/imoveis',      label: 'Imóveis',      icon: Home,            permission: 'imoveis.view' },
+  { href: '/admin/leads',        label: 'Leads / CRM',  icon: Users,           permission: 'leads.view' },
+  { href: '/admin/projetos',     label: 'Projetos',     icon: Building2,       permission: 'projetos.view' },
+  { href: '/admin/blog',         label: 'Blog',         icon: FileText,        permission: 'blog.view' },
+  { href: '/admin/construcao',   label: 'Construção',   icon: HardHat,         permission: 'construcao.view' },
+  { href: '/admin/equipa',       label: 'Equipa',       icon: UsersRound,      permission: 'equipa.view' },
+  { href: '/admin/parceiros',    label: 'Parceiros',    icon: Handshake,       permission: 'leads.view' },
+  { href: '/admin/definicoes',   label: 'Definições',   icon: Settings,        permission: 'definicoes.view' },
+  { href: '/admin/utilizadores', label: 'Utilizadores', icon: UserCog,         permission: 'utilizadores.view' },
+  { href: '/admin/permissoes',   label: 'Permissões',   icon: ShieldCheck,     permission: 'utilizadores.edit', superAdminOnly: true },
 ]
 
 interface Props {
-  user?: { nome: string; email: string; role: AdminRole } | null
+  user?: {
+    nome: string
+    email: string
+    role: AdminRole
+    permissions_extra?: string[]
+    permissions_denied?: string[]
+  } | null
 }
 
 export default function AdminSidebar({ user }: Props) {
@@ -47,9 +56,13 @@ export default function AdminSidebar({ user }: Props) {
     router.refresh()
   }
 
-  const visibleItems = NAV_ITEMS.filter((item) =>
-    can(role as AdminRole, item.permission as Parameters<typeof can>[1])
-  )
+  const visibleItems = NAV_ITEMS.filter((item) => {
+    if (item.superAdminOnly && role !== 'super_admin') return false
+    return canUser(
+      { role: role as AdminRole, permissions_extra: user?.permissions_extra, permissions_denied: user?.permissions_denied },
+      item.permission
+    )
+  })
 
   return (
     <aside className="w-64 flex-shrink-0 bg-[#1F3F44] min-h-screen flex flex-col">
@@ -111,7 +124,7 @@ export default function AdminSidebar({ user }: Props) {
       </nav>
 
       {/* Quick actions */}
-      {can(role as AdminRole, 'imoveis.create') && (
+      {canUser({ role: role as AdminRole, permissions_extra: user?.permissions_extra, permissions_denied: user?.permissions_denied }, 'imoveis.create') && (
         <div className="px-4 pb-2 space-y-2">
           <Link
             href="/admin/imoveis/novo"
