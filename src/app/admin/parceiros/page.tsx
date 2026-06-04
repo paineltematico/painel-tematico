@@ -100,12 +100,14 @@ export default function ParceirosPage() {
     setSaving(true)
     setFormError('')
     const { data, error } = await supabase.from('parceiros').insert({
-      nome:     form.nome.trim(),
-      empresa:  form.empresa.trim() || null,
-      ami:      form.ami.trim()     || null,
-      email:    form.email.trim()   || null,
-      telefone: form.telefone.trim()|| null,
-      ativo:    true,
+      nome:        form.nome.trim(),
+      empresa:     form.empresa.trim() || null,
+      ami:         form.ami.trim()     || null,
+      email:       form.email.trim()   || null,
+      telefone:    form.telefone.trim()|| null,
+      notas:       null,
+      token_visita:null,
+      ativo:       true,
     }).select('*, visitas_parceiros(id)').single()
     setSaving(false)
     if (error) { setFormError('Erro ao guardar. Tente novamente.'); return }

@@ -126,11 +126,13 @@ export type MembroEquipa = {
 export type Parceiro = {
   id: string
   nome: string
-  logo: string | null
-  website: string | null
-  categoria: string | null
-  ordem: number
+  empresa: string | null
+  email: string | null
+  telefone: string | null
+  ami: string | null
+  notas: string | null
   ativo: boolean
+  token_visita: string | null
   created_at: string
 }
 
