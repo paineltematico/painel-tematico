@@ -32,9 +32,10 @@ export type Projeto = {
   imagem: string | null        // cover for listing cards
   imagem_hero: string | null   // full-screen hero image on detail page
   hero_video: string | null    // hero video (MP4/MOV/WEBM) — takes priority over imagem_hero
-  fotos: string[]              // gallery (up to 20 images)
+  fotos: string[]              // gallery images (up to 20)
+  galeria_videos: string[]     // gallery autoplay videos (MP4/MOV/WEBM from Storage)
   plantas: string[]            // floor plan downloads (images or PDFs)
-  videos: string[]             // YouTube / Vimeo URLs
+  videos: string[]             // YouTube / Vimeo embed URLs
   estado: ProjetoEstado
   unidades_total: number | null
   unidades_disponiveis: number | null

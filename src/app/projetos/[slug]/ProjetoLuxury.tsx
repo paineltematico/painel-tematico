@@ -90,10 +90,24 @@ export default function ProjetoLuxury({
   }, [])
 
   /* lightbox */
-  const fotos   = Array.isArray(projeto.fotos)   ? projeto.fotos   : []
-  const plantas = Array.isArray(projeto.plantas) ? projeto.plantas : []
-  const videos  = Array.isArray(projeto.videos)  ? projeto.videos  : []
-  const embeds  = videos.map(v => ({ raw: v, embed: getEmbed(v) })).filter(v => v.embed)
+  const fotos         = Array.isArray(projeto.fotos)          ? projeto.fotos          : []
+  const galeriaVideos = Array.isArray(projeto.galeria_videos) ? projeto.galeria_videos : []
+  const plantas       = Array.isArray(projeto.plantas)        ? projeto.plantas        : []
+  const videos        = Array.isArray(projeto.videos)         ? projeto.videos         : []
+  const embeds        = videos.map(v => ({ raw: v, embed: getEmbed(v) })).filter(v => v.embed)
+
+  // Interleave gallery images and videos: video after every 3 images
+  type MediaItem = { type: 'img'; url: string; idx: number } | { type: 'vid'; url: string }
+  const mediaItems: MediaItem[] = []
+  let vIdx = 0
+  fotos.forEach((url, i) => {
+    mediaItems.push({ type: 'img', url, idx: i })
+    if ((i + 1) % 3 === 0 && vIdx < galeriaVideos.length) {
+      mediaItems.push({ type: 'vid', url: galeriaVideos[vIdx++] })
+    }
+  })
+  // Append any remaining videos
+  while (vIdx < galeriaVideos.length) mediaItems.push({ type: 'vid', url: galeriaVideos[vIdx++] })
 
   const [lb, setLb] = useState<number | null>(null)
   const prev = useCallback(() => setLb(a => (a! - 1 + fotos.length) % fotos.length), [fotos.length])
@@ -268,49 +282,45 @@ export default function ProjetoLuxury({
       )}
 
       {/* ══ GALLERY ══ */}
-      {fotos.length > 0 && (
+      {mediaItems.length > 0 && (
         <section style={{ background: D, paddingBlock: '7rem' }}>
-          <div className="max-w-7xl mx-auto px-8">
-            {/* Header */}
-            <div ref={r2} className="flex items-end justify-between mb-10"
-              style={{ transition: 'all 1s ease', opacity: v2 ? 1 : 0, transform: v2 ? 'none' : 'translateY(24px)' }}>
-              <div>
-                <p className="text-xs uppercase tracking-[0.3em] mb-2 opacity-40">Galeria</p>
-                <h2 className="font-serif font-bold" style={{ fontSize: 'clamp(2rem,4vw,4.5rem)' }}>
-                  {fotos.length} fotografias
-                </h2>
-              </div>
-              <p className="text-xs opacity-25 uppercase tracking-[0.2em] hidden sm:block">← → para navegar</p>
-            </div>
+          <div ref={r2} className="max-w-7xl mx-auto px-8"
+            style={{ transition: 'all 1s ease', opacity: v2 ? 1 : 0 }}>
 
-            {/* Featured first image */}
-            {fotos[0] && (
-              <div className="relative overflow-hidden rounded-xl mb-3 group cursor-zoom-in"
-                onClick={() => setLb(0)}
-                style={{ aspectRatio: '16/7', transition: 'all 1s ease 0.2s', opacity: v2 ? 1 : 0 }}>
-                <img src={fotos[0]} alt="Principal" className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700" />
-                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                  style={{ background: 'rgba(0,0,0,0.2)' }}>
-                  <ZoomIn className="w-10 h-10 text-white drop-shadow" />
-                </div>
-                <span className="absolute bottom-4 right-4 text-xs px-3 py-1 rounded-full" style={{ background: 'rgba(0,0,0,0.5)', color: 'rgba(255,255,255,0.6)' }}>
-                  1 / {fotos.length}
-                </span>
+            {/* Featured first item */}
+            {mediaItems[0] && (
+              <div className="relative overflow-hidden rounded-xl mb-3"
+                style={{ aspectRatio: '16/7' }}>
+                {mediaItems[0].type === 'vid'
+                  ? <video src={mediaItems[0].url} autoPlay muted loop playsInline className="w-full h-full object-cover" />
+                  : (
+                    <div className="w-full h-full group cursor-zoom-in" onClick={() => mediaItems[0].type === 'img' && setLb(mediaItems[0].idx)}>
+                      <img src={mediaItems[0].url} alt="Principal" className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700" />
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity" style={{ background: 'rgba(0,0,0,0.2)' }}>
+                        <ZoomIn className="w-10 h-10 text-white drop-shadow" />
+                      </div>
+                    </div>
+                  )}
               </div>
             )}
 
-            {/* Masonry rest */}
-            {fotos.length > 1 && (
+            {/* Masonry mix */}
+            {mediaItems.length > 1 && (
               <div className="columns-2 lg:columns-3 gap-3">
-                {fotos.slice(1).map((url, i) => (
-                  <div key={i} className="break-inside-avoid mb-3 group relative overflow-hidden rounded-xl cursor-zoom-in"
-                    onClick={() => setLb(i + 1)}>
-                    <img src={url} alt={`Foto ${i + 2}`} loading="lazy"
-                      className="w-full object-cover group-hover:scale-[1.04] transition-transform duration-500" />
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
-                      style={{ background: 'rgba(0,0,0,0.25)' }}>
-                      <ZoomIn className="w-6 h-6 text-white" />
-                    </div>
+                {mediaItems.slice(1).map((item, i) => (
+                  <div key={i} className="break-inside-avoid mb-3 overflow-hidden rounded-xl">
+                    {item.type === 'vid'
+                      ? <video src={item.url} autoPlay muted loop playsInline className="w-full object-cover" />
+                      : (
+                        <div className="group relative cursor-zoom-in" onClick={() => item.type === 'img' && setLb(item.idx)}>
+                          <img src={item.url} alt={`Foto ${item.idx + 1}`} loading="lazy"
+                            className="w-full object-cover group-hover:scale-[1.04] transition-transform duration-500" />
+                          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                            style={{ background: 'rgba(0,0,0,0.25)' }}>
+                            <ZoomIn className="w-6 h-6 text-white" />
+                          </div>
+                        </div>
+                      )}
                   </div>
                 ))}
               </div>

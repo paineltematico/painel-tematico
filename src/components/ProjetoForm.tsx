@@ -13,9 +13,10 @@ type FormState = {
   imagem: string        // cover for listing cards
   imagem_hero: string   // full-screen hero image
   hero_video: string    // full-screen hero video (MP4/MOV/WEBM)
-  fotos: string[]       // gallery
-  plantas: string[]     // floor plan downloads
-  videos: string[]      // YouTube / Vimeo URLs
+  fotos: string[]            // gallery images
+  galeria_videos: string[]   // gallery autoplay videos
+  plantas: string[]          // floor plan downloads
+  videos: string[]           // YouTube / Vimeo URLs
   estado: ProjetoEstado
   unidades_total: string; unidades_disponiveis: string
   ordem: string; ativo: boolean
@@ -32,8 +33,10 @@ export default function ProjetoForm({ projeto }: { projeto?: Projeto }) {
   const router = useRouter()
   const isEdit = Boolean(projeto)
 
-  const videoInputRef = useRef<HTMLInputElement>(null)
-  const [videoUploading, setVideoUploading] = useState(false)
+  const videoInputRef   = useRef<HTMLInputElement>(null)
+  const galeriaVidRef   = useRef<HTMLInputElement>(null)
+  const [videoUploading, setVideoUploading]     = useState(false)
+  const [galeriaVidUpl,  setGaleriaVidUpl]      = useState(false)
 
   const [form, setForm] = useState<FormState>({
     nome:                projeto?.nome ?? '',
@@ -46,6 +49,7 @@ export default function ProjetoForm({ projeto }: { projeto?: Projeto }) {
     imagem_hero:         projeto?.imagem_hero ?? '',
     hero_video:          projeto?.hero_video ?? '',
     fotos:               projeto?.fotos ?? [],
+    galeria_videos:      projeto?.galeria_videos ?? [],
     plantas:             projeto?.plantas ?? [],
     videos:              projeto?.videos ?? [],
     estado:              projeto?.estado ?? 'em_curso',
@@ -71,20 +75,27 @@ export default function ProjetoForm({ projeto }: { projeto?: Projeto }) {
   const setVideo    = (i: number, val: string) =>
     setForm(f => { const v = [...f.videos]; v[i] = val; return { ...f, videos: v } })
 
-  const uploadHeroVideo = async (file: File) => {
+  const uploadVideo = async (file: File, target: 'hero' | 'galeria') => {
     if (!['video/mp4', 'video/quicktime', 'video/webm'].includes(file.type)) {
-      setError('Use MP4, MOV ou WEBM para o vídeo hero.'); return
+      setError('Use MP4, MOV ou WEBM.'); return
     }
-    setVideoUploading(true); setError('')
+    if (target === 'hero') setVideoUploading(true)
+    else setGaleriaVidUpl(true)
+    setError('')
     const fd = new FormData()
     fd.append('file', file)
-    fd.append('folder', 'projetos/hero')
+    fd.append('folder', target === 'hero' ? 'projetos/hero' : 'projetos/galeria')
     const res  = await fetch('/api/admin/upload', { method: 'POST', body: fd })
     const data = await res.json()
-    if (res.ok) setForm(f => ({ ...f, hero_video: data.url }))
-    else setError(data.error ?? 'Erro no upload do vídeo')
-    setVideoUploading(false)
+    if (res.ok) {
+      if (target === 'hero') setForm(f => ({ ...f, hero_video: data.url }))
+      else setForm(f => ({ ...f, galeria_videos: [...f.galeria_videos, data.url] }))
+    } else setError(data.error ?? 'Erro no upload')
+    if (target === 'hero') setVideoUploading(false)
+    else setGaleriaVidUpl(false)
   }
+  const uploadHeroVideo    = (f: File) => uploadVideo(f, 'hero')
+  const removeGaleriaVideo = (i: number) => setForm(f => ({ ...f, galeria_videos: f.galeria_videos.filter((_, j) => j !== i) }))
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -101,6 +112,7 @@ export default function ProjetoForm({ projeto }: { projeto?: Projeto }) {
         imagem_hero:          form.imagem_hero || null,
         hero_video:           form.hero_video || null,
         fotos:                form.fotos,
+        galeria_videos:       form.galeria_videos,
         plantas:              form.plantas,
         videos:               form.videos.filter(v => v.trim()),
         estado:               form.estado,
@@ -250,11 +262,11 @@ export default function ProjetoForm({ projeto }: { projeto?: Projeto }) {
         </div>
       </div>
 
-      {/* ── Galeria ── */}
+      {/* ── Galeria de Imagens ── */}
       <div className="bg-white rounded-2xl border border-[#E8E3E3] p-6 space-y-4">
         <div>
           <h2 className="font-serif font-semibold text-[#1F3F44]">Galeria de Imagens</h2>
-          <p className="text-xs text-[#94a3b8] mt-0.5">Até 20 imagens — aparecem em grelha na página do projeto.</p>
+          <p className="text-xs text-[#94a3b8] mt-0.5">Até 20 imagens — aparecem na grelha da galeria.</p>
         </div>
         <ImageUpload
           urls={form.fotos}
@@ -262,6 +274,48 @@ export default function ProjetoForm({ projeto }: { projeto?: Projeto }) {
           folder="projetos"
           max={20}
         />
+      </div>
+
+      {/* ── Vídeos da Galeria (autoplay) ── */}
+      <div className="bg-white rounded-2xl border border-[#E8E3E3] p-6 space-y-4">
+        <div>
+          <h2 className="font-serif font-semibold text-[#1F3F44]">Vídeos da Galeria</h2>
+          <p className="text-xs text-[#94a3b8] mt-0.5">MP4, MOV ou WEBM — autoplay silencioso em loop, misturados com as imagens.</p>
+        </div>
+        {/* Preview list */}
+        {form.galeria_videos.length > 0 && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {form.galeria_videos.map((url, i) => (
+              <div key={url} className="relative rounded-xl overflow-hidden border border-[#e2e8f0] bg-black group aspect-video">
+                <video src={url} autoPlay muted loop playsInline className="w-full h-full object-cover" />
+                <button type="button" onClick={() => removeGaleriaVideo(i)}
+                  className="absolute top-2 right-2 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow">
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+        {/* Upload zone */}
+        {form.galeria_videos.length < 6 && (
+          <div onClick={() => !galeriaVidUpl && galeriaVidRef.current?.click()}
+            className="border-2 border-dashed border-[#e2e8f0] rounded-xl p-5 text-center cursor-pointer hover:border-[#00545F] hover:bg-teal-50/20 transition-all">
+            <input ref={galeriaVidRef} type="file" accept="video/mp4,video/quicktime,video/webm,.mov"
+              multiple className="hidden"
+              onChange={async (e) => {
+                const files = Array.from(e.target.files ?? [])
+                for (const f of files) await uploadVideo(f, 'galeria')
+                e.target.value = ''
+              }} />
+            {galeriaVidUpl
+              ? <div className="flex items-center justify-center gap-2 text-[#00545F]"><Loader2 className="w-5 h-5 animate-spin" /><span className="text-sm">A carregar…</span></div>
+              : <div className="flex flex-col items-center gap-1.5">
+                  <Video className="w-6 h-6 text-[#00545F]" />
+                  <p className="text-sm font-semibold text-[#1F3F44]">Adicionar vídeos à galeria</p>
+                  <p className="text-xs text-[#94a3b8]">MP4, MOV ou WEBM · máx. 6 vídeos</p>
+                </div>}
+          </div>
+        )}
       </div>
 
       {/* ── Vídeos ── */}
