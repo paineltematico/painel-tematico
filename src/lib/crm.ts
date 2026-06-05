@@ -35,6 +35,8 @@ export const ATIVIDADE_TIPOS: { value: AtividadeTipo; label: string; icon: strin
   { value: 'visita',         label: 'Visita ao imóvel',   icon: '🏠' },
   { value: 'reuniao',        label: 'Reunião',            icon: '🤝' },
   { value: 'mudanca_estado', label: 'Estado alterado',    icon: '🔄' },
+  { value: 'arquivamento',   label: 'Arquivamento',       icon: '🗄️' },
+  { value: 'transferencia',  label: 'Transferência',      icon: '↔️' },
 ]
 
 export function getEstado(v: LeadEstado) {

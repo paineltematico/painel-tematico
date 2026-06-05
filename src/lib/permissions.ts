@@ -9,9 +9,12 @@ export type Permission =
   | 'imoveis.edit'
   | 'imoveis.delete'
   | 'leads.view'
+  | 'leads.view_all'
   | 'leads.create'
   | 'leads.edit'
   | 'leads.delete'
+  | 'leads.archive'
+  | 'leads.comerciais'
   | 'projetos.view'
   | 'projetos.create'
   | 'projetos.edit'
@@ -43,7 +46,7 @@ const ROLE_PERMISSIONS: Record<AdminRole, Permission[]> = {
   super_admin: [
     'dashboard.view',
     'imoveis.view', 'imoveis.create', 'imoveis.edit', 'imoveis.delete',
-    'leads.view', 'leads.create', 'leads.edit', 'leads.delete',
+    'leads.view', 'leads.view_all', 'leads.create', 'leads.edit', 'leads.delete', 'leads.archive', 'leads.comerciais',
     'projetos.view', 'projetos.create', 'projetos.edit', 'projetos.delete',
     'unidades.view', 'unidades.edit',
     'obra.view', 'obra.edit',
@@ -57,7 +60,7 @@ const ROLE_PERMISSIONS: Record<AdminRole, Permission[]> = {
   diretor: [
     'dashboard.view',
     'imoveis.view', 'imoveis.create', 'imoveis.edit', 'imoveis.delete',
-    'leads.view', 'leads.create', 'leads.edit', 'leads.delete',
+    'leads.view', 'leads.view_all', 'leads.create', 'leads.edit', 'leads.delete', 'leads.archive', 'leads.comerciais',
     'projetos.view', 'projetos.create', 'projetos.edit', 'projetos.delete',
     'unidades.view', 'unidades.edit',
     'obra.view', 'obra.edit',
@@ -70,7 +73,7 @@ const ROLE_PERMISSIONS: Record<AdminRole, Permission[]> = {
   comercial: [
     'dashboard.view',
     'imoveis.view', 'imoveis.edit',
-    'leads.view', 'leads.create', 'leads.edit',
+    'leads.view', 'leads.create', 'leads.edit', 'leads.archive',
     'projetos.view',
     'unidades.view',
   ],

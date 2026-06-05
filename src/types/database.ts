@@ -71,7 +71,7 @@ export type VideoObra = {
 
 export type LeadEstado = 'novo' | 'contactado' | 'qualificado' | 'visita_agendada' | 'negociacao' | 'reserva' | 'ganho' | 'perdido'
 export type LeadPrioridade = 'baixa' | 'normal' | 'alta'
-export type AtividadeTipo = 'nota' | 'chamada' | 'email' | 'visita' | 'reuniao' | 'mudanca_estado'
+export type AtividadeTipo = 'nota' | 'chamada' | 'email' | 'visita' | 'reuniao' | 'mudanca_estado' | 'arquivamento' | 'transferencia'
 export type LeadTemperatura = 'frio' | 'morno' | 'quente' | 'muito_quente'
 
 export type Unidade = {
@@ -87,6 +87,13 @@ export type Unidade = {
   planta: string | null
   ordem: number
   created_at: string
+}
+
+export type AdminUserBasic = {
+  id: string
+  nome: string
+  email: string
+  role: string
 }
 
 export type AtualizacaoObra = {
@@ -159,9 +166,13 @@ export type Lead = {
   orcamento_min: number | null
   orcamento_max: number | null
   responsavel_id: string | null
+  criado_por: string | null
   notas: string | null
   lido: boolean
   fonte: string | null
+  arquivado: boolean
+  arquivado_em: string | null
+  arquivado_por: string | null
   created_at: string
   updated_at: string
 }

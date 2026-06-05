@@ -146,14 +146,15 @@ export default function ProjetoLuxury({
     <div style={{ background: D, color: '#F5F5F5', fontFamily: 'var(--font-cera)', overflowX: 'hidden' }}>
 
       {/* ══ OVERLAY NAV ══ */}
-      <nav className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-8 py-5"
+      <nav className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 sm:px-8 py-4 sm:py-5"
         style={{ background: 'linear-gradient(to bottom, rgba(7,16,15,0.95) 0%, rgba(7,16,15,0) 100%)' }}>
-        <Link href="/projetos" className="flex items-center gap-2 text-white/60 hover:text-white text-sm font-medium transition-colors group">
+        <Link href="/projetos" className="flex items-center gap-1.5 text-white/60 hover:text-white text-xs sm:text-sm font-medium transition-colors group flex-shrink-0">
           <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-          Todos os projetos
+          <span className="hidden sm:inline">Todos os projetos</span>
+          <span className="sm:hidden">Voltar</span>
         </Link>
-        <Link href="/"><img src="/logos/logo-white.png" alt="Painel Temático" className="h-6 w-auto opacity-70 hover:opacity-100 transition-opacity" /></Link>
-        <a href="#contacto" className="text-xs font-semibold uppercase tracking-[0.2em] px-5 py-2.5 rounded-full border transition-all"
+        <Link href="/" className="hidden sm:block"><img src="/logos/logo-white.png" alt="Painel Temático" className="h-6 w-auto opacity-70 hover:opacity-100 transition-opacity" /></Link>
+        <a href="#contacto" className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.15em] sm:tracking-[0.2em] px-3 sm:px-5 py-2 sm:py-2.5 rounded-full border transition-all flex-shrink-0"
           style={{ borderColor: G, color: G }}
           onMouseEnter={e => { const el = e.currentTarget; el.style.background = G; el.style.color = '#000' }}
           onMouseLeave={e => { const el = e.currentTarget; el.style.background = ''; el.style.color = G }}>
@@ -162,7 +163,7 @@ export default function ProjetoLuxury({
       </nav>
 
       {/* ══ HERO ══ */}
-      <section className="relative overflow-hidden" style={{ height: '100vh', minHeight: 700 }}>
+      <section className="relative overflow-hidden" style={{ height: '100svh', minHeight: 600 }}>
         {/* media */}
         {heroMedia
           ? <video src={heroMedia} autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover" />
@@ -173,49 +174,50 @@ export default function ProjetoLuxury({
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to top,rgba(7,16,15,0.97) 0%,rgba(7,16,15,0.25) 45%,rgba(7,16,15,0.88) 100%)' }} />
 
         {/* content */}
-        <div className="absolute inset-0 flex flex-col justify-end px-8 sm:px-14 pb-20 pt-32">
+        <div className="absolute inset-0 flex flex-col justify-end px-4 sm:px-8 md:px-14 pb-10 sm:pb-16 pt-24">
           {/* label row */}
-          <div className="flex items-center gap-4 mb-5" style={{ animation: 'fadeUp 1s 0.1s ease both' }}>
-            <span className="text-xs uppercase tracking-[0.3em] opacity-50">Empreendimento</span>
-            <span className="w-1 h-1 rounded-full opacity-30" style={{ background: G }} />
-            <span className="flex items-center gap-1.5 text-xs px-3 py-1 rounded-full border"
+          <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-5" style={{ animation: 'fadeUp 1s 0.1s ease both' }}>
+            <span className="text-[10px] sm:text-xs uppercase tracking-[0.25em] opacity-50">Empreendimento</span>
+            <span className="w-1 h-1 rounded-full opacity-30 hidden sm:block" style={{ background: G }} />
+            <span className="flex items-center gap-1.5 text-[10px] sm:text-xs px-2.5 sm:px-3 py-1 rounded-full border"
               style={{ background: estado.cls, borderColor: estado.border, color: estado.text }}>
               <StateIcon className="w-3 h-3" />{estado.label}
             </span>
           </div>
 
           {/* title */}
-          <h1 className="font-serif font-bold tracking-tight leading-[0.88] mb-5"
-            style={{ fontSize: 'clamp(3.5rem,9vw,10rem)', animation: 'fadeUp 1s 0.2s ease both' }}>
+          <h1 className="font-serif font-bold tracking-tight leading-[0.88] mb-3 sm:mb-5"
+            style={{ fontSize: 'clamp(2.2rem,8vw,10rem)', animation: 'fadeUp 1s 0.2s ease both' }}>
             {projeto.nome}
           </h1>
 
           {projeto.subtitulo && (
-            <p className="mb-6 opacity-55 font-light" style={{ fontSize: 'clamp(1rem,1.8vw,1.4rem)', animation: 'fadeUp 1s 0.35s ease both' }}>
+            <p className="mb-4 sm:mb-6 opacity-55 font-light" style={{ fontSize: 'clamp(0.9rem,1.8vw,1.4rem)', animation: 'fadeUp 1s 0.35s ease both' }}>
               {projeto.subtitulo}
             </p>
           )}
 
           {projeto.localizacao && (
-            <div className="flex items-center gap-2 mb-12 opacity-45" style={{ animation: 'fadeUp 1s 0.45s ease both' }}>
-              <MapPin className="w-4 h-4" style={{ color: G }} />
-              <span className="text-sm tracking-wide">{projeto.cidade ? `${projeto.cidade} · ` : ''}{projeto.localizacao}</span>
+            <div className="flex items-center gap-2 mb-6 sm:mb-8 opacity-45" style={{ animation: 'fadeUp 1s 0.45s ease both' }}>
+              <MapPin className="w-3.5 h-3.5 flex-shrink-0" style={{ color: G }} />
+              <span className="text-xs sm:text-sm tracking-wide">{projeto.cidade ? `${projeto.cidade} · ` : ''}{projeto.localizacao}</span>
             </div>
           )}
 
           {/* bottom stats row */}
-          <div className="flex items-center gap-10 pt-8" style={{ borderTop: '1px solid rgba(255,255,255,0.1)', animation: 'fadeUp 1s 0.55s ease both' }}>
+          <div className="flex flex-wrap items-center gap-5 sm:gap-10 pt-5 sm:pt-8"
+            style={{ borderTop: '1px solid rgba(255,255,255,0.1)', animation: 'fadeUp 1s 0.55s ease both' }}>
             {projeto.unidades_total && (
-              <div><p className="font-serif font-bold text-3xl">{projeto.unidades_total}</p><p className="text-[10px] uppercase tracking-[0.2em] opacity-40 mt-1">Unidades</p></div>
+              <div><p className="font-serif font-bold text-xl sm:text-3xl">{projeto.unidades_total}</p><p className="text-[9px] sm:text-[10px] uppercase tracking-[0.15em] opacity-40 mt-1">Unidades</p></div>
             )}
             {unidadesDisp > 0 && (
-              <div><p className="font-serif font-bold text-3xl" style={{ color: G }}>{unidadesDisp}</p><p className="text-[10px] uppercase tracking-[0.2em] opacity-40 mt-1">Disponíveis</p></div>
+              <div><p className="font-serif font-bold text-xl sm:text-3xl" style={{ color: G }}>{unidadesDisp}</p><p className="text-[9px] sm:text-[10px] uppercase tracking-[0.15em] opacity-40 mt-1">Disponíveis</p></div>
             )}
             {projeto.cidade && (
-              <div><p className="font-serif font-bold text-3xl">{projeto.cidade}</p><p className="text-[10px] uppercase tracking-[0.2em] opacity-40 mt-1">Localização</p></div>
+              <div className="hidden sm:block"><p className="font-serif font-bold text-3xl">{projeto.cidade}</p><p className="text-[10px] uppercase tracking-[0.15em] opacity-40 mt-1">Localização</p></div>
             )}
             {lastUpdate && projeto.estado === 'em_curso' && (
-              <div><p className="font-serif font-bold text-3xl" style={{ color: G }}>{lastUpdate.percentagem_conclusao}%</p><p className="text-[10px] uppercase tracking-[0.2em] opacity-40 mt-1">Concluído</p></div>
+              <div><p className="font-serif font-bold text-xl sm:text-3xl" style={{ color: G }}>{lastUpdate.percentagem_conclusao}%</p><p className="text-[9px] sm:text-[10px] uppercase tracking-[0.15em] opacity-40 mt-1">Concluído</p></div>
             )}
           </div>
         </div>
@@ -235,8 +237,8 @@ export default function ProjetoLuxury({
 
       {/* ══ STORY ══ */}
       {projeto.descricao && (
-        <section style={{ background: D3, paddingBlock: '9rem' }}>
-          <div ref={r1} className="max-w-6xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-5 gap-20 items-start"
+        <section className="py-16 sm:py-24 lg:py-32" style={{ background: D3 }}>
+          <div ref={r1} className="max-w-6xl mx-auto px-4 sm:px-8 grid grid-cols-1 lg:grid-cols-5 gap-8 sm:gap-12 lg:gap-20 items-start"
             style={{ transition: 'all 1.2s ease', opacity: v1 ? 1 : 0, transform: v1 ? 'none' : 'translateY(40px)' }}>
             <div className="lg:col-span-3">
               <p className="text-xs uppercase tracking-[0.3em] mb-8" style={{ color: G, opacity: 0.75 }}>A nossa visão</p>
@@ -283,14 +285,14 @@ export default function ProjetoLuxury({
 
       {/* ══ GALLERY ══ */}
       {mediaItems.length > 0 && (
-        <section style={{ background: D, paddingBlock: '7rem' }}>
-          <div ref={r2} className="max-w-7xl mx-auto px-8"
+        <section className="py-14 sm:py-20 lg:py-24" style={{ background: D }}>
+          <div ref={r2} className="max-w-7xl mx-auto px-4 sm:px-8"
             style={{ transition: 'all 1s ease', opacity: v2 ? 1 : 0 }}>
 
             {/* Featured first item */}
             {mediaItems[0] && (
               <div className="relative overflow-hidden rounded-xl mb-3"
-                style={{ aspectRatio: '16/7' }}>
+                style={{ aspectRatio: '16/9' }}>
                 {mediaItems[0].type === 'vid'
                   ? <video src={mediaItems[0].url} autoPlay muted loop playsInline className="w-full h-full object-cover" />
                   : (
@@ -306,7 +308,7 @@ export default function ProjetoLuxury({
 
             {/* Masonry mix */}
             {mediaItems.length > 1 && (
-              <div className="columns-2 lg:columns-3 gap-3">
+              <div className="columns-1 sm:columns-2 lg:columns-3 gap-3">
                 {mediaItems.slice(1).map((item, i) => (
                   <div key={i} className="break-inside-avoid mb-3 overflow-hidden rounded-xl">
                     {item.type === 'vid'
@@ -352,11 +354,11 @@ export default function ProjetoLuxury({
 
       {/* ══ VIDEOS ══ */}
       {embeds.length > 0 && (
-        <section style={{ background: D2, paddingBlock: '8rem' }}>
-          <div className="max-w-6xl mx-auto px-8">
+        <section className="py-16 sm:py-24 lg:py-28" style={{ background: D2 }}>
+          <div className="max-w-6xl mx-auto px-4 sm:px-8">
             <div ref={r3} style={{ transition: 'all 1s ease', opacity: v3 ? 1 : 0, transform: v3 ? 'none' : 'translateY(30px)' }}>
-              <p className="text-xs uppercase tracking-[0.3em] mb-4 opacity-40">Vídeos</p>
-              <h2 className="font-serif font-bold mb-14" style={{ fontSize: 'clamp(2rem,4vw,4.5rem)' }}>
+              <p className="text-[10px] sm:text-xs uppercase tracking-[0.3em] mb-3 sm:mb-4 opacity-40">Vídeos</p>
+              <h2 className="font-serif font-bold mb-8 sm:mb-12 lg:mb-14" style={{ fontSize: 'clamp(1.6rem,4vw,4.5rem)' }}>
                 Conheça o projeto
               </h2>
               <div className={`grid gap-5 ${embeds.length === 1 ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-2'}`}>
@@ -375,17 +377,17 @@ export default function ProjetoLuxury({
 
       {/* ══ PLANTS DOWNLOAD ══ */}
       {plantas.length > 0 && (
-        <section style={{ background: D, paddingBlock: '8rem' }}>
-          <div className="max-w-6xl mx-auto px-8">
+        <section className="py-16 sm:py-24 lg:py-28" style={{ background: D }}>
+          <div className="max-w-6xl mx-auto px-4 sm:px-8">
             <div ref={r4} style={{ transition: 'all 1s ease', opacity: v4 ? 1 : 0, transform: v4 ? 'none' : 'translateY(30px)' }}>
-              <p className="text-xs uppercase tracking-[0.3em] mb-4" style={{ color: G, opacity: 0.7 }}>Plantas</p>
-              <h2 className="font-serif font-bold mb-14" style={{ fontSize: 'clamp(2rem,4vw,4.5rem)' }}>
+              <p className="text-[10px] sm:text-xs uppercase tracking-[0.3em] mb-3 sm:mb-4" style={{ color: G, opacity: 0.7 }}>Plantas</p>
+              <h2 className="font-serif font-bold mb-8 sm:mb-12 lg:mb-14" style={{ fontSize: 'clamp(1.6rem,4vw,4.5rem)' }}>
                 Descarregar plantas
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 {plantas.map((url, i) => (
                   <a key={i} href={url} download target="_blank" rel="noreferrer"
-                    className="group flex items-center gap-5 p-6 rounded-2xl transition-all duration-300"
+                    className="group flex items-center gap-3 sm:gap-5 p-4 sm:p-5 rounded-2xl transition-all duration-300"
                     style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
                     onMouseEnter={e => { const el = e.currentTarget; el.style.background = 'rgba(201,169,110,0.07)'; el.style.borderColor = 'rgba(201,169,110,0.3)' }}
                     onMouseLeave={e => { const el = e.currentTarget; el.style.background = 'rgba(255,255,255,0.04)'; el.style.borderColor = 'rgba(255,255,255,0.07)' }}>
@@ -410,15 +412,15 @@ export default function ProjetoLuxury({
 
       {/* ══ UNITS ══ */}
       {unidades.length > 0 && (
-        <section id="unidades" style={{ background: D2, paddingBlock: '8rem' }}>
-          <div className="max-w-7xl mx-auto px-8">
+        <section id="unidades" className="py-16 sm:py-24 lg:py-28" style={{ background: D2 }}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-8">
             <div ref={r5} style={{ transition: 'all 1s ease', opacity: v5 ? 1 : 0, transform: v5 ? 'none' : 'translateY(30px)' }}>
-              <p className="text-xs uppercase tracking-[0.3em] mb-4 opacity-40">Disponibilidade</p>
-              <h2 className="font-serif font-bold mb-14" style={{ fontSize: 'clamp(2rem,4vw,4.5rem)' }}>
+              <p className="text-[10px] sm:text-xs uppercase tracking-[0.3em] mb-3 sm:mb-4 opacity-40">Disponibilidade</p>
+              <h2 className="font-serif font-bold mb-8 sm:mb-12 lg:mb-14" style={{ fontSize: 'clamp(1.6rem,4vw,4.5rem)' }}>
                 Frações disponíveis
               </h2>
               {/* Horizontal scroll */}
-              <div className="flex gap-4 overflow-x-auto pb-4" style={{ scrollbarWidth: 'thin', scrollbarColor: `${G} transparent` }}>
+              <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4" style={{ scrollbarWidth: 'thin', scrollbarColor: `${G} transparent` }}>
                 {unidades.map((u, i) => {
                   const isDisp     = u.estado === 'disponivel'
                   const isReserved = u.estado === 'reservado'
@@ -427,8 +429,9 @@ export default function ProjetoLuxury({
                   const isMuted    = isVendido || isEmBreve
                   return (
                     <div key={u.id}
-                      className="group flex-shrink-0 w-64 rounded-2xl p-6 relative overflow-hidden"
+                      className="group flex-shrink-0 rounded-2xl p-4 sm:p-5 relative overflow-hidden"
                       style={{
+                        width: 'clamp(190px, 46vw, 256px)',
                         background: isMuted
                           ? 'rgba(255,255,255,0.02)'
                           : isDisp
@@ -508,16 +511,16 @@ export default function ProjetoLuxury({
 
       {/* ══ TIMELINE ══ */}
       {atualizacoes.length > 0 && projeto.estado === 'em_curso' && (
-        <section style={{ background: D3, paddingBlock: '8rem' }}>
-          <div className="max-w-4xl mx-auto px-8">
-            <p className="text-xs uppercase tracking-[0.3em] mb-4 opacity-40">Progresso</p>
-            <h2 className="font-serif font-bold mb-16" style={{ fontSize: 'clamp(2rem,4vw,4.5rem)' }}>Evolução da obra</h2>
+        <section className="py-16 sm:py-24 lg:py-28" style={{ background: D3 }}>
+          <div className="max-w-4xl mx-auto px-4 sm:px-8">
+            <p className="text-[10px] sm:text-xs uppercase tracking-[0.3em] mb-3 sm:mb-4 opacity-40">Progresso</p>
+            <h2 className="font-serif font-bold mb-8 sm:mb-12 lg:mb-16" style={{ fontSize: 'clamp(1.6rem,4vw,4.5rem)' }}>Evolução da obra</h2>
             <div className="relative">
               <div className="absolute left-5 top-0 bottom-0 w-px" style={{ background: 'rgba(255,255,255,0.07)' }} />
               <div className="absolute left-5 top-0 w-px origin-top" style={{ background: G, opacity: 0.5, height: '100%', transform: 'scaleY(1)', transition: 'transform 2s ease' }} />
               <div className="space-y-12">
                 {atualizacoes.map((a, i) => (
-                  <div key={a.id} className="flex gap-8">
+                  <div key={a.id} className="flex gap-4 sm:gap-8">
                     <div className="relative z-10 w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 font-serif font-bold text-xs"
                       style={{
                         background: i === 0 ? G : D3,
@@ -538,7 +541,7 @@ export default function ProjetoLuxury({
                       {a.fotos && a.fotos.length > 0 && (
                         <div className="flex gap-2 mt-4">
                           {a.fotos.slice(0, 4).map((f, fi) => (
-                            <img key={fi} src={f} alt="" className="w-20 h-14 object-cover rounded-lg opacity-70 hover:opacity-100 transition-opacity" />
+                            <img key={fi} src={f} alt="" className="w-14 h-10 sm:w-20 sm:h-14 object-cover rounded-lg opacity-70 hover:opacity-100 transition-opacity" />
                           ))}
                         </div>
                       )}
@@ -552,38 +555,38 @@ export default function ProjetoLuxury({
       )}
 
       {/* ══ CONTACT ══ */}
-      <section id="contacto" style={{ background: D2, paddingBlock: '9rem' }}>
-        <div ref={r6} className="max-w-2xl mx-auto px-8"
+      <section id="contacto" className="py-16 sm:py-24 lg:py-28" style={{ background: D2 }}>
+        <div ref={r6} className="max-w-2xl mx-auto px-4 sm:px-8"
           style={{ transition: 'all 1.2s ease', opacity: v6 ? 1 : 0, transform: v6 ? 'none' : 'translateY(30px)' }}>
-          <p className="text-xs uppercase tracking-[0.3em] mb-6" style={{ color: G, opacity: 0.7 }}>Contacto</p>
-          <h2 className="font-serif font-bold leading-tight mb-6 text-white/90" style={{ fontSize: 'clamp(2rem,4vw,4rem)' }}>
+          <p className="text-[10px] sm:text-xs uppercase tracking-[0.3em] mb-5 sm:mb-6" style={{ color: G, opacity: 0.7 }}>Contacto</p>
+          <h2 className="font-serif font-bold leading-tight mb-4 sm:mb-6 text-white/90" style={{ fontSize: 'clamp(1.7rem,4vw,4rem)' }}>
             Marque uma visita ao projeto
           </h2>
-          <p className="opacity-40 text-sm leading-relaxed mb-12">
+          <p className="opacity-40 text-sm leading-relaxed mb-8 sm:mb-10">
             A nossa equipa está disponível para o acompanhar numa visita exclusiva e personalizada.
           </p>
           <div className="space-y-4">
             <Link href="/visita"
-              className="flex items-center gap-4 w-full group rounded-xl font-semibold text-sm text-black"
-              style={{ padding: '1.25rem 1.5rem', background: G }}>
-              <Calendar className="w-5 h-5 flex-shrink-0" />
+              className="flex items-center gap-3 sm:gap-4 w-full group rounded-xl font-semibold text-sm text-black"
+              style={{ padding: '1rem 1.25rem', background: G }}>
+              <Calendar className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
               <span className="tracking-wide">Agendar Visita Privada</span>
               <ChevronRight className="w-4 h-4 ml-auto group-hover:translate-x-1 transition-transform" />
             </Link>
             <a href="https://wa.me/351913440800"
-              className="flex items-center gap-4 w-full rounded-xl text-sm text-white/60 transition-colors"
-              style={{ padding: '1.25rem 1.5rem', border: '1px solid rgba(255,255,255,0.08)' }}
+              className="flex items-center gap-3 sm:gap-4 w-full rounded-xl text-sm text-white/60 transition-colors"
+              style={{ padding: '1rem 1.25rem', border: '1px solid rgba(255,255,255,0.08)' }}
               onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
               onMouseLeave={e => (e.currentTarget.style.background = '')}>
-              <MessageCircle className="w-5 h-5 flex-shrink-0" style={{ color: G }} />
+              <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" style={{ color: G }} />
               WhatsApp — resposta imediata
             </a>
             <a href="tel:+351913440800"
-              className="flex items-center gap-4 w-full rounded-xl text-sm text-white/60 transition-colors"
-              style={{ padding: '1.25rem 1.5rem', border: '1px solid rgba(255,255,255,0.08)' }}
+              className="flex items-center gap-3 sm:gap-4 w-full rounded-xl text-sm text-white/60 transition-colors"
+              style={{ padding: '1rem 1.25rem', border: '1px solid rgba(255,255,255,0.08)' }}
               onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
               onMouseLeave={e => (e.currentTarget.style.background = '')}>
-              <Phone className="w-5 h-5 flex-shrink-0" style={{ color: G }} />
+              <Phone className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" style={{ color: G }} />
               +351 913 440 800
             </a>
           </div>
@@ -591,15 +594,15 @@ export default function ProjetoLuxury({
       </section>
 
       {/* ══ FOOTER STRIP ══ */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-8 py-6"
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 sm:px-8 py-5 sm:py-6"
         style={{ background: D, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
         <Link href="/"><img src="/logos/logo-white.png" alt="Painel Temático" className="h-5 w-auto opacity-35" /></Link>
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4 sm:gap-6">
           {[{ label: 'Projetos', href: '/projetos' }, { label: 'Imóveis', href: '/imoveis' }, { label: 'Contacto', href: '/contacto' }].map(({ label, href }) => (
-            <Link key={href} href={href} className="text-xs opacity-25 hover:opacity-50 uppercase tracking-[0.2em] transition-opacity">{label}</Link>
+            <Link key={href} href={href} className="text-[10px] sm:text-xs opacity-25 hover:opacity-50 uppercase tracking-[0.15em] transition-opacity">{label}</Link>
           ))}
         </div>
-        <p className="text-xs opacity-15">© 2025 Painel Temático</p>
+        <p className="text-[10px] sm:text-xs opacity-15">© 2025 Painel Temático</p>
       </div>
 
       <style>{`
@@ -651,16 +654,14 @@ function ProjetoForm({ projetoNome, projetoId }: { projetoNome: string; projetoI
         <input required style={inp} value={form.nome} placeholder="O seu nome"
           onChange={e => setForm(f => ({ ...f, nome: e.target.value }))}
           onFocus={e => (e.target.style.borderColor = G)} onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.1)')} /></div>
-      <div className="grid grid-cols-2 gap-4">
-        <div><label style={lbl}>Email</label>
-          <input required type="email" style={inp} value={form.email} placeholder="email@exemplo.pt"
-            onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-            onFocus={e => (e.target.style.borderColor = G)} onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.1)')} /></div>
-        <div><label style={lbl}>Telefone</label>
-          <input style={inp} value={form.telefone} placeholder="+351 9xx xxx xxx"
-            onChange={e => setForm(f => ({ ...f, telefone: e.target.value }))}
-            onFocus={e => (e.target.style.borderColor = G)} onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.1)')} /></div>
-      </div>
+      <div><label style={lbl}>Email</label>
+        <input required type="email" style={inp} value={form.email} placeholder="email@exemplo.pt"
+          onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+          onFocus={e => (e.target.style.borderColor = G)} onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.1)')} /></div>
+      <div><label style={lbl}>Telefone</label>
+        <input style={inp} value={form.telefone} placeholder="+351 9xx xxx xxx"
+          onChange={e => setForm(f => ({ ...f, telefone: e.target.value }))}
+          onFocus={e => (e.target.style.borderColor = G)} onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.1)')} /></div>
       <div><label style={lbl}>Mensagem</label>
         <textarea rows={4} style={{ ...inp, resize: 'none' }} value={form.mensagem} placeholder="Tenho interesse neste projeto..."
           onChange={e => setForm(f => ({ ...f, mensagem: e.target.value }))}
