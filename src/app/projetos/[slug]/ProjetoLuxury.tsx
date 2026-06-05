@@ -420,34 +420,73 @@ export default function ProjetoLuxury({
               {/* Horizontal scroll */}
               <div className="flex gap-4 overflow-x-auto pb-4" style={{ scrollbarWidth: 'thin', scrollbarColor: `${G} transparent` }}>
                 {unidades.map((u, i) => {
-                  const isDisp = u.estado === 'disponivel'
+                  const isDisp     = u.estado === 'disponivel'
                   const isReserved = u.estado === 'reservado'
+                  const isVendido  = u.estado === 'vendido'
                   return (
-                    <div key={u.id} className="flex-shrink-0 w-64 rounded-2xl p-6 transition-all duration-500"
+                    <div key={u.id}
+                      className="group flex-shrink-0 w-64 rounded-2xl p-6 relative overflow-hidden"
                       style={{
-                        background: isDisp ? 'rgba(201,169,110,0.06)' : 'rgba(255,255,255,0.03)',
-                        border: `1px solid ${isDisp ? 'rgba(201,169,110,0.3)' : 'rgba(255,255,255,0.08)'}`,
-                        opacity: v5 ? 1 : 0,
+                        background: isVendido
+                          ? 'rgba(255,255,255,0.02)'
+                          : isDisp
+                            ? 'rgba(201,169,110,0.06)'
+                            : 'rgba(255,255,255,0.03)',
+                        border: `1px solid ${isVendido ? 'rgba(255,255,255,0.04)' : isDisp ? 'rgba(201,169,110,0.3)' : 'rgba(255,255,255,0.1)'}`,
+                        opacity: v5 ? (isVendido ? 0.45 : 1) : 0,
                         transform: v5 ? 'none' : 'translateY(20px)',
                         transition: `all 0.6s ease ${i * 60}ms`,
                       }}>
+
+                      {/* Diagonal "RESERVADO" watermark */}
+                      {isReserved && (
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-500 opacity-100 group-hover:opacity-10">
+                          <span
+                            className="font-serif font-bold text-2xl tracking-[0.2em] uppercase select-none"
+                            style={{
+                              color: '#fbbf24',
+                              transform: 'rotate(-30deg)',
+                              opacity: 0.25,
+                              letterSpacing: '0.25em',
+                            }}
+                          >
+                            Reservado
+                          </span>
+                        </div>
+                      )}
+
                       <div className="flex items-center justify-between mb-6">
-                        <p className="font-serif font-bold text-2xl text-white/90">{u.referencia}</p>
+                        <p className={`font-serif font-bold text-2xl ${isVendido ? 'text-white/30' : 'text-white/90'}`}>{u.referencia}</p>
                         <span className="text-[10px] font-semibold uppercase tracking-[0.15em] px-2.5 py-1 rounded-full"
                           style={{
                             background: isDisp ? 'rgba(201,169,110,0.15)' : isReserved ? 'rgba(251,191,36,0.1)' : 'rgba(255,255,255,0.05)',
-                            color: isDisp ? G : isReserved ? '#fbbf24' : 'rgba(255,255,255,0.3)',
+                            color: isDisp ? G : isReserved ? '#fbbf24' : 'rgba(255,255,255,0.2)',
                           }}>
                           {isDisp ? 'Disponível' : isReserved ? 'Reservado' : 'Vendido'}
                         </span>
                       </div>
-                      {u.tipologia && <p className="text-sm font-semibold mb-1" style={{ color: G, opacity: 0.8 }}>{u.tipologia}</p>}
+                      {u.tipologia && (
+                        <p className="text-sm font-semibold mb-1" style={{ color: isVendido ? 'rgba(255,255,255,0.2)' : G, opacity: isVendido ? 1 : 0.8 }}>
+                          {u.tipologia}
+                        </p>
+                      )}
                       <div className="space-y-2 mb-6">
-                        {u.area_m2 && <div className="flex items-center justify-between text-xs"><span className="opacity-35 uppercase tracking-[0.1em]">Área</span><span className="opacity-70">{u.area_m2} m²</span></div>}
-                        {u.piso !== null && <div className="flex items-center justify-between text-xs"><span className="opacity-35 uppercase tracking-[0.1em]">Piso</span><span className="opacity-70">{u.piso}</span></div>}
+                        {u.area_m2 && (
+                          <div className="flex items-center justify-between text-xs">
+                            <span className={isVendido ? 'opacity-20' : 'opacity-35'} style={{ textTransform: 'uppercase', letterSpacing: '0.1em' }}>Área</span>
+                            <span className={isVendido ? 'opacity-20' : 'opacity-70'}>{u.area_m2} m²</span>
+                          </div>
+                        )}
+                        {u.piso !== null && (
+                          <div className="flex items-center justify-between text-xs">
+                            <span className={isVendido ? 'opacity-20' : 'opacity-35'} style={{ textTransform: 'uppercase', letterSpacing: '0.1em' }}>Piso</span>
+                            <span className={isVendido ? 'opacity-20' : 'opacity-70'}>{u.piso}</span>
+                          </div>
+                        )}
                       </div>
-                      {u.preco && isDisp && (
-                        <p className="font-serif font-bold text-xl" style={{ color: G }}>
+                      {/* Preço: visível para disponivel e reservado, escondido para vendido */}
+                      {u.preco && !isVendido && (
+                        <p className="font-serif font-bold text-xl" style={{ color: isReserved ? 'rgba(255,255,255,0.5)' : G }}>
                           {new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(u.preco)}
                         </p>
                       )}
