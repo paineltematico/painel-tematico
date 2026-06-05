@@ -18,6 +18,7 @@ type FormState = {
   plantas: string[]          // floor plan downloads
   videos: string[]           // YouTube / Vimeo URLs
   estado: ProjetoEstado
+  tipo_projeto: 'apartamentos' | 'loteamento'
   unidades_total: string; unidades_disponiveis: string
   ordem: string; ativo: boolean
 }
@@ -53,6 +54,7 @@ export default function ProjetoForm({ projeto }: { projeto?: Projeto }) {
     plantas:             projeto?.plantas ?? [],
     videos:              projeto?.videos ?? [],
     estado:              projeto?.estado ?? 'em_curso',
+    tipo_projeto:        (projeto as any)?.tipo_projeto ?? 'apartamentos',
     unidades_total:      projeto?.unidades_total?.toString() ?? '',
     unidades_disponiveis: projeto?.unidades_disponiveis?.toString() ?? '',
     ordem:               projeto?.ordem?.toString() ?? '0',
@@ -116,6 +118,7 @@ export default function ProjetoForm({ projeto }: { projeto?: Projeto }) {
         plantas:              form.plantas,
         videos:               form.videos.filter(v => v.trim()),
         estado:               form.estado,
+        tipo_projeto:         form.tipo_projeto,
         unidades_total:       form.unidades_total ? parseInt(form.unidades_total) : null,
         unidades_disponiveis: form.unidades_disponiveis ? parseInt(form.unidades_disponiveis) : null,
         ordem:                parseInt(form.ordem) || 0,
@@ -158,6 +161,18 @@ export default function ProjetoForm({ projeto }: { projeto?: Projeto }) {
             <label className={labelCls}>Slug</label>
             <input value={form.slug} onChange={set('slug')} className={inputCls} placeholder="esporoes" />
           </div>
+        </div>
+        <div>
+          <label className={labelCls}>Tipo de empreendimento</label>
+          <select value={form.tipo_projeto} onChange={set('tipo_projeto')} className={inputCls}>
+            <option value="apartamentos">Apartamentos / Frações</option>
+            <option value="loteamento">Loteamento / Moradias</option>
+          </select>
+          <p className="text-xs text-[#94a3b8] mt-1">
+            {form.tipo_projeto === 'loteamento'
+              ? 'Cada unidade é um lote independente com área de terreno e construção.'
+              : 'Frações num edifício com áreas de construção.'}
+          </p>
         </div>
         <div>
           <label className={labelCls}>Subtítulo</label>
