@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
-import { Plus, Trash2, ArrowLeft, Loader2 } from 'lucide-react'
+import { Plus, Trash2, ArrowLeft, Loader2, CheckCircle2 } from 'lucide-react'
 import type { Unidade } from '@/types/database'
 
 const inputCls = 'w-full px-3.5 py-2.5 rounded-xl border border-[#E8E3E3] text-sm text-[#1F3F44] focus:outline-none focus:ring-2 focus:ring-[#00545F]/30 focus:border-[#00545F] transition-all'
@@ -36,7 +36,8 @@ export default function UnidadesPage() {
   const [unidades, setUnidades] = useState<UnidadeExt[]>([])
   const [tipo, setTipo] = useState<TipoProjeto>('apartamentos')
   const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState<string | null>(null)
+  const [saving, setSaving]   = useState<string | null>(null)
+  const [saved, setSaved]     = useState<string | null>(null)
   const [adding, setAdding] = useState(false)
   const [newU, setNewU] = useState(EMPTY_APT)
   const [projetoNome, setProjetoNome] = useState('')
@@ -81,6 +82,8 @@ export default function UnidadesPage() {
     await (supabase.from('unidades') as any).update(fields).eq('id', id)
     setUnidades(u => u.map(x => x.id === id ? { ...x, ...fields } : x))
     setSaving(null)
+    setSaved(id)
+    setTimeout(() => setSaved(s => s === id ? null : s), 2000)
   }
 
   const deleteUnidade = async (id: string) => {
@@ -241,6 +244,7 @@ export default function UnidadesPage() {
                   )}
                 </div>
                 {saving === u.id && <p className="text-xs text-[#00545F] flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" /> A guardar...</p>}
+                {saved === u.id && <p className="text-xs text-emerald-600 flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Guardado</p>}
               </div>
             )
           })}
@@ -293,11 +297,15 @@ export default function UnidadesPage() {
                   )}
                   <td className="px-4 py-3 text-sm text-[#1F3F44] font-medium whitespace-nowrap">{u.preco ? fmt(u.preco) : '—'}</td>
                   <td className="px-4 py-3">
-                    <select value={u.estado} onChange={e => updateField(u.id, { estado: e.target.value as Unidade['estado'] })}
-                      disabled={saving === u.id}
-                      className="text-xs font-semibold px-2.5 py-1 rounded-lg border border-[#e2e8f0] focus:outline-none focus:ring-1 focus:ring-[#00545F] bg-white">
-                      {ESTADOS_UNIDADE.map(e => <option key={e.value} value={e.value}>{e.label}</option>)}
-                    </select>
+                    <div className="flex items-center gap-2">
+                      <select value={u.estado} onChange={e => updateField(u.id, { estado: e.target.value as Unidade['estado'] })}
+                        disabled={saving === u.id}
+                        className="text-xs font-semibold px-2.5 py-1 rounded-lg border border-[#e2e8f0] focus:outline-none focus:ring-1 focus:ring-[#00545F] bg-white">
+                        {ESTADOS_UNIDADE.map(e => <option key={e.value} value={e.value}>{e.label}</option>)}
+                      </select>
+                      {saving === u.id && <Loader2 className="w-3.5 h-3.5 animate-spin text-[#00545F]" />}
+                      {saved === u.id && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />}
+                    </div>
                   </td>
                   <td className="px-4 py-3">
                     <button onClick={() => deleteUnidade(u.id)} className="p-1.5 text-[#94a3b8] hover:text-red-500 hover:bg-red-50 rounded-lg">
