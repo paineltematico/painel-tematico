@@ -133,7 +133,7 @@ export default function ProjetoLuxury({
 
       {/* ══ OVERLAY NAV ══ */}
       <nav className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-8 py-5"
-        style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.75) 0%, transparent 100%)' }}>
+        style={{ background: 'linear-gradient(to bottom, rgba(7,16,15,0.92) 0%, transparent 100%)' }}>
         <Link href="/projetos" className="flex items-center gap-2 text-white/60 hover:text-white text-sm font-medium transition-colors group">
           <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
           Todos os projetos
@@ -156,7 +156,7 @@ export default function ProjetoLuxury({
             ? <div ref={bgRef} className="absolute will-change-transform"
                 style={{ inset: '-30% 0', backgroundImage: `url(${heroImg})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
             : <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg,#1F3F44 0%,#0a0a0a 100%)' }} />}
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(to top,rgba(0,0,0,0.95) 0%,rgba(0,0,0,0.4) 55%,rgba(0,0,0,0.15) 100%)' }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to top,rgba(7,16,15,0.97) 0%,rgba(7,16,15,0.35) 55%,rgba(7,16,15,0.6) 100%)' }} />
 
         {/* content */}
         <div className="absolute inset-0 flex flex-col justify-end px-8 sm:px-14 pb-20 pt-32">
@@ -497,42 +497,39 @@ export default function ProjetoLuxury({
 
       {/* ══ CONTACT ══ */}
       <section id="contacto" style={{ background: D2, paddingBlock: '9rem' }}>
-        <div ref={r6} className="max-w-6xl mx-auto px-8 grid grid-cols-1 lg:grid-cols-2 gap-20 items-start"
+        <div ref={r6} className="max-w-2xl mx-auto px-8"
           style={{ transition: 'all 1.2s ease', opacity: v6 ? 1 : 0, transform: v6 ? 'none' : 'translateY(30px)' }}>
-          <div>
-            <p className="text-xs uppercase tracking-[0.3em] mb-6" style={{ color: G, opacity: 0.7 }}>Contacto</p>
-            <h2 className="font-serif font-bold leading-tight mb-6 text-white/90" style={{ fontSize: 'clamp(2rem,4vw,4rem)' }}>
-              Marque uma visita ao projeto
-            </h2>
-            <p className="opacity-40 text-sm leading-relaxed mb-12 max-w-xs">
-              A nossa equipa está disponível para o acompanhar numa visita exclusiva e personalizada.
-            </p>
-            <div className="space-y-4">
-              <Link href={`/visita`}
-                className="flex items-center gap-4 w-full group rounded-xl transition-colors font-semibold text-sm text-black"
-                style={{ padding: '1.25rem 1.5rem', background: G }}>
-                <Calendar className="w-5 h-5 flex-shrink-0" />
-                <span className="tracking-wide">Agendar Visita Privada</span>
-                <ChevronRight className="w-4 h-4 ml-auto group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <a href="https://wa.me/351913440800" className="flex items-center gap-4 w-full rounded-xl text-sm text-white/60 transition-colors"
-                style={{ padding: '1.25rem 1.5rem', border: '1px solid rgba(255,255,255,0.08)' }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
-                onMouseLeave={e => (e.currentTarget.style.background = '')}>
-                <MessageCircle className="w-5 h-5 flex-shrink-0" style={{ color: G }} />
-                WhatsApp — resposta imediata
-              </a>
-              <a href="tel:+351913440800" className="flex items-center gap-4 w-full rounded-xl text-sm text-white/60 transition-colors"
-                style={{ padding: '1.25rem 1.5rem', border: '1px solid rgba(255,255,255,0.08)' }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
-                onMouseLeave={e => (e.currentTarget.style.background = '')}>
-                <Phone className="w-5 h-5 flex-shrink-0" style={{ color: G }} />
-                +351 913 440 800
-              </a>
-            </div>
-          </div>
-          <div style={{ background: D3, borderRadius: 20, padding: '2.5rem', border: '1px solid rgba(255,255,255,0.06)' }}>
-            <ProjetoForm projetoNome={projeto.nome} projetoId={projeto.id} />
+          <p className="text-xs uppercase tracking-[0.3em] mb-6" style={{ color: G, opacity: 0.7 }}>Contacto</p>
+          <h2 className="font-serif font-bold leading-tight mb-6 text-white/90" style={{ fontSize: 'clamp(2rem,4vw,4rem)' }}>
+            Marque uma visita ao projeto
+          </h2>
+          <p className="opacity-40 text-sm leading-relaxed mb-12">
+            A nossa equipa está disponível para o acompanhar numa visita exclusiva e personalizada.
+          </p>
+          <div className="space-y-4">
+            <Link href="/visita"
+              className="flex items-center gap-4 w-full group rounded-xl font-semibold text-sm text-black"
+              style={{ padding: '1.25rem 1.5rem', background: G }}>
+              <Calendar className="w-5 h-5 flex-shrink-0" />
+              <span className="tracking-wide">Agendar Visita Privada</span>
+              <ChevronRight className="w-4 h-4 ml-auto group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <a href="https://wa.me/351913440800"
+              className="flex items-center gap-4 w-full rounded-xl text-sm text-white/60 transition-colors"
+              style={{ padding: '1.25rem 1.5rem', border: '1px solid rgba(255,255,255,0.08)' }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
+              onMouseLeave={e => (e.currentTarget.style.background = '')}>
+              <MessageCircle className="w-5 h-5 flex-shrink-0" style={{ color: G }} />
+              WhatsApp — resposta imediata
+            </a>
+            <a href="tel:+351913440800"
+              className="flex items-center gap-4 w-full rounded-xl text-sm text-white/60 transition-colors"
+              style={{ padding: '1.25rem 1.5rem', border: '1px solid rgba(255,255,255,0.08)' }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
+              onMouseLeave={e => (e.currentTarget.style.background = '')}>
+              <Phone className="w-5 h-5 flex-shrink-0" style={{ color: G }} />
+              +351 913 440 800
+            </a>
           </div>
         </div>
       </section>
