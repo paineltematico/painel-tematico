@@ -81,7 +81,7 @@ export type Unidade = {
   tipologia: string | null
   area_m2: number | null
   preco: number | null
-  estado: 'disponivel' | 'reservado' | 'vendido'
+  estado: 'disponivel' | 'reservado' | 'vendido' | 'em_breve'
   piso: number | null
   descricao: string | null
   planta: string | null

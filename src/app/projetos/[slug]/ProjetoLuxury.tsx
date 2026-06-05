@@ -423,31 +423,35 @@ export default function ProjetoLuxury({
                   const isDisp     = u.estado === 'disponivel'
                   const isReserved = u.estado === 'reservado'
                   const isVendido  = u.estado === 'vendido'
+                  const isEmBreve  = u.estado === 'em_breve'
+                  const isMuted    = isVendido || isEmBreve
                   return (
                     <div key={u.id}
                       className="group flex-shrink-0 w-64 rounded-2xl p-6 relative overflow-hidden"
                       style={{
-                        background: isVendido
+                        background: isMuted
                           ? 'rgba(255,255,255,0.02)'
                           : isDisp
                             ? 'rgba(201,169,110,0.06)'
                             : 'rgba(255,255,255,0.03)',
-                        border: `1px solid ${isVendido ? 'rgba(255,255,255,0.04)' : isDisp ? 'rgba(201,169,110,0.3)' : 'rgba(255,255,255,0.1)'}`,
-                        opacity: v5 ? (isVendido ? 0.45 : 1) : 0,
+                        border: `1px solid ${isMuted ? 'rgba(255,255,255,0.04)' : isDisp ? 'rgba(201,169,110,0.3)' : 'rgba(255,255,255,0.1)'}`,
+                        opacity: v5 ? (isMuted ? 0.45 : 1) : 0,
                         transform: v5 ? 'none' : 'translateY(20px)',
                         transition: `all 0.6s ease ${i * 60}ms`,
                       }}>
 
-                      {/* Diagonal "RESERVADO" watermark */}
+                      {/* Diagonal "RESERVADO" watermark — desvanece no hover */}
                       {isReserved && (
                         <div className="absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-500 opacity-100 group-hover:opacity-10">
                           <span
-                            className="font-serif font-bold text-2xl tracking-[0.2em] uppercase select-none"
+                            className="font-serif font-bold uppercase select-none"
                             style={{
+                              fontSize: 'clamp(1.8rem, 5vw, 2.6rem)',
                               color: '#fbbf24',
                               transform: 'rotate(-30deg)',
-                              opacity: 0.25,
-                              letterSpacing: '0.25em',
+                              opacity: 0.35,
+                              letterSpacing: '0.2em',
+                              whiteSpace: 'nowrap',
                             }}
                           >
                             Reservado
@@ -456,36 +460,39 @@ export default function ProjetoLuxury({
                       )}
 
                       <div className="flex items-center justify-between mb-6">
-                        <p className={`font-serif font-bold text-2xl ${isVendido ? 'text-white/30' : 'text-white/90'}`}>{u.referencia}</p>
-                        <span className="text-[10px] font-semibold uppercase tracking-[0.15em] px-2.5 py-1 rounded-full"
-                          style={{
-                            background: isDisp ? 'rgba(201,169,110,0.15)' : isReserved ? 'rgba(251,191,36,0.1)' : 'rgba(255,255,255,0.05)',
-                            color: isDisp ? G : isReserved ? '#fbbf24' : 'rgba(255,255,255,0.2)',
-                          }}>
-                          {isDisp ? 'Disponível' : isReserved ? 'Reservado' : 'Vendido'}
-                        </span>
+                        <p className={`font-serif font-bold text-2xl ${isMuted ? 'text-white/30' : 'text-white/90'}`}>{u.referencia}</p>
+                        {/* Badge: só mostra quando não é reservado (evita duplicação com diagonal) */}
+                        {!isReserved && (
+                          <span className="text-[10px] font-semibold uppercase tracking-[0.15em] px-2.5 py-1 rounded-full"
+                            style={{
+                              background: isDisp ? 'rgba(201,169,110,0.15)' : isEmBreve ? 'rgba(99,179,237,0.1)' : 'rgba(255,255,255,0.05)',
+                              color: isDisp ? G : isEmBreve ? '#63b3ed' : 'rgba(255,255,255,0.2)',
+                            }}>
+                            {isDisp ? 'Disponível' : isEmBreve ? 'Em Breve' : 'Vendido'}
+                          </span>
+                        )}
                       </div>
                       {u.tipologia && (
-                        <p className="text-sm font-semibold mb-1" style={{ color: isVendido ? 'rgba(255,255,255,0.2)' : G, opacity: isVendido ? 1 : 0.8 }}>
+                        <p className="text-sm font-semibold mb-1" style={{ color: isMuted ? 'rgba(255,255,255,0.2)' : G, opacity: isMuted ? 1 : 0.8 }}>
                           {u.tipologia}
                         </p>
                       )}
                       <div className="space-y-2 mb-6">
                         {u.area_m2 && (
                           <div className="flex items-center justify-between text-xs">
-                            <span className={isVendido ? 'opacity-20' : 'opacity-35'} style={{ textTransform: 'uppercase', letterSpacing: '0.1em' }}>Área</span>
-                            <span className={isVendido ? 'opacity-20' : 'opacity-70'}>{u.area_m2} m²</span>
+                            <span className={isMuted ? 'opacity-20' : 'opacity-35'} style={{ textTransform: 'uppercase', letterSpacing: '0.1em' }}>Área</span>
+                            <span className={isMuted ? 'opacity-20' : 'opacity-70'}>{u.area_m2} m²</span>
                           </div>
                         )}
                         {u.piso !== null && (
                           <div className="flex items-center justify-between text-xs">
-                            <span className={isVendido ? 'opacity-20' : 'opacity-35'} style={{ textTransform: 'uppercase', letterSpacing: '0.1em' }}>Piso</span>
-                            <span className={isVendido ? 'opacity-20' : 'opacity-70'}>{u.piso}</span>
+                            <span className={isMuted ? 'opacity-20' : 'opacity-35'} style={{ textTransform: 'uppercase', letterSpacing: '0.1em' }}>Piso</span>
+                            <span className={isMuted ? 'opacity-20' : 'opacity-70'}>{u.piso}</span>
                           </div>
                         )}
                       </div>
-                      {/* Preço: visível para disponivel e reservado, escondido para vendido */}
-                      {u.preco && !isVendido && (
+                      {/* Preço: visível para disponivel e reservado, escondido para vendido e em_breve */}
+                      {u.preco && !isMuted && (
                         <p className="font-serif font-bold text-xl" style={{ color: isReserved ? 'rgba(255,255,255,0.5)' : G }}>
                           {new Intl.NumberFormat('pt-PT', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(u.preco)}
                         </p>

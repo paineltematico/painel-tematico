@@ -27,6 +27,7 @@ const ESTADOS_UNIDADE = [
   { value: 'disponivel', label: 'Disponível', cls: 'bg-emerald-50 text-emerald-700' },
   { value: 'reservado',  label: 'Reservado',  cls: 'bg-amber-50 text-amber-700' },
   { value: 'vendido',    label: 'Vendido',    cls: 'bg-slate-100 text-slate-500' },
+  { value: 'em_breve',   label: 'Em Breve',   cls: 'bg-blue-50 text-blue-500' },
 ]
 
 export default function UnidadesPage() {
