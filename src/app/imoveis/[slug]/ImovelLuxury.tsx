@@ -86,7 +86,7 @@ export default function ImovelLuxury({ imovel }: { imovel: Imovel }) {
 
       {/* ══ OVERLAY NAV ══ */}
       <nav className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-8 py-5"
-        style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%)' }}>
+        style={{ background: 'linear-gradient(to bottom, rgba(7,16,15,0.95) 0%, rgba(7,16,15,0) 100%)' }}>
         <Link href="/imoveis"
           className="flex items-center gap-2 text-white/70 hover:text-white transition-colors text-sm font-medium group">
           <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
@@ -113,8 +113,8 @@ export default function ImovelLuxury({ imovel }: { imovel: Imovel }) {
         ) : (
           <div className="absolute inset-0" style={{ background: '#1F3F44' }} />
         )}
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.2) 100%)' }} />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.3) 0%, transparent 60%)' }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(7,16,15,0.97) 0%, rgba(7,16,15,0.25) 45%, rgba(7,16,15,0.88) 100%)' }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, rgba(7,16,15,0.3) 0%, rgba(7,16,15,0) 60%)' }} />
 
         {/* Content */}
         <div className="absolute inset-0 flex flex-col justify-end px-8 sm:px-14 pb-16 pt-32">

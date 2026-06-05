@@ -147,7 +147,7 @@ export default function ProjetoLuxury({
 
       {/* ══ OVERLAY NAV ══ */}
       <nav className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-8 py-5"
-        style={{ background: 'linear-gradient(to bottom, rgba(7,16,15,0.92) 0%, transparent 100%)' }}>
+        style={{ background: 'linear-gradient(to bottom, rgba(7,16,15,0.95) 0%, rgba(7,16,15,0) 100%)' }}>
         <Link href="/projetos" className="flex items-center gap-2 text-white/60 hover:text-white text-sm font-medium transition-colors group">
           <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
           Todos os projetos
@@ -170,7 +170,7 @@ export default function ProjetoLuxury({
             ? <div ref={bgRef} className="absolute will-change-transform"
                 style={{ inset: '-30% 0', backgroundImage: `url(${heroImg})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
             : <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg,#1F3F44 0%,#0a0a0a 100%)' }} />}
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(to top,rgba(7,16,15,0.97) 0%,rgba(7,16,15,0.35) 55%,rgba(7,16,15,0.6) 100%)' }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to top,rgba(7,16,15,0.97) 0%,rgba(7,16,15,0.25) 45%,rgba(7,16,15,0.88) 100%)' }} />
 
         {/* content */}
         <div className="absolute inset-0 flex flex-col justify-end px-8 sm:px-14 pb-20 pt-32">
