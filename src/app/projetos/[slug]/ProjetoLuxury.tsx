@@ -11,9 +11,9 @@ import type { Projeto, Unidade, AtualizacaoObra, Testemunho } from '@/types/data
 
 /* ── palette ── */
 const G  = '#C9A96E'   // gold
-const D  = '#0a0a0a'   // darkest
-const D2 = '#111111'
-const D3 = '#161616'
+const D  = '#07100f'   // darkest — near-black with brand teal undertone
+const D2 = '#0d1a1c'   // dark teal-black
+const D3 = '#101f22'   // medium dark teal (echoes #1F3F44 at low luminosity)
 
 /* ── helpers ── */
 function useVisible(th = 0.12) {

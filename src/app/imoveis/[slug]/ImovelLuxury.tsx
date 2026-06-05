@@ -24,8 +24,8 @@ function useVisible(threshold = 0.12) {
 }
 
 const GOLD  = '#C9A96E'
-const DARK  = '#0f0f0f'
-const DARK2 = '#161616'
+const DARK  = '#07100f'   // near-black with brand teal undertone
+const DARK2 = '#0d1a1c'   // dark teal-black
 
 /* ── component ── */
 export default function ImovelLuxury({ imovel }: { imovel: Imovel }) {
