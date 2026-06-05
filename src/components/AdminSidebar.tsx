@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import {
   LayoutDashboard, Home, Users, Settings, Building2, FileText,
-  LogOut, Plus, ExternalLink, UserCog, HardHat, UsersRound, Handshake, ShieldCheck,
+  LogOut, Plus, ExternalLink, UserCog, HardHat, UsersRound, Handshake, ShieldCheck, X,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { AdminRole } from '@/lib/auth'
@@ -42,9 +42,10 @@ interface Props {
     permissions_extra?: string[]
     permissions_denied?: string[]
   } | null
+  onClose?: () => void
 }
 
-export default function AdminSidebar({ user }: Props) {
+export default function AdminSidebar({ user, onClose }: Props) {
   const pathname = usePathname()
   const router   = useRouter()
   const role     = user?.role ?? 'comercial'
@@ -64,19 +65,26 @@ export default function AdminSidebar({ user }: Props) {
   })
 
   return (
-    <aside className="w-64 flex-shrink-0 bg-[#1F3F44] min-h-screen flex flex-col">
+    <aside className="w-72 lg:w-64 flex-shrink-0 bg-[#1F3F44] min-h-screen flex flex-col">
 
       {/* Logo + user info */}
       <div className="p-6 border-b border-white/10">
-        <Link href="/admin/dashboard" className="inline-block mb-4">
-          <Image
-            src="/logos/logo-white.png"
-            alt="Painel Temático"
-            width={160}
-            height={48}
-            className="h-8 w-auto object-contain"
-          />
-        </Link>
+        <div className="flex items-start justify-between mb-4">
+          <Link href="/admin/dashboard" onClick={onClose} className="inline-block">
+            <Image
+              src="/logos/logo-white.png"
+              alt="Painel Temático"
+              width={160}
+              height={48}
+              className="h-8 w-auto object-contain"
+            />
+          </Link>
+          {onClose && (
+            <button onClick={onClose} className="p-1.5 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-colors lg:hidden">
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
         {user && (
           <div className="mt-3">
             <p className="text-white text-sm font-semibold truncate">{user.nome}</p>
@@ -106,6 +114,7 @@ export default function AdminSidebar({ user }: Props) {
           <Link
             key={href}
             href={href}
+            onClick={onClose}
             className={cn(
               'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all',
               pathname.startsWith(href)

@@ -115,7 +115,7 @@ export default function UnidadesPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
         {[
           { label: 'Total',      value: stats.total,      cls: 'border-[#e2e8f0]' },
           { label: 'Disponível', value: stats.disponivel, cls: 'border-emerald-200 bg-emerald-50/50' },
@@ -132,7 +132,7 @@ export default function UnidadesPage() {
       {/* Add form */}
       <div className="bg-white rounded-2xl border border-[#E8E3E3] p-6 mb-6">
         <h2 className="font-serif font-semibold text-[#1F3F44] mb-4 capitalize">Adicionar {termFracao}</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-3">
           <div>
             <label className="block text-xs font-semibold text-[#475569] uppercase tracking-wider mb-1">
               {isLoteamento ? 'Nº do Lote *' : 'Referência *'}
@@ -187,8 +187,67 @@ export default function UnidadesPage() {
         </button>
       </div>
 
-      {/* Table */}
-      <div className="bg-white rounded-2xl border border-[#E8E3E3] overflow-hidden overflow-x-auto">
+      {/* Mobile cards */}
+      {!loading && unidades.length > 0 && (
+        <div className="md:hidden space-y-3">
+          {unidades.map(u => {
+            const estadoCfg = ESTADOS_UNIDADE.find(e => e.value === u.estado)!
+            return (
+              <div key={u.id} className="bg-white rounded-2xl border border-[#E8E3E3] p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-serif font-bold text-[#1F3F44]">{u.referencia}</p>
+                    {u.tipologia && <p className="text-xs text-[#94a3b8]">{u.tipologia}</p>}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <select value={u.estado} onChange={e => updateField(u.id, { estado: e.target.value as Unidade['estado'] })}
+                      className={`text-xs font-semibold px-2.5 py-1 rounded-full border focus:outline-none ${estadoCfg.cls}`}>
+                      {ESTADOS_UNIDADE.map(e => <option key={e.value} value={e.value}>{e.label}</option>)}
+                    </select>
+                    <button onClick={() => deleteUnidade(u.id)} className="p-1.5 text-[#94a3b8] hover:text-red-500 rounded-lg">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  {u.area_m2 && <div className="bg-[#f8fafc] rounded-lg px-3 py-2"><p className="text-[10px] text-[#94a3b8] uppercase tracking-wider">{isLoteamento ? 'Área Bruta' : 'Área'}</p><p className="font-semibold text-[#1F3F44]">{u.area_m2} m²</p></div>}
+                  {u.preco && <div className="bg-[#f8fafc] rounded-lg px-3 py-2"><p className="text-[10px] text-[#94a3b8] uppercase tracking-wider">Preço</p><p className="font-semibold text-[#1F3F44]">{fmt(u.preco)}</p></div>}
+                  {isLoteamento && (
+                    <>
+                      <div className="bg-[#f8fafc] rounded-lg px-3 py-2">
+                        <p className="text-[10px] text-[#94a3b8] uppercase tracking-wider mb-1">Área Lote</p>
+                        <input type="number" defaultValue={u.area_lote ?? ''} onBlur={e => updateField(u.id, { area_lote: e.target.value ? +e.target.value : null })}
+                          className="w-full text-sm font-semibold text-[#1F3F44] bg-transparent focus:outline-none" placeholder="—" />
+                      </div>
+                      <div className="bg-[#f8fafc] rounded-lg px-3 py-2">
+                        <p className="text-[10px] text-[#94a3b8] uppercase tracking-wider mb-1">Área Exterior</p>
+                        <input type="number" defaultValue={u.area_exterior ?? ''} onBlur={e => updateField(u.id, { area_exterior: e.target.value ? +e.target.value : null })}
+                          className="w-full text-sm font-semibold text-[#1F3F44] bg-transparent focus:outline-none" placeholder="—" />
+                      </div>
+                      <div className="bg-[#f8fafc] rounded-lg px-3 py-2 col-span-2">
+                        <p className="text-[10px] text-[#94a3b8] uppercase tracking-wider mb-1">% Conclusão</p>
+                        <div className="flex items-center gap-2">
+                          <input type="number" min={0} max={100} defaultValue={u.percentagem_conclusao ?? 0}
+                            onBlur={e => updateField(u.id, { percentagem_conclusao: +e.target.value })}
+                            className="w-16 text-sm font-semibold text-[#1F3F44] bg-transparent focus:outline-none" />
+                          <span className="text-xs text-[#94a3b8]">%</span>
+                          <div className="flex-1 h-1.5 bg-[#e2e8f0] rounded-full overflow-hidden">
+                            <div className="h-full bg-[#00545F] rounded-full transition-all" style={{ width: `${u.percentagem_conclusao ?? 0}%` }} />
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+                {saving === u.id && <p className="text-xs text-[#00545F] flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" /> A guardar...</p>}
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {/* Desktop table */}
+      <div className={`bg-white rounded-2xl border border-[#E8E3E3] overflow-hidden overflow-x-auto ${!loading && unidades.length > 0 ? 'hidden md:block' : ''}`}>
         {loading ? (
           <div className="p-10 text-center"><Loader2 className="w-6 h-6 animate-spin text-[#94a3b8] mx-auto" /></div>
         ) : unidades.length === 0 ? (
@@ -197,15 +256,9 @@ export default function UnidadesPage() {
           <table className="w-full">
             <thead className="bg-[#f8fafc] border-b border-[#e2e8f0]">
               <tr>
-                {[
-                  'Ref.',
-                  'Tipo',
-                  isLoteamento ? 'Área Bruta' : 'Área',
+                {['Ref.', 'Tipo', isLoteamento ? 'Área Bruta' : 'Área',
                   ...(isLoteamento ? ['Área Lote', 'Área Ext.', '% Conclusão'] : []),
-                  'Preço',
-                  'Estado',
-                  '',
-                ].map(h => (
+                  'Preço', 'Estado', ''].map(h => (
                   <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-[#64748b] uppercase tracking-wide whitespace-nowrap">{h}</th>
                 ))}
               </tr>
@@ -220,29 +273,24 @@ export default function UnidadesPage() {
                     <>
                       <td className="px-4 py-3">
                         <input type="number" defaultValue={u.area_lote ?? ''} onBlur={e => updateField(u.id, { area_lote: e.target.value ? +e.target.value : null })}
-                          className="w-20 px-2 py-1 text-xs rounded-lg border border-[#E8E3E3] text-[#1F3F44] focus:outline-none focus:ring-1 focus:ring-[#00545F]"
-                          placeholder="—" />
+                          className="w-20 px-2 py-1 text-xs rounded-lg border border-[#E8E3E3] text-[#1F3F44] focus:outline-none focus:ring-1 focus:ring-[#00545F]" placeholder="—" />
                       </td>
                       <td className="px-4 py-3">
                         <input type="number" defaultValue={u.area_exterior ?? ''} onBlur={e => updateField(u.id, { area_exterior: e.target.value ? +e.target.value : null })}
-                          className="w-20 px-2 py-1 text-xs rounded-lg border border-[#E8E3E3] text-[#1F3F44] focus:outline-none focus:ring-1 focus:ring-[#00545F]"
-                          placeholder="—" />
+                          className="w-20 px-2 py-1 text-xs rounded-lg border border-[#E8E3E3] text-[#1F3F44] focus:outline-none focus:ring-1 focus:ring-[#00545F]" placeholder="—" />
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1.5">
                           <input type="number" min={0} max={100} defaultValue={u.percentagem_conclusao ?? 0}
                             onBlur={e => updateField(u.id, { percentagem_conclusao: +e.target.value })}
-                            className="w-16 px-2 py-1 text-xs rounded-lg border border-[#E8E3E3] text-[#1F3F44] focus:outline-none focus:ring-1 focus:ring-[#00545F]"
-                          />
+                            className="w-16 px-2 py-1 text-xs rounded-lg border border-[#E8E3E3] text-[#1F3F44] focus:outline-none focus:ring-1 focus:ring-[#00545F]" />
                           <span className="text-xs text-[#94a3b8]">%</span>
                           {saving === u.id && <Loader2 className="w-3 h-3 animate-spin text-[#00545F]" />}
                         </div>
                       </td>
                     </>
                   )}
-                  <td className="px-4 py-3 text-sm text-[#1F3F44] font-medium whitespace-nowrap">
-                    {u.preco ? fmt(u.preco) : '—'}
-                  </td>
+                  <td className="px-4 py-3 text-sm text-[#1F3F44] font-medium whitespace-nowrap">{u.preco ? fmt(u.preco) : '—'}</td>
                   <td className="px-4 py-3">
                     <select value={u.estado} onChange={e => updateField(u.id, { estado: e.target.value as Unidade['estado'] })}
                       disabled={saving === u.id}
