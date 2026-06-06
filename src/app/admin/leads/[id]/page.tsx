@@ -2,7 +2,8 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { ESTADOS, PRIORIDADES, formatFullDate, formatRelativeDate } from '@/lib/crm'
-import { ChevronRight, Mail, Phone, Home, Calendar, ExternalLink, Pencil, Archive, UserCircle2 } from 'lucide-react'
+import { ChevronRight, Mail, Phone, Calendar, Pencil, Archive, UserCircle2 } from 'lucide-react'
+// Mail/Phone still used in contact links below
 import { cn } from '@/lib/utils'
 import LeadStageSelector from '@/components/crm/LeadStageSelector'
 import LeadPrioritySelector from '@/components/crm/LeadPrioritySelector'
@@ -10,7 +11,10 @@ import AddActivityForm from '@/components/crm/AddActivityForm'
 import LeadNotesEditor from '@/components/crm/LeadNotesEditor'
 import LeadTimeline from '@/components/crm/LeadTimeline'
 import LeadArchivarButton from '@/components/crm/LeadArchivarButton'
+import LeadInteresseEditor from '@/components/crm/LeadInteresseEditor'
+import LeadTransferirButton from '@/components/crm/LeadTransferirButton'
 import { getCurrentUser } from '@/lib/auth-server'
+import { canUser } from '@/lib/permissions'
 
 interface Props { params: Promise<{ id: string }> }
 
@@ -48,6 +52,7 @@ export default async function LeadDetailPage({ params }: Props) {
   if (!lead) notFound()
 
   const isSuperAdmin = me?.role === 'super_admin'
+  const canTransfer = me ? canUser(me, 'leads.comerciais') : false
 
   // Filtrar atividades de arquivamento para não-super_admin
   const todasAtividades = await getAtividades(id)
@@ -59,6 +64,12 @@ export default async function LeadDetailPage({ params }: Props) {
     getAdminUser(lead.criado_por),
     getAdminUser(lead.responsavel_id),
   ])
+
+  // Fetch users for transfer button
+  const { data: adminUsersRaw } = canTransfer
+    ? await supabaseAdmin.from('admin_users').select('id, nome').order('nome')
+    : { data: [] }
+  const adminUsers = (adminUsersRaw ?? []).map(u => ({ id: u.id, nome: u.nome ?? '' }))
 
   const est = ESTADOS.find((e) => e.value === lead.estado) ?? ESTADOS[0]
   const pri = PRIORIDADES.find((p) => p.value === lead.prioridade) ?? PRIORIDADES[1]
@@ -131,19 +142,12 @@ export default async function LeadDetailPage({ params }: Props) {
                 <Pencil className="w-3.5 h-3.5" /> Editar
               </Link>
             )}
-            <a
-              href={`mailto:${lead.email}?subject=Painel Temático — ${lead.imovel_titulo ?? 'Imóvel'}`}
-              className="px-4 py-2 rounded-xl bg-[#1F3F44] text-white text-sm font-semibold hover:bg-[#1e293b] transition-colors flex items-center gap-2"
-            >
-              <Mail className="w-3.5 h-3.5" /> Email
-            </a>
-            {lead.telefone && (
-              <a
-                href={`tel:${lead.telefone}`}
-                className="px-4 py-2 rounded-xl border border-[#e2e8f0] text-[#1F3F44] text-sm font-semibold hover:bg-[#f8fafc] transition-colors flex items-center gap-2"
-              >
-                <Phone className="w-3.5 h-3.5" /> Ligar
-              </a>
+            {canTransfer && !lead.arquivado && (
+              <LeadTransferirButton
+                leadId={lead.id}
+                responsavelId={lead.responsavel_id}
+                users={adminUsers}
+              />
             )}
             <LeadArchivarButton
               leadId={lead.id}
@@ -153,31 +157,24 @@ export default async function LeadDetailPage({ params }: Props) {
           </div>
         </div>
 
-        {/* Property & message */}
-        {(lead.imovel_titulo || lead.mensagem) && (
-          <div className="mt-5 pt-5 border-t border-[#e2e8f0] grid grid-cols-1 md:grid-cols-2 gap-4">
-            {lead.imovel_titulo && (
-              <div className="bg-[#f8fafc] rounded-xl p-4">
-                <p className="text-xs font-semibold text-[#94a3b8] uppercase tracking-wider mb-1.5">Imóvel de interesse</p>
-                <div className="flex items-center gap-2">
-                  <Home className="w-4 h-4 text-[#00545F] flex-shrink-0" />
-                  <span className="text-sm font-medium text-[#1F3F44]">{lead.imovel_titulo}</span>
-                  {lead.imovel_id && (
-                    <Link href={`/imoveis/${lead.imovel_id}`} target="_blank" className="text-[#94a3b8] hover:text-[#00545F]">
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </Link>
-                  )}
-                </div>
-              </div>
-            )}
-            {lead.mensagem && (
-              <div className="bg-[#f8fafc] rounded-xl p-4">
-                <p className="text-xs font-semibold text-[#94a3b8] uppercase tracking-wider mb-1.5">Mensagem inicial</p>
-                <p className="text-sm text-[#475569] leading-relaxed">{lead.mensagem}</p>
-              </div>
-            )}
+        {/* Mensagem inicial */}
+        {lead.mensagem && (
+          <div className="mt-5 pt-5 border-t border-[#e2e8f0]">
+            <div className="bg-[#f8fafc] rounded-xl p-4">
+              <p className="text-xs font-semibold text-[#94a3b8] uppercase tracking-wider mb-1.5">Mensagem inicial</p>
+              <p className="text-sm text-[#475569] leading-relaxed">{lead.mensagem}</p>
+            </div>
           </div>
         )}
+
+        {/* Imóvel de interesse + notas de interesse */}
+        <LeadInteresseEditor
+          leadId={lead.id}
+          imovelTitulo={lead.imovel_titulo}
+          imovelId={lead.imovel_id}
+          notasInteresse={lead.notas_interesse}
+          readOnly={lead.arquivado ?? false}
+        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

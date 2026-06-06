@@ -10,7 +10,9 @@ import type { AtividadeTipo } from '@/types/database'
 
 interface Props { leadId: string }
 
-const QUICK_TYPES = ATIVIDADE_TIPOS.filter(t => t.value !== 'mudanca_estado')
+const QUICK_TYPES = ATIVIDADE_TIPOS.filter(
+  t => t.value !== 'mudanca_estado' && t.value !== 'arquivamento' && t.value !== 'transferencia'
+)
 
 export default function AddActivityForm({ leadId }: Props) {
   const [tipo, setTipo] = useState<AtividadeTipo>('nota')

@@ -32,7 +32,9 @@ export default function LoginForm() {
       if (!res.ok) {
         setError(data.error ?? 'Erro ao fazer login')
       } else {
-        router.push(from)
+        // Comerciais não têm acesso à dashboard — aterram nos Imóveis
+        const dest = data.role === 'comercial' ? '/admin/imoveis' : from
+        router.push(dest)
         router.refresh()
       }
     } catch {

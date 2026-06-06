@@ -112,8 +112,16 @@ export default function ImovelForm({ imovel }: Props) {
           .eq('id', imovel.id)
         if (err) throw err
       } else {
-        const { error: err } = await supabase.from('imoveis').insert(payload)
-        if (err) throw err
+        // Criação via API: regista automaticamente o angariador (utilizador da sessão)
+        const res = await fetch('/api/admin/imoveis', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+        if (!res.ok) {
+          const d = await res.json().catch(() => ({}))
+          throw new Error(d.error ?? 'Erro ao publicar o imóvel.')
+        }
       }
 
       router.push('/admin/imoveis')

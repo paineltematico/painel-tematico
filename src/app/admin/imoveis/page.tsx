@@ -1,21 +1,26 @@
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 import { formatPrice } from '@/lib/utils'
-import { Plus, Pencil, Eye, Home } from 'lucide-react'
+import { Plus, Pencil, Eye, Home, UserCircle2 } from 'lucide-react'
 import DeleteImovelButton from '@/components/DeleteImovelButton'
 
 export const dynamic = 'force-dynamic'
 
 async function getAllImoveis() {
-  const { data } = await supabase
+  const { data } = await supabaseAdmin
     .from('imoveis')
-    .select('id, titulo, slug, tipo, tipologia, preco, cidade, disponivel, destaque, fotos, created_at')
+    .select('id, titulo, slug, tipo, tipologia, preco, cidade, disponivel, destaque, fotos, created_at, angariador_id')
     .order('created_at', { ascending: false })
   return data ?? []
 }
 
+async function getUserMap() {
+  const { data } = await supabaseAdmin.from('admin_users').select('id, nome')
+  return new Map((data ?? []).map((u) => [u.id, u.nome as string]))
+}
+
 export default async function AdminImoveisPage() {
-  const imoveis = await getAllImoveis()
+  const [imoveis, userMap] = await Promise.all([getAllImoveis(), getUserMap()])
 
   const stats = {
     total: imoveis.length,
@@ -76,6 +81,7 @@ export default async function AdminImoveisPage() {
                 <th className="text-left px-4 py-3.5 text-xs font-semibold text-[#64748b] uppercase tracking-wider hidden md:table-cell">Tipo</th>
                 <th className="text-left px-4 py-3.5 text-xs font-semibold text-[#64748b] uppercase tracking-wider hidden lg:table-cell">Preço</th>
                 <th className="text-left px-4 py-3.5 text-xs font-semibold text-[#64748b] uppercase tracking-wider hidden lg:table-cell">Estado</th>
+                <th className="text-left px-4 py-3.5 text-xs font-semibold text-[#64748b] uppercase tracking-wider hidden xl:table-cell">Angariação</th>
                 <th className="px-4 py-3.5 text-right text-xs font-semibold text-[#64748b] uppercase tracking-wider">Ações</th>
               </tr>
             </thead>
@@ -116,6 +122,16 @@ export default async function AdminImoveisPage() {
                         <span className="ml-2 text-xs text-[#00545F] font-semibold">★ Destaque</span>
                       )}
                     </div>
+                  </td>
+                  <td className="px-4 py-4 hidden xl:table-cell">
+                    {imovel.angariador_id && userMap.get(imovel.angariador_id) ? (
+                      <span className="inline-flex items-center gap-1.5 text-xs text-[#475569]">
+                        <UserCircle2 className="w-3.5 h-3.5 text-[#00545F]" />
+                        {userMap.get(imovel.angariador_id)}
+                      </span>
+                    ) : (
+                      <span className="text-[#94a3b8] text-xs">—</span>
+                    )}
                   </td>
                   <td className="px-4 py-4">
                     <div className="flex items-center justify-end gap-1">

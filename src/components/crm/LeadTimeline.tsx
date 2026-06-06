@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Pencil, Check, X, History, ChevronDown, ChevronUp } from 'lucide-react'
 import { ATIVIDADE_TIPOS, ESTADOS, formatRelativeDate } from '@/lib/crm'
 import { supabase } from '@/lib/supabase'
+import { cn } from '@/lib/utils'
 import type { LeadAtividade } from '@/types/database'
 
 interface Versao {
@@ -86,7 +87,7 @@ export default function LeadTimeline({ atividades: initial, isSuperAdmin = false
       {items.map((at, i) => {
         const tipo      = ATIVIDADE_TIPOS.find((t) => t.value === at.tipo)
         const isEditing = editing === at.id
-        const editavel  = at.tipo !== 'mudanca_estado'
+        const editavel  = !['mudanca_estado', 'arquivamento', 'transferencia'].includes(at.tipo)
         const wasEdited = !!at.updated_at
         const versoes   = at.versoes ?? []
         const isExpanded = expanded === at.id
@@ -157,6 +158,15 @@ export default function LeadTimeline({ atividades: initial, isSuperAdmin = false
                   <span className="font-medium text-[#00545F]">
                     {ESTADOS.find(e => e.value === at.estado_novo)?.label ?? at.estado_novo}
                   </span>
+                </p>
+              ) : (at.tipo === 'arquivamento' || at.tipo === 'transferencia') ? (
+                <p className={cn(
+                  'text-sm rounded-xl p-3 border leading-relaxed',
+                  at.tipo === 'arquivamento'
+                    ? 'bg-amber-50 border-amber-200 text-amber-800'
+                    : 'bg-blue-50 border-blue-200 text-blue-800'
+                )}>
+                  {at.conteudo}
                 </p>
               ) : isEditing ? (
                 <div className="space-y-2">

@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import {
   LayoutDashboard, Home, Users, Settings, Building2, FileText,
-  LogOut, Plus, ExternalLink, UserCog, HardHat, UsersRound, Handshake, ShieldCheck, X,
+  LogOut, Plus, ExternalLink, UserCog, HardHat, UsersRound, Handshake, ShieldCheck, X, UserCheck, BarChart2,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { AdminRole } from '@/lib/auth'
@@ -25,6 +25,8 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/admin/dashboard',    label: 'Dashboard',    icon: LayoutDashboard, permission: 'dashboard.view' },
   { href: '/admin/imoveis',      label: 'Imóveis',      icon: Home,            permission: 'imoveis.view' },
   { href: '/admin/leads',        label: 'Leads / CRM',  icon: Users,           permission: 'leads.view' },
+  { href: '/admin/leads/comerciais', label: 'Comerciais', icon: UserCheck,   permission: 'leads.comerciais' },
+  { href: '/admin/estatisticas', label: 'Estatísticas', icon: BarChart2,      permission: 'estatisticas.view' },
   { href: '/admin/projetos',     label: 'Projetos',     icon: Building2,       permission: 'projetos.view' },
   { href: '/admin/blog',         label: 'Blog',         icon: FileText,        permission: 'blog.view' },
   { href: '/admin/construcao',   label: 'Construção',   icon: HardHat,         permission: 'construcao.view' },
@@ -63,6 +65,12 @@ export default function AdminSidebar({ user, onClose }: Props) {
       item.permission
     )
   })
+
+  // Realce: escolhe o item cujo href é o prefixo mais longo do caminho atual
+  const activeHref = visibleItems
+    .map((i) => i.href)
+    .filter((h) => pathname === h || pathname.startsWith(h + '/'))
+    .sort((a, b) => b.length - a.length)[0]
 
   return (
     <aside className="w-72 lg:w-64 flex-shrink-0 bg-[#1F3F44] min-h-screen flex flex-col">
@@ -117,7 +125,7 @@ export default function AdminSidebar({ user, onClose }: Props) {
             onClick={onClose}
             className={cn(
               'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all',
-              pathname.startsWith(href)
+              href === activeHref
                 ? 'bg-[#00545F] text-white'
                 : 'text-slate-300 hover:text-white hover:bg-white/10'
             )}

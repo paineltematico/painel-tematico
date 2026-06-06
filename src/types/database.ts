@@ -16,6 +16,10 @@ export type Imovel = {
   fotos: string[]
   destaque: boolean
   disponivel: boolean
+  angariador_id: string | null
+  angariacao_perdida: boolean
+  angariacao_perdida_em: string | null
+  angariacao_perdida_motivo: string | null
   created_at: string
 }
 
@@ -146,6 +150,9 @@ export type Parceiro = {
   notas: string | null
   ativo: boolean
   token_visita: string | null
+  arquivado: boolean
+  arquivado_em: string | null
+  arquivado_por: string | null
   created_at: string
 }
 
@@ -168,6 +175,7 @@ export type Lead = {
   responsavel_id: string | null
   criado_por: string | null
   notas: string | null
+  notas_interesse: string | null
   lido: boolean
   fonte: string | null
   arquivado: boolean
@@ -192,13 +200,13 @@ export type Database = {
     Tables: {
       imoveis: {
         Row: Imovel
-        Insert: Omit<Imovel, 'id' | 'created_at'> & { id?: string; created_at?: string }
+        Insert: Omit<Imovel, 'id' | 'created_at' | 'angariador_id' | 'angariacao_perdida' | 'angariacao_perdida_em' | 'angariacao_perdida_motivo'> & { id?: string; created_at?: string; angariador_id?: string | null; angariacao_perdida?: boolean; angariacao_perdida_em?: string | null; angariacao_perdida_motivo?: string | null }
         Update: Partial<Omit<Imovel, 'id' | 'created_at'>>
         Relationships: []
       }
       contactos_imoveis: {
         Row: Lead
-        Insert: Omit<Lead, 'id' | 'created_at' | 'updated_at' | 'imovel_id' | 'notas' | 'telefone' | 'mensagem' | 'imovel_titulo' | 'fonte' | 'temperatura' | 'score' | 'tags' | 'projeto_interesse' | 'orcamento_min' | 'orcamento_max' | 'responsavel_id'> & {
+        Insert: Omit<Lead, 'id' | 'created_at' | 'updated_at' | 'imovel_id' | 'notas' | 'notas_interesse' | 'telefone' | 'mensagem' | 'imovel_titulo' | 'fonte' | 'temperatura' | 'score' | 'tags' | 'projeto_interesse' | 'orcamento_min' | 'orcamento_max' | 'responsavel_id' | 'criado_por' | 'arquivado' | 'arquivado_em' | 'arquivado_por'> & {
           id?: string; created_at?: string; updated_at?: string
           imovel_id?: string | null; notas?: string | null
           telefone?: string | null; mensagem?: string | null
@@ -206,7 +214,9 @@ export type Database = {
           temperatura?: LeadTemperatura; score?: number
           tags?: string[] | null; projeto_interesse?: string | null
           orcamento_min?: number | null; orcamento_max?: number | null
-          responsavel_id?: string | null
+          responsavel_id?: string | null; criado_por?: string | null
+          arquivado?: boolean; arquivado_em?: string | null; arquivado_por?: string | null
+          notas_interesse?: string | null
         }
         Update: Partial<Omit<Lead, 'id' | 'created_at' | 'updated_at'>>
         Relationships: []
@@ -276,7 +286,7 @@ export type Database = {
       }
       parceiros: {
         Row: Parceiro
-        Insert: Omit<Parceiro, 'id' | 'created_at'> & { id?: string; created_at?: string }
+        Insert: Omit<Parceiro, 'id' | 'created_at' | 'arquivado' | 'arquivado_em' | 'arquivado_por'> & { id?: string; created_at?: string; arquivado?: boolean; arquivado_em?: string | null; arquivado_por?: string | null }
         Update: Partial<Omit<Parceiro, 'id' | 'created_at'>>
         Relationships: []
       }

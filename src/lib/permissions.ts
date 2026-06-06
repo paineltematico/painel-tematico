@@ -15,6 +15,9 @@ export type Permission =
   | 'leads.delete'
   | 'leads.archive'
   | 'leads.comerciais'
+  | 'parceiros.archive'
+  | 'parceiros.delete'
+  | 'estatisticas.view'
   | 'projetos.view'
   | 'projetos.create'
   | 'projetos.edit'
@@ -47,6 +50,7 @@ const ROLE_PERMISSIONS: Record<AdminRole, Permission[]> = {
     'dashboard.view',
     'imoveis.view', 'imoveis.create', 'imoveis.edit', 'imoveis.delete',
     'leads.view', 'leads.view_all', 'leads.create', 'leads.edit', 'leads.delete', 'leads.archive', 'leads.comerciais',
+    'parceiros.archive', 'parceiros.delete', 'estatisticas.view',
     'projetos.view', 'projetos.create', 'projetos.edit', 'projetos.delete',
     'unidades.view', 'unidades.edit',
     'obra.view', 'obra.edit',
@@ -61,6 +65,7 @@ const ROLE_PERMISSIONS: Record<AdminRole, Permission[]> = {
     'dashboard.view',
     'imoveis.view', 'imoveis.create', 'imoveis.edit', 'imoveis.delete',
     'leads.view', 'leads.view_all', 'leads.create', 'leads.edit', 'leads.delete', 'leads.archive', 'leads.comerciais',
+    'parceiros.archive', 'parceiros.delete', 'estatisticas.view',
     'projetos.view', 'projetos.create', 'projetos.edit', 'projetos.delete',
     'unidades.view', 'unidades.edit',
     'obra.view', 'obra.edit',
@@ -71,11 +76,12 @@ const ROLE_PERMISSIONS: Record<AdminRole, Permission[]> = {
     'definicoes.view', 'definicoes.edit',
   ],
   comercial: [
-    'dashboard.view',
-    'imoveis.view', 'imoveis.edit',
+    // Apenas Imóveis, Leads e Parceiros (Parceiros usa 'leads.view').
+    // Pode angariar (criar) imóveis e gerir os seus leads.
+    'dashboard.view', 'estatisticas.view',
+    'imoveis.view', 'imoveis.create', 'imoveis.edit',
     'leads.view', 'leads.create', 'leads.edit', 'leads.archive',
-    'projetos.view',
-    'unidades.view',
+    'parceiros.archive',
   ],
   marketing: [
     'dashboard.view',

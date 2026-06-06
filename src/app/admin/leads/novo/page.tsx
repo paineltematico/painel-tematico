@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ChevronRight, Loader2 } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
 import { cn } from '@/lib/utils'
 
 export default function NovoLeadPage() {
@@ -39,21 +38,27 @@ export default function NovoLeadPage() {
     }
 
     setLoading(true)
-    const { error: err, data } = await supabase.from('contactos_imoveis').insert({
-      nome: form.nome,
-      email: form.email,
-      telefone: form.telefone || null,
-      mensagem: form.mensagem || null,
-      imovel_titulo: form.imovel_titulo || null,
-      prioridade: form.prioridade as 'baixa' | 'normal' | 'alta',
-      fonte: form.fonte,
-      estado: 'novo',
-      temperatura: 'frio',
-      score: 0,
-      lido: true,
-    }).select().single()
+    const res = await fetch('/api/admin/leads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nome: form.nome,
+        email: form.email,
+        telefone: form.telefone || null,
+        mensagem: form.mensagem || null,
+        imovel_titulo: form.imovel_titulo || null,
+        prioridade: form.prioridade,
+        fonte: form.fonte,
+      }),
+    })
 
-    if (err) { setError(err.message); setLoading(false); return }
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({}))
+      setError(d.error ?? 'Erro ao criar o lead.')
+      setLoading(false)
+      return
+    }
+    const data = await res.json()
     router.push(`/admin/leads/${data.id}`)
   }
 
