@@ -1,10 +1,12 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import { Suspense } from 'react'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { getCurrentUser } from '@/lib/auth-server'
 import { canUser } from '@/lib/permissions'
 import { Home, TrendingUp, Target, Users, UserCircle2, Star, AlertTriangle } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import EstatisticasFiltro from '@/components/admin/EstatisticasFiltro'
 
 export const dynamic = 'force-dynamic'
 
@@ -121,12 +123,19 @@ function FonteBar({ label, count, total, color }: { label: string; count: number
 /* ══════════════════════════════════════════
    PAGE
 ══════════════════════════════════════════ */
-export default async function EstatisticasPage() {
+interface Props {
+  searchParams: Promise<{ comercial?: string }>
+}
+
+export default async function EstatisticasPage({ searchParams }: Props) {
   const user = await getCurrentUser()
   if (!user) redirect('/admin/login')
   if (!canUser(user, 'estatisticas.view')) redirect('/admin/dashboard')
 
   const canViewAll = canUser(user, 'leads.view_all')
+  const { comercial: filtroComercialId } = await searchParams
+  // Only super_admin/diretor can filter by comercial
+  const selectedUserId = canViewAll ? (filtroComercialId ?? null) : null
 
   const now = new Date()
   const twelveAgo = new Date(now.getFullYear(), now.getMonth() - 11, 1).toISOString()
@@ -138,19 +147,27 @@ export default async function EstatisticasPage() {
     { data: leadsRaw },
     { data: users },
   ] = await Promise.all([
-    supabaseAdmin
-      .from('imoveis')
-      .select('id, created_at, disponivel, angariacao_perdida, angariador_id, cidade, tipologia')
-      .not('angariador_id', 'is', null)
-      .gte('created_at', twelveAgo)
-      .order('created_at', { ascending: true }),
+    (() => {
+      let q = supabaseAdmin
+        .from('imoveis')
+        .select('id, created_at, disponivel, angariacao_perdida, angariador_id, cidade, tipologia')
+        .not('angariador_id', 'is', null)
+        .gte('created_at', twelveAgo)
+        .order('created_at', { ascending: true })
+      if (selectedUserId) q = q.eq('angariador_id', selectedUserId)
+      return q
+    })(),
     // leads visibility
     (() => {
       let q = supabaseAdmin
         .from('contactos_imoveis')
         .select('id, estado, fonte, created_at, responsavel_id, arquivado, temperatura')
         .eq('arquivado', false)
-      if (!canViewAll) q = q.or(`responsavel_id.eq.${user.id},criado_por.eq.${user.id}`)
+      if (selectedUserId) {
+        q = q.eq('responsavel_id', selectedUserId)
+      } else if (!canViewAll) {
+        q = q.or(`responsavel_id.eq.${user.id},criado_por.eq.${user.id}`)
+      }
       return q
     })(),
     supabaseAdmin.from('admin_users').select('id, nome, role').eq('ativo', true),
@@ -260,18 +277,35 @@ export default async function EstatisticasPage() {
 
   const ROLE_LABEL: Record<string, string> = { super_admin: 'Super Admin', diretor: 'Diretor', comercial: 'Comercial' }
 
+  const selectedUser = selectedUserId ? allUsers.find(u => u.id === selectedUserId) : null
+  const subTitle = canViewAll
+    ? selectedUser ? `A ver: ${selectedUser.nome}` : 'Toda a equipa'
+    : 'Os meus dados'
+
+  // Comerciais available for filter (those with leads or angs)
+  const filtroUsers = canViewAll
+    ? allUsers.filter(u => ['comercial', 'diretor', 'super_admin'].includes(u.role))
+    : []
+
   return (
     <div className="max-w-7xl mx-auto space-y-8">
 
       {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-4">
+      <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
           <h1 className="font-serif text-2xl font-bold text-[#1F3F44]">Estatísticas</h1>
           <p className="text-[#64748b] text-sm mt-0.5">
-            Análise de performance · {canViewAll ? 'Toda a equipa' : 'Os meus dados'}
+            Análise de performance · {subTitle}
           </p>
         </div>
-        <Link href="/admin/dashboard" className="text-[#00545F] text-sm font-semibold hover:underline">← Dashboard</Link>
+        <div className="flex items-center gap-3 flex-wrap">
+          {canViewAll && (
+            <Suspense fallback={null}>
+              <EstatisticasFiltro users={filtroUsers} />
+            </Suspense>
+          )}
+          <Link href="/admin/dashboard" className="text-[#00545F] text-sm font-semibold hover:underline">← Dashboard</Link>
+        </div>
       </div>
 
       {/* KPIs topo */}
