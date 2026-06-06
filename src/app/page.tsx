@@ -344,7 +344,7 @@ export default async function HomePage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/contacto"
+              href="/avaliacao"
               className="px-8 py-4 rounded-xl bg-[#00545F] text-white font-semibold hover:bg-[#006B78] transition-colors shadow-lg"
             >
               Pedir avaliação gratuita
