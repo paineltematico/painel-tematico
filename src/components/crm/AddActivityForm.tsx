@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
 import { ATIVIDADE_TIPOS } from '@/lib/crm'
 import { Loader2, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -20,23 +19,28 @@ export default function AddActivityForm({ leadId }: Props) {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
+  const [erro, setErro] = useState('')
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!conteudo.trim()) return
     setLoading(true)
+    setErro('')
 
-    await supabase.from('lead_atividades').insert({
-      lead_id: leadId,
-      tipo,
-      conteudo: conteudo.trim(),
+    const res = await fetch(`/api/admin/leads/${leadId}/atividade`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tipo, conteudo }),
     })
 
-    // Mark as read when activity is added
-    await supabase.from('contactos_imoveis').update({ lido: true }).eq('id', leadId)
-
-    setConteudo('')
+    if (res.ok) {
+      setConteudo('')
+      router.refresh()
+    } else {
+      const d = await res.json().catch(() => ({}))
+      setErro(d.error ?? 'Erro ao registar atividade.')
+    }
     setLoading(false)
-    router.refresh()
   }
 
   return (
@@ -81,6 +85,7 @@ export default function AddActivityForm({ leadId }: Props) {
         <p className="absolute bottom-2.5 right-3 text-xs text-[#94a3b8] pointer-events-none">⌘↵</p>
       </div>
 
+      {erro && <p className="text-red-500 text-xs">{erro}</p>}
       <div className="flex justify-end">
         <button
           type="submit"
