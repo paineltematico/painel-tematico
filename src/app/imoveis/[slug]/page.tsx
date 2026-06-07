@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 import ImovelLuxury from './ImovelLuxury'
 import type { Imovel } from '@/types/database'
 
@@ -9,7 +9,7 @@ interface Props {
 }
 
 async function getImovel(slug: string): Promise<Imovel | null> {
-  const { data } = await supabase
+  const { data } = await supabaseAdmin
     .from('imoveis')
     .select('*')
     .eq('slug', slug)
@@ -36,5 +36,18 @@ export default async function ImovelPage({ params }: Props) {
   const imovel = await getImovel(slug)
   if (!imovel) notFound()
 
-  return <ImovelLuxury imovel={imovel} />
+  let angariador: { nome: string; role: string } | null = null
+
+  if (imovel.angariador_id) {
+    const { data } = await supabaseAdmin
+      .from('admin_users')
+      .select('nome, role')
+      .eq('id', imovel.angariador_id)
+      .single()
+    if (data) {
+      angariador = { nome: data.nome as string, role: data.role as string }
+    }
+  }
+
+  return <ImovelLuxury imovel={imovel} angariador={angariador} />
 }

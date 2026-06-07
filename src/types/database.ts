@@ -14,6 +14,8 @@ export type Imovel = {
   distrito: string | null
   descricao: string | null
   fotos: string[]
+  plantas: string[]
+  especificidades: string[] | null
   destaque: boolean
   disponivel: boolean
   angariador_id: string | null

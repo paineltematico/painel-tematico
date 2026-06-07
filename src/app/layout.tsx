@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
 import WhatsAppButton from '@/components/WhatsAppButton'
 import EditModeBar from '@/components/EditModeBar'
+import LanguageSwitcher from '@/components/LanguageSwitcher'
 import { EditModeProvider } from '@/context/EditModeContext'
 import { getCurrentUser } from '@/lib/auth-server'
 import localFont from 'next/font/local'
@@ -63,6 +64,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <EditModeProvider initialEditMode={editMode}>
           {children}
           <WhatsAppButton />
+          <LanguageSwitcher />
           <EditModeBar />
         </EditModeProvider>
       </body>

@@ -24,6 +24,8 @@ type FormData = {
   distrito: string
   descricao: string
   fotos: string[]
+  plantas: string[]
+  especificidades: string
   destaque: boolean
   disponivel: boolean
 }
@@ -62,6 +64,8 @@ export default function ImovelForm({ imovel }: Props) {
     distrito: imovel?.distrito ?? '',
     descricao: imovel?.descricao ?? '',
     fotos: imovel?.fotos ?? [],
+    plantas: imovel?.plantas ?? [],
+    especificidades: (imovel?.especificidades ?? []).join('\n'),
     destaque: imovel?.destaque ?? false,
     disponivel: imovel?.disponivel ?? true,
   })
@@ -101,6 +105,10 @@ export default function ImovelForm({ imovel }: Props) {
         distrito: form.distrito || null,
         descricao: form.descricao || null,
         fotos: form.fotos,
+        plantas: form.plantas,
+        especificidades: form.especificidades
+          ? form.especificidades.split('\n').map(s => s.trim()).filter(Boolean)
+          : [],
         destaque: form.destaque,
         disponivel: form.disponivel,
       }
@@ -250,6 +258,35 @@ export default function ImovelForm({ imovel }: Props) {
           folder="imoveis"
           max={20}
         />
+      </section>
+
+      {/* ─ Plantas ─ */}
+      <section className="bg-white rounded-2xl border border-[#e2e8f0] p-6">
+        <h2 className="font-serif font-semibold text-[#1F3F44] mb-1">Plantas</h2>
+        <p className="text-[#94a3b8] text-xs mb-5">Plantas e layouts do imóvel (imagens ou PDFs). Aparecem numa secção própria na página do imóvel.</p>
+        <ImageUpload
+          urls={form.plantas}
+          onChange={(urls) => set('plantas', urls)}
+          folder="imoveis/plantas"
+          max={10}
+        />
+      </section>
+
+      {/* ─ Especificidades ─ */}
+      <section className="bg-white rounded-2xl border border-[#e2e8f0] p-6">
+        <h2 className="font-serif font-semibold text-[#1F3F44] mb-1">Especificidades</h2>
+        <p className="text-[#94a3b8] text-xs mb-5">
+          Lista de características detalhadas — uma por linha.<br />
+          Ex: <em>Cozinha equipada, Chão em madeira, Ar condicionado, Painéis solares...</em>
+        </p>
+        <textarea
+          rows={8}
+          value={form.especificidades}
+          onChange={(e) => set('especificidades', e.target.value)}
+          placeholder={'Cozinha totalmente equipada\nPavimento em madeira maciça\nAr condicionado\nPainéis solares\nPiscina privativa\nVidros duplos\n...'}
+          className={cn(field, 'resize-none font-mono text-xs')}
+        />
+        <p className="text-[#94a3b8] text-xs mt-2">Uma característica por linha</p>
       </section>
 
       {/* ─ Visibilidade ─ */}

@@ -4,6 +4,7 @@ import Footer from '@/components/Footer'
 import ContactForm from '@/components/ContactForm'
 import { getSettings } from '@/lib/settings'
 import { EditableText } from '@/components/EditableText'
+import { EditableHeroImage } from '@/components/EditableHeroImage'
 
 export const metadata: Metadata = {
   title: 'Contacto',
@@ -21,10 +22,12 @@ export default async function ContactoPage() {
         {/* ── Hero dark info section ───────────────────────────── */}
         <section className="relative min-h-screen flex items-center bg-[#0d1f22] overflow-hidden">
 
-          {/* Background image + overlay */}
-          <div
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-30"
-            style={{ backgroundImage: "url('/images/contacto-hero.jpg')" }}
+          {/* Background image + overlay (parallax, editable in edit mode) */}
+          <EditableHeroImage
+            settingKey="hero_contacto_image"
+            currentUrl={settings.hero_contacto_image || '/images/contacto-hero.jpg'}
+            className="absolute inset-0 opacity-30"
+            overlayOpacity={0.5}
           />
           <div className="absolute inset-0 bg-gradient-to-r from-[#0d1f22]/90 via-[#0d1f22]/60 to-[#0d1f22]/80" />
 

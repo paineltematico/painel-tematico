@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import Link from 'next/link'
 import {
   Bed, Bath, Car, Maximize2, MapPin, ChevronLeft, ChevronRight as ChevRight,
-  X, ChevronRight, ZoomIn, Phone, MessageCircle, Calendar, ArrowDown,
+  X, ChevronRight, ZoomIn, Phone, MessageCircle, Calendar, ArrowDown, Share2, Copy, Printer, User,
 } from 'lucide-react'
 import type { Imovel } from '@/types/database'
 import { formatPrice, formatArea } from '@/lib/utils'
@@ -24,7 +24,12 @@ function useVisible(th = 0.12) {
   return [ref, v] as const
 }
 
-export default function ImovelLuxury({ imovel }: { imovel: Imovel }) {
+interface Angariador {
+  nome: string
+  role: string
+}
+
+export default function ImovelLuxury({ imovel, angariador }: { imovel: Imovel; angariador?: Angariador | null }) {
   const bgRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -40,27 +45,55 @@ export default function ImovelLuxury({ imovel }: { imovel: Imovel }) {
     return () => window.removeEventListener('scroll', fn)
   }, [])
 
-  const [lb, setLb] = useState<number | null>(null)
+  // Gallery lightbox state (shared for fotos and plantas)
+  const [lb, setLb] = useState<{ images: string[]; index: number } | null>(null)
   const fotos = imovel.fotos ?? []
-  const prev = useCallback(() => setLb(a => (a! - 1 + fotos.length) % fotos.length), [fotos.length])
-  const next = useCallback(() => setLb(a => (a! + 1) % fotos.length), [fotos.length])
+  const plantas = imovel.plantas ?? []
+
+  const lbPrev = useCallback(() => setLb(a => a ? { ...a, index: (a.index - 1 + a.images.length) % a.images.length } : null), [])
+  const lbNext = useCallback(() => setLb(a => a ? { ...a, index: (a.index + 1) % a.images.length } : null), [])
+
   useEffect(() => {
     if (lb === null) return
     const h = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight') next()
-      if (e.key === 'ArrowLeft')  prev()
+      if (e.key === 'ArrowRight') lbNext()
+      if (e.key === 'ArrowLeft')  lbPrev()
       if (e.key === 'Escape')     setLb(null)
     }
     window.addEventListener('keydown', h)
     document.body.style.overflow = 'hidden'
     return () => { window.removeEventListener('keydown', h); document.body.style.overflow = '' }
-  }, [lb, next, prev])
+  }, [lb, lbNext, lbPrev])
+
+  // Share buttons state
+  const [copied, setCopied] = useState(false)
+
+  const handleShare = async () => {
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({ title: imovel.titulo, url: window.location.href })
+      } catch { /* cancelled */ }
+    } else {
+      handleCopy()
+    }
+  }
+
+  const handleCopy = () => {
+    if (typeof navigator !== 'undefined') {
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
+      })
+    }
+  }
 
   const [s1r, s1v] = useVisible()
   const [s2r, s2v] = useVisible()
   const [s3r, s3v] = useVisible()
   const [s4r, s4v] = useVisible()
   const [s5r, s5v] = useVisible()
+  const [s6r, s6v] = useVisible()
+  const [s7r, s7v] = useVisible()
 
   const features = [
     imovel.quartos    != null && { icon: Bed,       label: 'Quartos',        value: imovel.quartos },
@@ -70,7 +103,24 @@ export default function ImovelLuxury({ imovel }: { imovel: Imovel }) {
   ].filter(Boolean) as { icon: React.ElementType; label: string; value: string | number }[]
 
   const location = [imovel.localizacao, imovel.cidade, imovel.distrito].filter(Boolean).join(' · ')
+  const address  = [imovel.localizacao, imovel.cidade, imovel.distrito].filter(Boolean).join(', ')
   const heroImg  = fotos[0] ?? null
+
+  const btnStyle: React.CSSProperties = {
+    display: 'flex', alignItems: 'center', gap: '0.4rem',
+    padding: '0.45rem 0.85rem',
+    background: 'rgba(255,255,255,0.12)',
+    border: '1px solid rgba(255,255,255,0.2)',
+    borderRadius: '999px',
+    color: '#fff',
+    fontSize: '0.7rem',
+    fontWeight: 600,
+    letterSpacing: '0.08em',
+    cursor: 'pointer',
+    backdropFilter: 'blur(8px)',
+    transition: 'background 0.2s',
+    whiteSpace: 'nowrap' as const,
+  }
 
   return (
     <div style={{ background: DARK, color: '#F5F5F5', fontFamily: 'var(--font-cera)' }}>
@@ -164,12 +214,35 @@ export default function ImovelLuxury({ imovel }: { imovel: Imovel }) {
           </div>
         </div>
 
+        {/* Share / Copy / Print buttons — bottom-right of hero */}
+        <div className="absolute bottom-10 sm:bottom-16 right-4 sm:right-8 md:right-14 flex items-center gap-2"
+          style={{ animation: 'fadeUp 1s 0.5s ease both' }}>
+          <button style={btnStyle} onClick={handleShare}
+            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.22)')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.12)')}>
+            <Share2 className="w-3 h-3" />
+            <span>Partilhar</span>
+          </button>
+          <button style={btnStyle} onClick={handleCopy}
+            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.22)')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.12)')}>
+            <Copy className="w-3 h-3" />
+            <span>{copied ? 'Copiado!' : 'Copiar link'}</span>
+          </button>
+          <button style={btnStyle} onClick={() => window.print()}
+            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.22)')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.12)')}>
+            <Printer className="w-3 h-3" />
+            <span>Brochura PDF</span>
+          </button>
+        </div>
+
         <div className="absolute bottom-5 left-1/2 -translate-x-1/2 opacity-30" style={{ animation: 'bounce 2s 1.5s infinite' }}>
           <ArrowDown className="w-5 h-5" />
         </div>
       </section>
 
-      {/* ══ STORY ══ */}
+      {/* ══ DESCRIPTION (previously "Sobre este imóvel") ══ */}
       {imovel.descricao && (
         <section className="py-16 sm:py-24 lg:py-32" style={{ background: DARK2 }}>
           <div ref={s1r} className="max-w-6xl mx-auto px-4 sm:px-8"
@@ -177,7 +250,7 @@ export default function ImovelLuxury({ imovel }: { imovel: Imovel }) {
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 sm:gap-12 lg:gap-16 items-start">
               <div className="lg:col-span-3">
                 <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.3em] mb-6 sm:mb-8" style={{ color: GOLD }}>
-                  Sobre este imóvel
+                  Descrição
                 </p>
                 <p className="font-serif leading-relaxed text-white/80"
                   style={{ fontSize: 'clamp(1rem,1.8vw,1.4rem)', lineHeight: 1.75 }}>
@@ -225,7 +298,8 @@ export default function ImovelLuxury({ imovel }: { imovel: Imovel }) {
             </div>
             <div className="columns-1 sm:columns-2 lg:columns-3 gap-3">
               {fotos.map((url, i) => (
-                <div key={i} className="break-inside-avoid mb-3 group relative overflow-hidden rounded-xl cursor-zoom-in" onClick={() => setLb(i)}>
+                <div key={i} className="break-inside-avoid mb-3 group relative overflow-hidden rounded-xl cursor-zoom-in"
+                  onClick={() => setLb({ images: fotos, index: i })}>
                   <img src={url} alt={`Foto ${i + 1}`} loading="lazy"
                     className="w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]" />
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
@@ -236,76 +310,97 @@ export default function ImovelLuxury({ imovel }: { imovel: Imovel }) {
               ))}
             </div>
           </div>
-
-          {/* Lightbox */}
-          {lb !== null && (
-            <div className="fixed inset-0 z-[9999] flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.97)' }} onClick={() => setLb(null)}>
-              <img src={fotos[lb]} alt="" className="max-h-[85vh] max-w-[92vw] sm:max-w-[88vw] object-contain rounded-lg"
-                onClick={e => e.stopPropagation()} />
-              <button onClick={() => setLb(null)}
-                className="absolute top-4 right-4 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-white"
-                style={{ background: 'rgba(255,255,255,0.12)' }}>
-                <X className="w-5 h-5" />
-              </button>
-              <div className="absolute top-4 left-1/2 -translate-x-1/2 text-xs sm:text-sm" style={{ color: 'rgba(245,245,245,0.4)' }}>
-                {lb + 1} / {fotos.length}
-              </div>
-              {fotos.length > 1 && <>
-                <button onClick={e => { e.stopPropagation(); prev() }}
-                  className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-white"
-                  style={{ background: 'rgba(255,255,255,0.1)' }}>
-                  <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
-                </button>
-                <button onClick={e => { e.stopPropagation(); next() }}
-                  className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-white"
-                  style={{ background: 'rgba(255,255,255,0.1)' }}>
-                  <ChevRight className="w-5 h-5 sm:w-6 sm:h-6" />
-                </button>
-                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 max-w-[88vw] overflow-x-auto py-1">
-                  {fotos.map((u, i) => (
-                    <button key={i} onClick={e => { e.stopPropagation(); setLb(i) }}
-                      className="flex-shrink-0 w-10 h-8 sm:w-12 sm:h-9 rounded overflow-hidden border-2 transition-all"
-                      style={{ borderColor: i === lb ? GOLD : 'transparent', opacity: i === lb ? 1 : 0.35 }}>
-                      <img src={u} alt="" className="w-full h-full object-cover" />
-                    </button>
-                  ))}
-                </div>
-              </>}
-            </div>
-          )}
         </section>
       )}
 
-      {/* ══ FEATURES ══ */}
-      {features.length > 0 && (
-        <section className="py-16 sm:py-24 lg:py-28" style={{ background: DARK2 }}>
+      {/* ══ PLANTAS ══ */}
+      {plantas.length > 0 && (
+        <section className="py-14 sm:py-20 lg:py-24" style={{ background: '#0a0a0a', borderTop: '1px solid rgba(255,255,255,0.04)' }}>
           <div className="max-w-7xl mx-auto px-4 sm:px-8">
-            <div ref={s3r} style={{ transition: 'all 1s ease', opacity: s3v ? 1 : 0, transform: s3v ? 'none' : 'translateY(30px)' }}>
-              <p className="text-[10px] sm:text-xs uppercase tracking-[0.3em] mb-3 sm:mb-4" style={{ color: GOLD, opacity: 0.7 }}>Características</p>
-              <h2 className="font-serif font-bold mb-8 sm:mb-12 lg:mb-16 text-white/90"
-                style={{ fontSize: 'clamp(1.6rem,4vw,4rem)' }}>
-                Detalhes do imóvel
-              </h2>
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-px" style={{ background: 'rgba(255,255,255,0.06)' }}>
-                {features.map(({ icon: Icon, label, value }, i) => (
-                  <div key={label} className="flex flex-col justify-between p-5 sm:p-7 lg:p-10"
-                    style={{
-                      background: DARK2,
-                      transition: `all 0.8s ease ${i * 120}ms`,
-                      opacity: s3v ? 1 : 0,
-                      transform: s3v ? 'none' : 'translateY(24px)',
-                    }}>
-                    <Icon className="w-5 h-5 sm:w-6 sm:h-6 mb-5 sm:mb-8" style={{ color: GOLD, opacity: 0.8 }} />
-                    <div>
-                      <p className="font-serif font-bold mb-1.5"
-                        style={{ fontSize: 'clamp(1.5rem,3.5vw,3.5rem)', color: '#F5F5F5' }}>
-                        {value}
-                      </p>
-                      <p className="text-[9px] sm:text-[10px] sm:text-xs uppercase tracking-[0.2em] opacity-40">{label}</p>
+            <div ref={s6r} style={{ transition: 'all 1s ease', opacity: s6v ? 1 : 0, transform: s6v ? 'none' : 'translateY(24px)' }}>
+              <div className="flex items-end justify-between mb-8 sm:mb-10">
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.3em] opacity-40 mb-2">Plantas</p>
+                  <h2 className="font-serif font-bold" style={{ fontSize: 'clamp(1.6rem,4vw,4rem)' }}>
+                    {plantas.length === 1 ? '1 planta' : `${plantas.length} plantas`}
+                  </h2>
+                </div>
+                <p className="text-xs sm:text-sm opacity-25 hidden sm:block">Toque para ampliar</p>
+              </div>
+              <div className="flex gap-4 overflow-x-auto pb-4" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(201,169,110,0.3) transparent' }}>
+                {plantas.map((url, i) => (
+                  <div key={i}
+                    className="flex-shrink-0 group relative overflow-hidden rounded-xl cursor-zoom-in"
+                    style={{ width: 'clamp(240px, 35vw, 420px)', aspectRatio: '4/3' }}
+                    onClick={() => setLb({ images: plantas, index: i })}>
+                    <img src={url} alt={`Planta ${i + 1}`} loading="lazy"
+                      className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-[1.04]"
+                      style={{ background: 'rgba(255,255,255,0.03)' }} />
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      style={{ background: 'rgba(0,0,0,0.25)' }}>
+                      <ZoomIn className="w-7 h-7 text-white drop-shadow" />
                     </div>
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ══ ESPECIFICIDADES (previously "Características" / "Detalhes do imóvel") ══ */}
+      {(features.length > 0 || (imovel.especificidades && imovel.especificidades.length > 0)) && (
+        <section className="py-16 sm:py-24 lg:py-28" style={{ background: DARK2 }}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-8">
+            <div ref={s3r} style={{ transition: 'all 1s ease', opacity: s3v ? 1 : 0, transform: s3v ? 'none' : 'translateY(30px)' }}>
+              <p className="text-[10px] sm:text-xs uppercase tracking-[0.3em] mb-3 sm:mb-4" style={{ color: GOLD, opacity: 0.7 }}>Especificidades</p>
+              <h2 className="font-serif font-bold mb-8 sm:mb-12 lg:mb-16 text-white/90"
+                style={{ fontSize: 'clamp(1.6rem,4vw,4rem)' }}>
+                Detalhes do imóvel
+              </h2>
+
+              {features.length > 0 && (
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-px mb-12 sm:mb-16" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                  {features.map(({ icon: Icon, label, value }, i) => (
+                    <div key={label} className="flex flex-col justify-between p-5 sm:p-7 lg:p-10"
+                      style={{
+                        background: DARK2,
+                        transition: `all 0.8s ease ${i * 120}ms`,
+                        opacity: s3v ? 1 : 0,
+                        transform: s3v ? 'none' : 'translateY(24px)',
+                      }}>
+                      <Icon className="w-5 h-5 sm:w-6 sm:h-6 mb-5 sm:mb-8" style={{ color: GOLD, opacity: 0.8 }} />
+                      <div>
+                        <p className="font-serif font-bold mb-1.5"
+                          style={{ fontSize: 'clamp(1.5rem,3.5vw,3.5rem)', color: '#F5F5F5' }}>
+                          {value}
+                        </p>
+                        <p className="text-[9px] sm:text-[10px] sm:text-xs uppercase tracking-[0.2em] opacity-40">{label}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {imovel.especificidades && imovel.especificidades.length > 0 && (
+                <div>
+                  <div className="w-full h-px mb-8 sm:mb-10" style={{ background: 'rgba(255,255,255,0.06)' }} />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0">
+                    {imovel.especificidades.map((item, i) => (
+                      <div key={i} className="flex items-center gap-3 py-3 px-1"
+                        style={{
+                          borderBottom: '1px solid rgba(255,255,255,0.05)',
+                          transition: `all 0.6s ease ${i * 50}ms`,
+                          opacity: s3v ? 1 : 0,
+                          transform: s3v ? 'none' : 'translateY(12px)',
+                        }}>
+                        <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: GOLD, opacity: 0.7 }} />
+                        <span className="text-sm text-white/70">{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </section>
@@ -324,16 +419,76 @@ export default function ImovelLuxury({ imovel }: { imovel: Imovel }) {
             <p className="opacity-45 text-sm leading-relaxed mb-6 sm:mb-8 max-w-sm">
               {[imovel.localizacao, imovel.cidade, imovel.distrito].filter(Boolean).join(', ')}
             </p>
-            <div className="flex items-center gap-2 text-sm" style={{ color: GOLD }}>
+            <div className="flex items-center gap-2 text-sm mb-8 sm:mb-10" style={{ color: GOLD }}>
               <MapPin className="w-4 h-4 flex-shrink-0" />
               <span className="opacity-65 text-xs sm:text-sm">{location}</span>
+            </div>
+
+            {/* Google Maps embed */}
+            <div className="rounded-2xl overflow-hidden" style={{ height: 400, border: '1px solid rgba(255,255,255,0.07)' }}>
+              <iframe
+                title="Localização no mapa"
+                src={`https://maps.google.com/maps?q=${encodeURIComponent(address)}&output=embed`}
+                width="100%"
+                height="100%"
+                style={{ border: 0, filter: 'grayscale(0.3) invert(0.85) hue-rotate(170deg) brightness(0.85)' }}
+                loading="lazy"
+                allowFullScreen
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ══ COMMERCIAL / ANGARIADOR ══ */}
+      {angariador && (
+        <section className="py-16 sm:py-24 lg:py-28" style={{ background: DARK2 }}>
+          <div ref={s7r} className="max-w-6xl mx-auto px-4 sm:px-8"
+            style={{ transition: 'all 1.2s ease', opacity: s7v ? 1 : 0, transform: s7v ? 'none' : 'translateY(30px)' }}>
+            <p className="text-[10px] sm:text-xs uppercase tracking-[0.3em] mb-5 sm:mb-6" style={{ color: GOLD, opacity: 0.7 }}>
+              Responsável por este imóvel
+            </p>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-6 sm:gap-10">
+              {/* Avatar */}
+              <div className="flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center"
+                style={{ background: 'rgba(201,169,110,0.15)', border: '2px solid rgba(201,169,110,0.35)' }}>
+                <span className="font-serif font-bold text-2xl sm:text-3xl" style={{ color: GOLD }}>
+                  {angariador.nome.charAt(0).toUpperCase()}
+                </span>
+              </div>
+
+              {/* Info */}
+              <div className="flex-1">
+                <h3 className="font-serif font-bold text-xl sm:text-2xl text-white mb-1">{angariador.nome}</h3>
+                <p className="text-[10px] uppercase tracking-[0.2em] mb-5" style={{ color: GOLD, opacity: 0.7 }}>{angariador.role}</p>
+
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <a href="https://wa.me/351913440800"
+                    className="flex items-center gap-3 rounded-xl text-sm transition-all"
+                    style={{ padding: '0.75rem 1.25rem', border: '1px solid rgba(255,255,255,0.1)' }}
+                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
+                    onMouseLeave={e => (e.currentTarget.style.background = '')}>
+                    <MessageCircle className="w-4 h-4 flex-shrink-0" style={{ color: GOLD }} />
+                    <span className="text-white/65">WhatsApp</span>
+                  </a>
+                  <a href="tel:+351913440800"
+                    className="flex items-center gap-3 rounded-xl text-sm transition-all"
+                    style={{ padding: '0.75rem 1.25rem', border: '1px solid rgba(255,255,255,0.1)' }}
+                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
+                    onMouseLeave={e => (e.currentTarget.style.background = '')}>
+                    <Phone className="w-4 h-4 flex-shrink-0" style={{ color: GOLD }} />
+                    <span className="text-white/65">+351 913 440 800</span>
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </section>
       )}
 
       {/* ══ CONTACT ══ */}
-      <section id="contacto" className="py-16 sm:py-24 lg:py-28" style={{ background: DARK2 }}>
+      <section id="contacto" className="py-16 sm:py-24 lg:py-28" style={{ background: angariador ? '#0a0a0a' : DARK2 }}>
         <div ref={s5r} className="max-w-6xl mx-auto px-4 sm:px-8"
           style={{ transition: 'all 1.2s ease', opacity: s5v ? 1 : 0, transform: s5v ? 'none' : 'translateY(30px)' }}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-14 lg:gap-20 items-start">
@@ -391,11 +546,52 @@ export default function ImovelLuxury({ imovel }: { imovel: Imovel }) {
         <p className="text-[10px] sm:text-xs opacity-15">© 2025 Painel Temático</p>
       </div>
 
+      {/* ══ LIGHTBOX (shared for fotos + plantas) ══ */}
+      {lb !== null && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.97)' }} onClick={() => setLb(null)}>
+          <img src={lb.images[lb.index]} alt="" className="max-h-[85vh] max-w-[92vw] sm:max-w-[88vw] object-contain rounded-lg"
+            onClick={e => e.stopPropagation()} />
+          <button onClick={() => setLb(null)}
+            className="absolute top-4 right-4 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-white"
+            style={{ background: 'rgba(255,255,255,0.12)' }}>
+            <X className="w-5 h-5" />
+          </button>
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 text-xs sm:text-sm" style={{ color: 'rgba(245,245,245,0.4)' }}>
+            {lb.index + 1} / {lb.images.length}
+          </div>
+          {lb.images.length > 1 && <>
+            <button onClick={e => { e.stopPropagation(); lbPrev() }}
+              className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-white"
+              style={{ background: 'rgba(255,255,255,0.1)' }}>
+              <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
+            <button onClick={e => { e.stopPropagation(); lbNext() }}
+              className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-white"
+              style={{ background: 'rgba(255,255,255,0.1)' }}>
+              <ChevRight className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 max-w-[88vw] overflow-x-auto py-1">
+              {lb.images.map((u, i) => (
+                <button key={i} onClick={e => { e.stopPropagation(); setLb(prev => prev ? { ...prev, index: i } : null) }}
+                  className="flex-shrink-0 w-10 h-8 sm:w-12 sm:h-9 rounded overflow-hidden border-2 transition-all"
+                  style={{ borderColor: i === lb.index ? GOLD : 'transparent', opacity: i === lb.index ? 1 : 0.35 }}>
+                  <img src={u} alt="" className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          </>}
+        </div>
+      )}
+
       <style>{`
         @keyframes fadeUp { from { opacity:0; transform:translateY(28px) } to { opacity:1; transform:translateY(0) } }
         @keyframes bounce { 0%,100% { transform:translateX(-50%) translateY(0) } 50% { transform:translateX(-50%) translateY(7px) } }
         @media (max-width:480px) { .xs\\:hidden { display:none } }
         @media (min-width:480px) { .xs\\:inline { display:inline } }
+        @media print {
+          nav, .no-print { display: none !important; }
+          section { break-inside: avoid; }
+        }
       `}</style>
     </div>
   )

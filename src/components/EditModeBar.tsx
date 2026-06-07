@@ -50,6 +50,7 @@ export default function EditModeBar() {
       <div className="w-px h-4 bg-white/15" />
       <Link
         href={`/edit/exit?return=${encodeURIComponent(pathname)}`}
+        data-edit-safe
         className="flex items-center gap-1 text-white/50 hover:text-red-400 transition-colors text-xs font-medium"
         title="Sair do modo de edição"
       >

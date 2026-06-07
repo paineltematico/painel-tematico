@@ -25,6 +25,14 @@ export type SiteSettings = {
   sobre_historia_p2: string
   sobre_historia_p3: string
 
+  // Hero background images (per page) — saved to Supabase Storage
+  hero_home_image: string
+  hero_contacto_image: string
+  hero_sobre_image: string
+  hero_imoveis_image: string
+  hero_construcao_image: string
+  hero_projetos_image: string
+
   // Homepage — secção "Porquê nós"
   home_porque_titulo: string
   home_card1_titulo: string
@@ -59,6 +67,14 @@ const DEFAULTS: SiteSettings = {
   sobre_historia_p1:  'A Painel Temático nasceu da vontade de construir de forma diferente — com materiais de excelência, técnicas avançadas e um cuidado genuíno em cada detalhe.',
   sobre_historia_p2:  'Com projetos emblemáticos em Braga e arredores, especializamo-nos em habitação premium acessível. Porque acreditamos que qualidade de vida não deve ser um luxo reservado a poucos.',
   sobre_historia_p3:  'Cada projeto começa com uma pergunta simples: "onde eu gostaria de viver?" E construímos a resposta.',
+
+  // Hero images
+  hero_home_image:        '',
+  hero_contacto_image:    '',
+  hero_sobre_image:       '',
+  hero_imoveis_image:     '',
+  hero_construcao_image:  '',
+  hero_projetos_image:    '',
 
   // Homepage — secção "Porquê nós"
   home_porque_titulo:  'A diferença está nos detalhes',
