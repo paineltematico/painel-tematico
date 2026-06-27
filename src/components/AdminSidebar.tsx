@@ -1,17 +1,63 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import {
   LayoutDashboard, Home, Users, Settings, Building2, FileText,
-  LogOut, Plus, ExternalLink, UserCog, HardHat, UsersRound, Handshake, ShieldCheck, X, UserCheck, BarChart2, ClipboardList,
+  LogOut, Plus, ExternalLink, UserCog, HardHat, UsersRound, Handshake, ShieldCheck, X, UserCheck, BarChart2, ClipboardList, Globe,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { AdminRole } from '@/lib/auth'
 import { ROLE_LABELS, ROLE_COLORS } from '@/lib/auth'
 import { canUser } from '@/lib/permissions'
 import type { Permission } from '@/lib/permissions'
+
+const LANGS = [
+  { code: 'pt', flag: '🇵🇹', label: 'PT' },
+  { code: 'en', flag: '🇬🇧', label: 'EN' },
+  { code: 'es', flag: '🇪🇸', label: 'ES' },
+  { code: 'fr', flag: '🇫🇷', label: 'FR' },
+]
+
+function SidebarLang() {
+  const [open, setOpen] = useState(false)
+  const [current, setCurrent] = useState('pt')
+
+  const handleSelect = (code: string) => {
+    setCurrent(code)
+    setOpen(false)
+    if (typeof window === 'undefined') return
+    if (code === 'pt') { window.location.href = window.location.href; return }
+    const base = window.location.href.includes('translate.google.com')
+      ? decodeURIComponent(window.location.href.split('&u=')[1] ?? window.location.href)
+      : window.location.href
+    window.location.href = `https://translate.google.com/translate?sl=pt&tl=${code}&u=${encodeURIComponent(base)}`
+  }
+
+  const sel = LANGS.find(l => l.code === current) ?? LANGS[0]
+
+  return (
+    <div className="relative">
+      {open && (
+        <div className="absolute bottom-full left-0 right-0 mb-1 bg-[#0d1a1c] border border-white/10 rounded-xl overflow-hidden shadow-xl">
+          {LANGS.map(l => (
+            <button key={l.code} onClick={() => handleSelect(l.code)}
+              className={`flex items-center gap-2.5 w-full px-3 py-2 text-sm transition-colors hover:bg-white/8 ${l.code === current ? 'text-[#4ecdc4] bg-white/5' : 'text-slate-400'}`}>
+              <span>{l.flag}</span><span className="font-medium">{l.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
+      <button onClick={() => setOpen(o => !o)}
+        className="flex items-center gap-3 px-3 py-2 w-full rounded-xl text-sm text-slate-500 hover:text-white hover:bg-white/10 transition-all">
+        <Globe className="w-4 h-4 flex-shrink-0" />
+        <span>{sel.flag} {sel.label}</span>
+      </button>
+    </div>
+  )
+}
 
 interface NavItem {
   href: string
@@ -160,8 +206,9 @@ export default function AdminSidebar({ user, onClose }: Props) {
         </div>
       )}
 
-      {/* Logout */}
-      <div className="p-4 border-t border-white/10">
+      {/* Language + Logout */}
+      <div className="p-4 border-t border-white/10 space-y-1">
+        <SidebarLang />
         <button
           onClick={handleLogout}
           className="flex items-center gap-3 px-3 py-2 w-full rounded-xl text-sm text-slate-500 hover:text-white hover:bg-white/10 transition-all"

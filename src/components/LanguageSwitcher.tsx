@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { usePathname } from 'next/navigation'
 import { Globe, ChevronDown, X } from 'lucide-react'
 
 const LANGUAGES = [
@@ -21,9 +22,13 @@ function getGoogleTranslateUrl(targetLang: string, currentUrl: string) {
 }
 
 export default function LanguageSwitcher() {
+  const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const [current, setCurrent] = useState('pt')
   const ref = useRef<HTMLDivElement>(null)
+
+  // Hide in admin — the sidebar has its own language switcher
+  if (pathname?.startsWith('/admin')) return null
 
   // Detect if already on Google Translate proxy
   useEffect(() => {
