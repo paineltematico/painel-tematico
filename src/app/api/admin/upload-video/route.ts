@@ -23,6 +23,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Use MP4, WebM ou MOV.' }, { status: 400 })
   }
 
+  const maxBytes = 200 * 1024 * 1024
+  if (file.size > maxBytes) {
+    return NextResponse.json({ error: 'Vídeo excede o limite de 200MB.' }, { status: 413 })
+  }
+
   const ext      = file.name.split('.').pop()?.toLowerCase() ?? 'mp4'
   const slug     = file.name.replace(/\.[^/.]+$/, '').replace(/[^a-z0-9]/gi, '-').toLowerCase().slice(0, 40)
   const ts       = Date.now()

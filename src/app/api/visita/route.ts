@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { rateLimit, clientIp } from '@/lib/rate-limit'
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -7,6 +8,10 @@ const supabaseAdmin = createClient(
 )
 
 export async function POST(request: Request) {
+  if (!rateLimit(`visita:${clientIp(request)}`, 5, 10 * 60 * 1000)) {
+    return NextResponse.json({ error: 'Demasiados pedidos. Tente novamente dentro de alguns minutos.' }, { status: 429 })
+  }
+
   const body = await request.json()
   const { nome, email, telefone, imovel_id, imovel_outro, data_visita, hora_visita, notas } = body
 

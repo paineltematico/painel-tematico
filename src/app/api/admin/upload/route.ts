@@ -35,6 +35,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Tipo não suportado. Use JPEG, PNG, WebP, PDF, MP4, MOV ou WEBM.' }, { status: 400 })
   }
 
+  const maxBytes = bucket === 'videos' ? 200 * 1024 * 1024 : 20 * 1024 * 1024
+  if (file.size > maxBytes) {
+    return NextResponse.json(
+      { error: `Ficheiro excede o limite de ${Math.round(maxBytes / 1024 / 1024)}MB.` },
+      { status: 413 }
+    )
+  }
+
   // Build unique filename
   const ext      = file.name.split('.').pop()?.toLowerCase() ?? 'bin'
   const slug     = file.name.replace(/\.[^/.]+$/, '').replace(/[^a-z0-9]/gi, '-').toLowerCase().slice(0, 40)

@@ -3,15 +3,21 @@ import { supabase } from '@/lib/supabase'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { verifyPassword, createToken, hashPassword, COOKIE_NAME } from '@/lib/auth'
 import type { AdminRole } from '@/lib/auth'
+import { rateLimit, clientIp } from '@/lib/rate-limit'
 
 const COOKIE_OPTS = {
   httpOnly: true,
   sameSite: 'lax' as const,
+  secure: process.env.NODE_ENV === 'production',
   maxAge: 60 * 60 * 24 * 7, // 7 days
   path: '/',
 }
 
 export async function POST(request: Request) {
+  if (!rateLimit(`login:${clientIp(request)}`, 10, 15 * 60 * 1000)) {
+    return NextResponse.json({ error: 'Demasiadas tentativas. Tente novamente dentro de alguns minutos.' }, { status: 429 })
+  }
+
   const body = await request.json()
   const { email, password } = body as { email?: string; password?: string }
 

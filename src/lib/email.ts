@@ -197,10 +197,40 @@ export function emailFollowUp2(nome: string, tipo: string, cidade: string): stri
 </body></html>`
 }
 
+function escapeHtml(v: unknown): string {
+  return String(v ?? '—')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+}
+
+export function emailAdminNovoLead(data: Record<string, unknown>): string {
+  const rows = Object.entries(data).map(([k, v]) =>
+    `<tr><td style="padding:6px 12px;color:#64748b;font-size:13px;border-bottom:1px solid #f1f5f9;">${k}</td>
+     <td style="padding:6px 12px;color:#1F3F44;font-size:13px;font-weight:600;border-bottom:1px solid #f1f5f9;">${escapeHtml(v)}</td></tr>`
+  ).join('')
+  return `
+<!DOCTYPE html><html><body style="font-family:Arial,sans-serif;background:#f1f5f9;padding:20px;">
+<div style="max-width:600px;margin:0 auto;background:#fff;border-radius:12px;overflow:hidden;">
+  <div style="background:#1F3F44;padding:24px;"><h2 style="color:#fff;margin:0;">📩 Novo Contacto Recebido</h2></div>
+  <div style="padding:24px;">
+    <table width="100%" cellpadding="0" cellspacing="0">${rows}</table>
+    <div style="margin-top:20px;text-align:center;">
+      <a href="https://painel-tematico.vercel.app/admin/leads"
+         style="background:#00545F;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:700;">
+        Ver no CRM
+      </a>
+    </div>
+  </div>
+</div>
+</body></html>`
+}
+
 export function emailAdminNovaAvaliacao(data: Record<string, unknown>): string {
   const rows = Object.entries(data).map(([k, v]) =>
     `<tr><td style="padding:6px 12px;color:#64748b;font-size:13px;border-bottom:1px solid #f1f5f9;">${k}</td>
-     <td style="padding:6px 12px;color:#1F3F44;font-size:13px;font-weight:600;border-bottom:1px solid #f1f5f9;">${v ?? '—'}</td></tr>`
+     <td style="padding:6px 12px;color:#1F3F44;font-size:13px;font-weight:600;border-bottom:1px solid #f1f5f9;">${escapeHtml(v)}</td></tr>`
   ).join('')
   return `
 <!DOCTYPE html><html><body style="font-family:Arial,sans-serif;background:#f1f5f9;padding:20px;">

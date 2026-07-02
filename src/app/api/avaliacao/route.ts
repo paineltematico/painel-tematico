@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
+import { rateLimit, clientIp } from '@/lib/rate-limit'
 import {
   sendEmail, sendAdminEmail,
   emailConfirmacao, emailAdminNovaAvaliacao
 } from '@/lib/email'
 
 export async function POST(req: NextRequest) {
+  if (!rateLimit(`avaliacao:${clientIp(req)}`, 5, 10 * 60 * 1000)) {
+    return NextResponse.json({ error: 'Demasiados pedidos. Tente novamente dentro de alguns minutos.' }, { status: 429 })
+  }
+
   const body = await req.json()
 
   const {

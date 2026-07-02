@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { supabase } from '@/lib/supabase'
 import { Phone, Mail, Check, Loader2 } from 'lucide-react'
 
 interface Props {
@@ -14,31 +13,44 @@ interface Props {
 
 export default function ContactForm({ imovelId, imovelTitulo, projetoId, projetoNome, variant = 'card' }: Props) {
   const [form, setForm] = useState({ nome: '', email: '', telefone: '', mensagem: '' })
+  const [website, setWebsite] = useState('') // honeypot anti-spam — humanos nunca preenchem
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setStatus('loading')
     try {
-      const { error } = await supabase.from('contactos_imoveis').insert({
-        ...form,
-        imovel_id: imovelId ?? null,
-        imovel_titulo: imovelTitulo ?? projetoNome ?? null,
-        projeto_interesse: projetoId ?? null,
-        lido: false,
-        estado: 'novo' as const,
-        prioridade: 'normal' as const,
-        fonte: 'site',
-        temperatura: 'morno',
-        score: 20,
+      const res = await fetch('/api/contacto', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...form,
+          website,
+          imovel_id: imovelId ?? null,
+          imovel_titulo: imovelTitulo ?? projetoNome ?? null,
+          projeto_id: projetoId ?? null,
+        }),
       })
-      if (error) throw error
+      if (!res.ok) throw new Error('request failed')
       setStatus('success')
       setForm({ nome: '', email: '', telefone: '', mensagem: '' })
     } catch {
       setStatus('error')
     }
   }
+
+  const honeypotInput = (
+    <input
+      type="text"
+      name="website"
+      value={website}
+      onChange={e => setWebsite(e.target.value)}
+      tabIndex={-1}
+      autoComplete="off"
+      aria-hidden="true"
+      className="absolute -left-[9999px] h-0 w-0 opacity-0"
+    />
+  )
 
   if (variant === 'inline') {
     return (
@@ -52,7 +64,8 @@ export default function ContactForm({ imovelId, imovelTitulo, projetoId, projeto
             <p className="text-slate-300 text-sm">A nossa equipa entrará em contacto brevemente.</p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <form onSubmit={handleSubmit} className="relative grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {honeypotInput}
             {[
               { key: 'nome', label: 'Nome *', placeholder: 'O seu nome', required: true },
               { key: 'email', label: 'Email *', placeholder: 'email@exemplo.com', type: 'email', required: true },
@@ -119,7 +132,8 @@ export default function ContactForm({ imovelId, imovelTitulo, projetoId, projeto
             </button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="relative space-y-4">
+            {honeypotInput}
             <div>
               <label className="block text-xs font-semibold text-[#475569] mb-1.5">Nome *</label>
               <input
