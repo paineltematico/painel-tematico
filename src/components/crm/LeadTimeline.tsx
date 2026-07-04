@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { Pencil, Check, X, History, ChevronDown, ChevronUp } from 'lucide-react'
 import { ATIVIDADE_TIPOS, ESTADOS, formatRelativeDate } from '@/lib/crm'
-import { supabase } from '@/lib/supabase'
 import { cn } from '@/lib/utils'
 import type { LeadAtividade } from '@/types/database'
 
@@ -45,30 +44,16 @@ export default function LeadTimeline({ atividades: initial, isSuperAdmin = false
 
   const saveEdit = async (id: string) => {
     setSaving(true)
-    const now = new Date().toISOString()
-    const current = items.find(a => a.id === id) as AtividadeComVersoes
+    // O histórico de versões é construído server-side
+    const res = await fetch(`/api/admin/atividades/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ conteudo: draft }),
+    })
 
-    // Build new versoes — append current content before overwriting
-    const prevVersoes: Versao[] = current.versoes ?? []
-    const newVersoes: Versao[] = [
-      ...prevVersoes,
-      {
-        conteudo:  current.conteudo ?? '',
-        editado_em: current.updated_at ?? current.created_at,
-      },
-    ]
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase.from('lead_atividades') as any)
-      .update({ conteudo: draft, updated_at: now, versoes: newVersoes })
-      .eq('id', id)
-
-    if (!error) {
-      setItems(prev => prev.map(a =>
-        a.id === id
-          ? { ...a, conteudo: draft, updated_at: now, versoes: newVersoes }
-          : a
-      ))
+    if (res.ok) {
+      const updated: AtividadeComVersoes = await res.json()
+      setItems(prev => prev.map(a => (a.id === id ? { ...a, ...updated } : a)))
     }
     setEditing(null)
     setDraft('')

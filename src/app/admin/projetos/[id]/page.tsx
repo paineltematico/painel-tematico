@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 import ProjetoForm from '@/components/ProjetoForm'
 import { Home, HardHat, ExternalLink } from 'lucide-react'
 import type { Projeto } from '@/types/database'
@@ -9,7 +9,7 @@ interface Props { params: Promise<{ id: string }> }
 
 export default async function EditarProjetoPage({ params }: Props) {
   const { id } = await params
-  const { data } = await supabase.from('projetos').select('*').eq('id', id).single()
+  const { data } = await supabaseAdmin.from('projetos').select('*').eq('id', id).single()
   if (!data) notFound()
 
   const projeto = data as Projeto

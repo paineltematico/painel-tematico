@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase'
 import { Plus, Trash2, ArrowLeft, Loader2, HardHat, CheckCircle } from 'lucide-react'
 import type { AtualizacaoObra } from '@/types/database'
 import ImageUpload from '@/components/admin/ImageUpload'
@@ -26,30 +25,33 @@ export default function AtualizacoesObraPage() {
   const [projetoNome, setProjetoNome] = useState('')
 
   useEffect(() => {
-    Promise.all([
-      supabase.from('atualizacoes_obra').select('*').eq('projeto_id', projetoId).order('data_atualizacao', { ascending: false }),
-      supabase.from('projetos').select('nome').eq('id', projetoId).single(),
-    ]).then(([{ data: a }, { data: p }]) => {
-      setAtualizacoes((a ?? []) as AtualizacaoObra[])
-      setProjetoNome(p?.nome ?? '')
-      setLoading(false)
-    })
+    fetch(`/api/admin/projetos/${projetoId}/atualizacoes`)
+      .then(r => (r.ok ? r.json() : { atualizacoes: [], projeto: null }))
+      .then(({ atualizacoes: a, projeto: p }) => {
+        setAtualizacoes((a ?? []) as AtualizacaoObra[])
+        setProjetoNome(p?.nome ?? '')
+        setLoading(false)
+      })
   }, [projetoId])
 
   const addAtualizacao = async () => {
     if (!newA.titulo) return
     setAdding(true)
-    const { data, error } = await supabase.from('atualizacoes_obra').insert({
-      projeto_id: projetoId,
-      titulo: newA.titulo,
-      descricao: newA.descricao || null,
-      fase: newA.fase || null,
-      percentagem_conclusao: newA.percentagem_conclusao,
-      data_atualizacao: newA.data_atualizacao,
-      fotos: newA.fotos,
-      publicado: true,
-    }).select().single()
-    if (!error && data) {
+    const res = await fetch(`/api/admin/projetos/${projetoId}/atualizacoes`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        titulo: newA.titulo,
+        descricao: newA.descricao || null,
+        fase: newA.fase || null,
+        percentagem_conclusao: newA.percentagem_conclusao,
+        data_atualizacao: newA.data_atualizacao,
+        fotos: newA.fotos,
+        publicado: true,
+      }),
+    })
+    if (res.ok) {
+      const data = await res.json()
       setAtualizacoes(a => [data as AtualizacaoObra, ...a])
       setNewA(EMPTY)
       setShowForm(false)
@@ -59,8 +61,8 @@ export default function AtualizacoesObraPage() {
 
   const deleteAtualizacao = async (id: string) => {
     if (!confirm('Eliminar esta atualização?')) return
-    await supabase.from('atualizacoes_obra').delete().eq('id', id)
-    setAtualizacoes(a => a.filter(x => x.id !== id))
+    const res = await fetch(`/api/admin/atualizacoes/${id}`, { method: 'DELETE' })
+    if (res.ok) setAtualizacoes(a => a.filter(x => x.id !== id))
   }
 
   const latestPct = atualizacoes[0]?.percentagem_conclusao ?? 0

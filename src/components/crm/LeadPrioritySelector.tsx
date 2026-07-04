@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
 import { PRIORIDADES } from '@/lib/crm'
 import { cn } from '@/lib/utils'
 import type { LeadPrioridade } from '@/types/database'
@@ -16,7 +15,11 @@ export default function LeadPrioritySelector({ leadId, current }: Props) {
   const change = async (p: LeadPrioridade) => {
     if (p === active) return
     setActive(p)
-    await supabase.from('contactos_imoveis').update({ prioridade: p }).eq('id', leadId)
+    await fetch(`/api/admin/leads/${leadId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prioridade: p }),
+    })
     router.refresh()
   }
 

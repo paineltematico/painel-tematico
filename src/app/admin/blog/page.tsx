@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 import { Plus, Pencil, Eye, FileText, EyeOff } from 'lucide-react'
 import type { Artigo } from '@/types/database'
 
@@ -10,7 +10,7 @@ function formatDate(iso: string) {
 }
 
 export default async function AdminBlogPage() {
-  const { data } = await supabase.from('blog_posts').select('*').order('created_at', { ascending: false })
+  const { data } = await supabaseAdmin.from('blog_posts').select('*').order('created_at', { ascending: false })
   const artigos = (data ?? []) as Artigo[]
   const publicados = artigos.filter((a) => a.publicado).length
 

@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Check, Loader2 } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
 
 export default function MarkLeadRead({ id }: { id: string }) {
   const [loading, setLoading] = useState(false)
@@ -11,7 +10,11 @@ export default function MarkLeadRead({ id }: { id: string }) {
 
   const mark = async () => {
     setLoading(true)
-    await supabase.from('contactos_imoveis').update({ lido: true }).eq('id', id)
+    await fetch(`/api/admin/leads/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ lido: true }),
+    })
     router.refresh()
   }
 

@@ -4,6 +4,7 @@ import { getCurrentUser } from '@/lib/auth-server'
 import { canUser } from '@/lib/permissions'
 import { podeAcederLead } from '@/lib/crm-server'
 
+// POST /api/admin/leads/[id]/estado — muda o estado do lead e regista a atividade
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -17,25 +18,26 @@ export async function POST(
   if (!(await podeAcederLead(me, id))) {
     return NextResponse.json({ error: 'Sem permissão' }, { status: 403 })
   }
-  const { tipo, conteudo } = await req.json()
+  const { estado, estado_anterior } = await req.json()
 
-  if (!conteudo?.trim()) {
-    return NextResponse.json({ error: 'Conteúdo obrigatório' }, { status: 400 })
+  if (!estado) {
+    return NextResponse.json({ error: 'Estado obrigatório' }, { status: 400 })
   }
 
-  const { data, error } = await supabaseAdmin
-    .from('lead_atividades')
-    .insert({ lead_id: id, tipo, conteudo: conteudo.trim() })
-    .select()
-    .single()
+  const { error } = await supabaseAdmin
+    .from('contactos_imoveis')
+    .update({ estado })
+    .eq('id', id)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  // Mark lead as read
-  await supabaseAdmin
-    .from('contactos_imoveis')
-    .update({ lido: true })
-    .eq('id', id)
+  const { error: logError } = await supabaseAdmin.from('lead_atividades').insert({
+    lead_id: id,
+    tipo: 'mudanca_estado',
+    estado_anterior: estado_anterior ?? null,
+    estado_novo: estado,
+  })
 
-  return NextResponse.json(data)
+  if (logError) return NextResponse.json({ error: logError.message }, { status: 500 })
+  return NextResponse.json({ ok: true })
 }

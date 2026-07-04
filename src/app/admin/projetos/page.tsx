@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 import { Plus, Pencil, Eye, Building2 } from 'lucide-react'
 import type { Projeto } from '@/types/database'
 
@@ -15,7 +15,7 @@ const ESTADO_LABEL: Record<string, string> = {
 }
 
 export default async function AdminProjetosPage() {
-  const { data } = await supabase.from('projetos').select('*').order('ordem', { ascending: true })
+  const { data } = await supabaseAdmin.from('projetos').select('*').order('ordem', { ascending: true })
   const projetos = (data ?? []) as Projeto[]
 
   return (

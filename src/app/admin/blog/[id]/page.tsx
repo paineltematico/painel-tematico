@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 import ArtigoForm from '@/components/ArtigoForm'
 import type { Artigo } from '@/types/database'
 
@@ -7,7 +7,7 @@ interface Props { params: Promise<{ id: string }> }
 
 export default async function EditarArtigoPage({ params }: Props) {
   const { id } = await params
-  const { data } = await supabase.from('blog_posts').select('*').eq('id', id).single()
+  const { data } = await supabaseAdmin.from('blog_posts').select('*').eq('id', id).single()
   if (!data) notFound()
 
   return (

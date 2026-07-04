@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
 import { Plus, Trash2, GripVertical, Loader2, Check, Video } from 'lucide-react'
 import type { VideoObra } from '@/types/database'
 
@@ -15,23 +14,30 @@ export default function AdminConstrucaoPage() {
   const [adding, setAdding] = useState(false)
 
   useEffect(() => {
-    supabase.from('videos_obra').select('*').order('ordem').then(({ data }) => {
-      setVideos((data ?? []) as VideoObra[])
-      setLoading(false)
-    })
+    fetch('/api/admin/videos-obra')
+      .then(r => (r.ok ? r.json() : []))
+      .then((data) => {
+        setVideos((data ?? []) as VideoObra[])
+        setLoading(false)
+      })
   }, [])
 
   const addVideo = async () => {
     if (!newVideo.titulo || !newVideo.url) return
     setAdding(true)
-    const { data, error } = await supabase.from('videos_obra').insert({
-      ...newVideo,
-      thumbnail: newVideo.thumbnail || null,
-      projeto: newVideo.projeto || null,
-      ordem: videos.length,
-      ativo: true,
-    }).select().single()
-    if (!error && data) {
+    const res = await fetch('/api/admin/videos-obra', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...newVideo,
+        thumbnail: newVideo.thumbnail || null,
+        projeto: newVideo.projeto || null,
+        ordem: videos.length,
+        ativo: true,
+      }),
+    })
+    if (res.ok) {
+      const data = await res.json()
       setVideos((v) => [...v, data as VideoObra])
       setNewVideo({ titulo: '', url: '', projeto: '', thumbnail: '' })
     }
@@ -40,15 +46,19 @@ export default function AdminConstrucaoPage() {
 
   const toggleAtivo = async (id: string, ativo: boolean) => {
     setSaving(id)
-    await supabase.from('videos_obra').update({ ativo }).eq('id', id)
+    await fetch(`/api/admin/videos-obra/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ativo }),
+    })
     setVideos((v) => v.map((x) => x.id === id ? { ...x, ativo } : x))
     setSaving(null)
   }
 
   const deleteVideo = async (id: string) => {
     if (!confirm('Eliminar este vídeo?')) return
-    await supabase.from('videos_obra').delete().eq('id', id)
-    setVideos((v) => v.filter((x) => x.id !== id))
+    const res = await fetch(`/api/admin/videos-obra/${id}`, { method: 'DELETE' })
+    if (res.ok) setVideos((v) => v.filter((x) => x.id !== id))
   }
 
   return (

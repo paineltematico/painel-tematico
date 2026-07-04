@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
 import { ESTADOS } from '@/lib/crm'
 import { cn } from '@/lib/utils'
 import type { LeadEstado } from '@/types/database'
@@ -20,19 +19,13 @@ export default function LeadStageSelector({ leadId, current }: Props) {
     const anterior = active
     setActive(novo)
 
-    // Update lead state
-    await supabase
-      .from('contactos_imoveis')
-      .update({ estado: novo })
-      .eq('id', leadId)
-
-    // Log activity
-    await supabase.from('lead_atividades').insert({
-      lead_id: leadId,
-      tipo: 'mudanca_estado',
-      estado_anterior: anterior,
-      estado_novo: novo,
+    // Atualiza o estado e regista a atividade server-side
+    const res = await fetch(`/api/admin/leads/${leadId}/estado`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ estado: novo, estado_anterior: anterior }),
     })
+    if (!res.ok) setActive(anterior)
 
     setLoading(null)
     router.refresh()

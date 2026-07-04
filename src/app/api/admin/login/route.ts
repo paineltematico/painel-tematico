@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { verifyPassword, createToken, hashPassword, COOKIE_NAME } from '@/lib/auth'
 import type { AdminRole } from '@/lib/auth'
@@ -63,7 +62,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Palavra-passe incorreta' }, { status: 401 })
   }
 
-  const { count } = await supabase.from('admin_users').select('*', { count: 'exact', head: true })
+  const { count } = await supabaseAdmin.from('admin_users').select('*', { count: 'exact', head: true })
 
   const bootstrapToken = createToken({
     id: 'bootstrap',

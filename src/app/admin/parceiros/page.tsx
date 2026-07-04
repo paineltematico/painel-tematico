@@ -6,7 +6,6 @@ import {
   ChevronDown, ChevronRight, Plus, X, Loader2,
   Archive, Trash2, RotateCcw, AlertTriangle,
 } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
 import { canUser } from '@/lib/permissions'
 import type { AdminRole } from '@/lib/auth'
 
@@ -87,17 +86,10 @@ export default function ParceirosPage() {
   useEffect(() => {
     let active = true
     ;(async () => {
-      const [{ data: v }, { data: p }] = await Promise.all([
-        supabase
-          .from('visitas_parceiros')
-          .select('*, imoveis(titulo, tipologia, cidade), parceiros(nome, empresa, ami)')
-          .eq('arquivado', verArquivados)
-          .order('data_visita', { ascending: false }),
-        supabase
-          .from('parceiros')
-          .select('*, visitas_parceiros(id)')
-          .eq('arquivado', verArquivados)
-          .order('created_at', { ascending: false }),
+      const arq = verArquivados ? '?arquivados=1' : ''
+      const [v, p] = await Promise.all([
+        fetch(`/api/admin/visitas${arq}`).then(r => (r.ok ? r.json() : [])),
+        fetch(`/api/admin/parceiros${arq}`).then(r => (r.ok ? r.json() : [])),
       ])
       if (!active) return
       setVisitas((v ?? []) as Visita[])
@@ -115,8 +107,12 @@ export default function ParceirosPage() {
   }, [])
 
   const updateEstado = async (id: string, estado: string) => {
-    await supabase.from('visitas_parceiros').update({ estado } as never).eq('id', id)
-    setVisitas(vs => vs.map(v => v.id === id ? { ...v, estado } : v))
+    const res = await fetch(`/api/admin/visitas/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ estado }),
+    })
+    if (res.ok) setVisitas(vs => vs.map(v => v.id === id ? { ...v, estado } : v))
   }
 
   // ── Arquivar / Restaurar / Destruir ──
@@ -166,18 +162,20 @@ export default function ParceirosPage() {
     if (!form.nome.trim()) return
     setSaving(true)
     setFormError('')
-    const { data, error } = await supabase.from('parceiros').insert({
-      nome:        form.nome.trim(),
-      empresa:     form.empresa.trim() || null,
-      ami:         form.ami.trim()     || null,
-      email:       form.email.trim()   || null,
-      telefone:    form.telefone.trim()|| null,
-      notas:       null,
-      token_visita:null,
-      ativo:       true,
-    }).select('*, visitas_parceiros(id)').single()
+    const res = await fetch('/api/admin/parceiros', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nome:     form.nome.trim(),
+        empresa:  form.empresa.trim() || null,
+        ami:      form.ami.trim()     || null,
+        email:    form.email.trim()   || null,
+        telefone: form.telefone.trim()|| null,
+      }),
+    })
     setSaving(false)
-    if (error) { setFormError('Erro ao guardar. Tente novamente.'); return }
+    if (!res.ok) { setFormError('Erro ao guardar. Tente novamente.'); return }
+    const data = await res.json()
     if (!verArquivados) setParceiros(ps => [data as Parceiro, ...ps])
     setForm(EMPTY_FORM)
     setShowForm(false)

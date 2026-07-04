@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import { supabase } from '@/lib/supabase'
 import { Plus, Trash2, ArrowLeft, Loader2, CheckCircle2 } from 'lucide-react'
 import type { Unidade } from '@/types/database'
 
@@ -47,29 +46,26 @@ export default function UnidadesPage() {
   const termFracoes  = isLoteamento ? 'lotes' : 'frações'
 
   useEffect(() => {
-    Promise.all([
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (supabase.from('unidades') as any).select('*').eq('projeto_id', projetoId).order('ordem'),
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (supabase.from('projetos') as any).select('nome, tipo_projeto').eq('id', projetoId).single(),
-    ]).then(([{ data: u }, { data: p }]) => {
-      setUnidades((u ?? []) as UnidadeExt[])
-      setProjetoNome(p?.nome ?? '')
-      setTipo((p?.tipo_projeto ?? 'apartamentos') as TipoProjeto)
-      setLoading(false)
-    })
+    fetch(`/api/admin/projetos/${projetoId}/unidades`)
+      .then(r => (r.ok ? r.json() : { unidades: [], projeto: null }))
+      .then(({ unidades: u, projeto: p }) => {
+        setUnidades((u ?? []) as UnidadeExt[])
+        setProjetoNome(p?.nome ?? '')
+        setTipo((p?.tipo_projeto ?? 'apartamentos') as TipoProjeto)
+        setLoading(false)
+      })
   }, [projetoId])
 
   const addUnidade = async () => {
     if (!newU.referencia) return
     setAdding(true)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase.from('unidades') as any).insert({
-      ...newU,
-      projeto_id: projetoId,
-      ordem: unidades.length,
-    }).select().single()
-    if (!error && data) {
+    const res = await fetch(`/api/admin/projetos/${projetoId}/unidades`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...newU, ordem: unidades.length }),
+    })
+    if (res.ok) {
+      const data = await res.json()
       setUnidades(u => [...u, data as UnidadeExt])
       setNewU(EMPTY_APT)
     }
@@ -78,8 +74,11 @@ export default function UnidadesPage() {
 
   const updateField = async (id: string, fields: Partial<UnidadeExt>) => {
     setSaving(id)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase.from('unidades') as any).update(fields).eq('id', id)
+    await fetch(`/api/admin/unidades/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(fields),
+    })
     setUnidades(u => u.map(x => x.id === id ? { ...x, ...fields } : x))
     setSaving(null)
     setSaved(id)
@@ -88,9 +87,8 @@ export default function UnidadesPage() {
 
   const deleteUnidade = async (id: string) => {
     if (!confirm(`Eliminar este ${termFracao}?`)) return
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase.from('unidades') as any).delete().eq('id', id)
-    setUnidades(u => u.filter(x => x.id !== id))
+    const res = await fetch(`/api/admin/unidades/${id}`, { method: 'DELETE' })
+    if (res.ok) setUnidades(u => u.filter(x => x.id !== id))
   }
 
   const stats = {

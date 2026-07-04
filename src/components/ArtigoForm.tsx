@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
 import { Loader2 } from 'lucide-react'
 import type { Artigo } from '@/types/database'
 import ImageUpload from '@/components/admin/ImageUpload'
@@ -57,12 +56,14 @@ export default function ArtigoForm({ artigo }: { artigo?: Artigo }) {
         publicado: form.publicado,
         publicado_em: form.publicado ? (artigo?.publicado_em ?? new Date().toISOString()) : null,
       }
-      if (isEdit) {
-        const { error: err } = await supabase.from('blog_posts').update(payload).eq('id', artigo!.id)
-        if (err) throw err
-      } else {
-        const { error: err } = await supabase.from('blog_posts').insert(payload)
-        if (err) throw err
+      const res = await fetch(isEdit ? `/api/admin/artigos/${artigo!.id}` : '/api/admin/artigos', {
+        method: isEdit ? 'PATCH' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}))
+        throw new Error(d.error ?? 'Erro ao guardar')
       }
       router.push('/admin/blog')
       router.refresh()

@@ -2,12 +2,10 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
 import { Loader2 } from 'lucide-react'
 import ImageUpload from '@/components/admin/ImageUpload'
 import { cn } from '@/lib/utils'
 import type { Imovel } from '@/types/database'
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 
 type FormData = {
   titulo: string
@@ -114,11 +112,15 @@ export default function ImovelForm({ imovel }: Props) {
       }
 
       if (isEdit) {
-        const { error: err } = await supabase
-          .from('imoveis')
-          .update(payload)
-          .eq('id', imovel.id)
-        if (err) throw err
+        const res = await fetch(`/api/admin/imoveis/${imovel.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+        if (!res.ok) {
+          const d = await res.json().catch(() => ({}))
+          throw new Error(d.error ?? 'Erro ao guardar o imóvel.')
+        }
       } else {
         // Criação via API: regista automaticamente o angariador (utilizador da sessão)
         const res = await fetch('/api/admin/imoveis', {

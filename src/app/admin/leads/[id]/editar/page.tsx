@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Loader2, CheckCircle } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
 import { cn } from '@/lib/utils'
 
 const field = 'w-full px-3.5 py-2.5 rounded-xl border border-[#e2e8f0] text-sm focus:outline-none focus:ring-2 focus:ring-[#00545F]/30 focus:border-[#00545F] transition-all'
@@ -23,8 +22,9 @@ export default function EditarLeadPage() {
   })
 
   useEffect(() => {
-    supabase.from('contactos_imoveis').select('*').eq('id', id).single()
-      .then(({ data }) => {
+    fetch(`/api/admin/leads/${id}`)
+      .then(r => (r.ok ? r.json() : null))
+      .then((data) => {
         if (data) setForm({
           nome:          data.nome ?? '',
           email:         data.email ?? '',
@@ -49,17 +49,27 @@ export default function EditarLeadPage() {
     }
     setSaving(true)
     setError('')
-    const { error: err } = await supabase.from('contactos_imoveis').update({
-      nome:          form.nome,
-      email:         form.email || undefined,
-      telefone:      form.telefone || undefined,
-      mensagem:      form.mensagem || undefined,
-      imovel_titulo: form.imovel_titulo || undefined,
-      prioridade:    form.prioridade as 'baixa' | 'normal' | 'alta',
-      fonte:         form.fonte,
-    }).eq('id', id)
+    // Campos com undefined são omitidos pelo JSON.stringify — só atualiza o que foi preenchido
+    const res = await fetch(`/api/admin/leads/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nome:          form.nome,
+        email:         form.email || undefined,
+        telefone:      form.telefone || undefined,
+        mensagem:      form.mensagem || undefined,
+        imovel_titulo: form.imovel_titulo || undefined,
+        prioridade:    form.prioridade as 'baixa' | 'normal' | 'alta',
+        fonte:         form.fonte,
+      }),
+    })
 
-    if (err) { setError(err.message); setSaving(false); return }
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({}))
+      setError(d.error ?? 'Erro ao guardar')
+      setSaving(false)
+      return
+    }
     router.push(`/admin/leads/${id}`)
     router.refresh()
   }

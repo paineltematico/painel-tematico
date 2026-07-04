@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Trash2, Loader2 } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
 
 interface Props { id: string; titulo: string }
 
@@ -14,7 +13,12 @@ export default function DeleteImovelButton({ id, titulo }: Props) {
 
   const handleDelete = async () => {
     setLoading(true)
-    await supabase.from('imoveis').delete().eq('id', id)
+    const res = await fetch(`/api/admin/imoveis/${id}`, { method: 'DELETE' })
+    if (!res.ok) {
+      setLoading(false)
+      setConfirming(false)
+      return
+    }
     router.refresh()
   }
 

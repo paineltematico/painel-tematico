@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabase-admin'
+import { getCurrentUser } from '@/lib/auth-server'
+import { canUser } from '@/lib/permissions'
 
 export async function POST(request: NextRequest) {
-  // Verify admin session
-  const session = request.cookies.get('admin_session')?.value
-  if (session !== 'authenticated') {
+  const me = await getCurrentUser()
+  if (!me || !canUser(me, 'definicoes.edit')) {
     return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
   }
 
@@ -18,7 +19,7 @@ export async function POST(request: NextRequest) {
       updated_at: new Date().toISOString(),
     }))
 
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('site_settings')
       .upsert(rows, { onConflict: 'key' })
 

@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
 import { Plus, Trash2, GripVertical, Loader2, Users, Edit3, Check, X } from 'lucide-react'
 import type { MembroEquipa } from '@/types/database'
 import ImageUpload from '@/components/admin/ImageUpload'
@@ -20,26 +19,33 @@ export default function AdminEquipaPage() {
   const [newMembro, setNewMembro] = useState(EMPTY)
 
   useEffect(() => {
-    supabase.from('equipa').select('*').order('ordem').then(({ data }) => {
-      setMembros((data ?? []) as MembroEquipa[])
-      setLoading(false)
-    })
+    fetch('/api/admin/equipa')
+      .then(r => (r.ok ? r.json() : []))
+      .then((data) => {
+        setMembros((data ?? []) as MembroEquipa[])
+        setLoading(false)
+      })
   }, [])
 
   const addMembro = async () => {
     if (!newMembro.nome || !newMembro.cargo) return
     setAdding(true)
-    const { data, error } = await supabase.from('equipa').insert({
-      ...newMembro,
-      bio: newMembro.bio || null,
-      foto: newMembro.foto || null,
-      email: newMembro.email || null,
-      telefone: newMembro.telefone || null,
-      linkedin: newMembro.linkedin || null,
-      ordem: membros.length,
-      ativo: true,
-    }).select().single()
-    if (!error && data) {
+    const res = await fetch('/api/admin/equipa', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...newMembro,
+        bio: newMembro.bio || null,
+        foto: newMembro.foto || null,
+        email: newMembro.email || null,
+        telefone: newMembro.telefone || null,
+        linkedin: newMembro.linkedin || null,
+        ordem: membros.length,
+        ativo: true,
+      }),
+    })
+    if (res.ok) {
+      const data = await res.json()
       setMembros(m => [...m, data as MembroEquipa])
       setNewMembro(EMPTY)
       setShowForm(false)
@@ -49,15 +55,19 @@ export default function AdminEquipaPage() {
 
   const toggleAtivo = async (id: string, ativo: boolean) => {
     setSaving(id)
-    await supabase.from('equipa').update({ ativo }).eq('id', id)
+    await fetch(`/api/admin/equipa/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ativo }),
+    })
     setMembros(m => m.map(x => x.id === id ? { ...x, ativo } : x))
     setSaving(null)
   }
 
   const deleteMembro = async (id: string) => {
     if (!confirm('Eliminar este membro da equipa?')) return
-    await supabase.from('equipa').delete().eq('id', id)
-    setMembros(m => m.filter(x => x.id !== id))
+    const res = await fetch(`/api/admin/equipa/${id}`, { method: 'DELETE' })
+    if (res.ok) setMembros(m => m.filter(x => x.id !== id))
   }
 
   return (

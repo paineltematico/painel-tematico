@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { supabase } from '@/lib/supabase'
 import { Check, Loader2 } from 'lucide-react'
 
 interface Props { leadId: string; initialNotes: string }
@@ -13,9 +12,13 @@ export default function LeadNotesEditor({ leadId, initialNotes }: Props) {
 
   const save = async () => {
     setSaving(true)
-    await supabase.from('contactos_imoveis').update({ notas: notes }).eq('id', leadId)
+    const res = await fetch(`/api/admin/leads/${leadId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ notas: notes }),
+    })
     setSaving(false)
-    setSaved(true)
+    if (res.ok) setSaved(true)
   }
 
   return (
