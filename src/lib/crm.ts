@@ -24,8 +24,9 @@ export function getTemperatura(v: LeadTemperatura) {
 
 export const PRIORIDADES: { value: LeadPrioridade; label: string; emoji: string; color: string }[] = [
   { value: 'alta',   label: 'Alta',   emoji: '🔴', color: 'text-red-600 bg-red-50 border-red-200' },
-  { value: 'normal', label: 'Normal', emoji: '🟡', color: 'text-amber-600 bg-teal-50 border-amber-200' },
+  { value: 'normal', label: 'Normal', emoji: '🟡', color: 'text-amber-600 bg-amber-50 border-amber-200' },
   { value: 'baixa',  label: 'Baixa',  emoji: '🟢', color: 'text-emerald-600 bg-emerald-50 border-emerald-200' },
+  { value: 'fria',   label: 'Fria',   emoji: '⚪', color: 'text-slate-500 bg-slate-50 border-slate-200' },
 ]
 
 export const ATIVIDADE_TIPOS: { value: AtividadeTipo; label: string; icon: string }[] = [

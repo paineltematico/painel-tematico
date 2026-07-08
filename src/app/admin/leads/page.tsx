@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import { Suspense } from 'react'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { getCurrentUser } from '@/lib/auth-server'
 import { canUser } from '@/lib/permissions'
@@ -7,10 +8,11 @@ import { ESTADOS, formatRelativeDate } from '@/lib/crm'
 import { Mail, Phone, Plus, TrendingUp, Archive, UserCircle2, Users as UsersIcon, Inbox } from 'lucide-react'
 import type { LeadEstado } from '@/types/database'
 import { cn } from '@/lib/utils'
+import LeadsSearchBar from '@/components/crm/LeadsSearchBar'
 
 export const dynamic = 'force-dynamic'
 
-interface SearchParams { estado?: string; vista?: string }
+interface SearchParams { estado?: string; vista?: string; q?: string }
 
 export default async function LeadsPage({
   searchParams,
@@ -20,7 +22,7 @@ export default async function LeadsPage({
   const me = await getCurrentUser()
   if (!me) redirect('/admin/login')
 
-  const { estado, vista } = await searchParams
+  const { estado, vista, q } = await searchParams
   const canViewAll    = canUser(me, 'leads.view_all')
   const canComerciais = canUser(me, 'leads.comerciais')
   const isSuperAdmin  = me.role === 'super_admin'
@@ -34,6 +36,7 @@ export default async function LeadsPage({
     .order('updated_at', { ascending: false })
   if (!canViewAll) listQ = listQ.or(`responsavel_id.eq.${me.id},criado_por.eq.${me.id}`)
   if (estado) listQ = listQ.eq('estado', estado as LeadEstado)
+  if (q?.trim()) listQ = listQ.ilike('nome', `%${q.trim()}%`)
   const { data: leadsData } = await listQ
   const leads = leadsData ?? []
 
@@ -78,7 +81,10 @@ export default async function LeadsPage({
             {!canViewAll && <span className="text-[#94a3b8]"> · só os meus</span>}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <Suspense fallback={null}>
+            <LeadsSearchBar defaultValue={q} />
+          </Suspense>
           {canComerciais && (
             <Link
               href="/admin/leads/comerciais"
@@ -214,7 +220,7 @@ export default async function LeadsPage({
                 )}
               >
                 {/* Priority dot */}
-                <div className="flex-shrink-0 w-2 h-10 rounded-full" style={{ background: lead.prioridade === 'alta' ? '#ef4444' : lead.prioridade === 'normal' ? '#f59e0b' : '#10b981' }} />
+                <div className="flex-shrink-0 w-2 h-10 rounded-full" style={{ background: lead.prioridade === 'alta' ? '#ef4444' : lead.prioridade === 'normal' ? '#f59e0b' : lead.prioridade === 'fria' ? '#94a3b8' : '#10b981' }} />
 
                 {/* Avatar */}
                 <div className="w-10 h-10 rounded-xl bg-[#f1f5f9] flex items-center justify-center flex-shrink-0 text-[#1F3F44] font-bold text-sm font-serif">
