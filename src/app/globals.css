@@ -16,9 +16,21 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  /* O smooth-scroll é gerido pelo Lenis (JS). Em reduced-motion volta ao nativo. */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: smooth; }
+}
+
+/* Cursor personalizado ativo → esconde o nativo (só em ecrãs com hover fino) */
+.has-custom-cursor,
+.has-custom-cursor a,
+.has-custom-cursor button,
+.has-custom-cursor [role='button'] {
+  cursor: none;
 }
 
 body {
