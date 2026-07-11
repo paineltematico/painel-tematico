@@ -25,14 +25,6 @@ html {
   html { scroll-behavior: smooth; }
 }
 
-/* Cursor personalizado ativo → esconde o nativo (só em ecrãs com hover fino) */
-.has-custom-cursor,
-.has-custom-cursor a,
-.has-custom-cursor button,
-.has-custom-cursor [role='button'] {
-  cursor: none;
-}
-
 body {
   background: #ffffff;
   color: #1F3F44;
