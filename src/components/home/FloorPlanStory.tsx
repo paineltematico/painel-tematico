@@ -430,23 +430,20 @@ export default function FloorPlanStory() {
                   </div>
                 ))}
               </div>
-              {/* legenda + indicador de nível (tipo elevador) */}
-              <div ref={metaRef} className="mt-6 flex items-center justify-center gap-4">
+              {/* indicador de nível (tipo elevador) — referência visual do piso */}
+              <div ref={metaRef} className="mt-6 flex items-center justify-center">
                 <div className="flex flex-col-reverse gap-[5px]" aria-hidden="true">
                   {floors.map((fl, i) => (
                     <span
                       key={fl.n}
                       className="block h-[2px] rounded-full transition-all duration-500 motion-reduce:transition-none"
                       style={{
-                        width: i === active ? 24 : 12,
+                        width: i === active ? 28 : 14,
                         backgroundColor: i === active ? '#6BBFC9' : 'rgba(255,255,255,0.22)',
                       }}
                     />
                   ))}
                 </div>
-                <p className="text-white/40 text-[11px] font-medium uppercase tracking-[0.22em]">
-                  Axonometria · Lote 6
-                </p>
               </div>
             </div>
           </div>
