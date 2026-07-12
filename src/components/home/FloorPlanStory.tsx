@@ -50,54 +50,25 @@ const EASE_MASK = 'power4.out'
 const EASE_DRAW = 'power2.inOut'
 
 /**
- * Momento assinatura: a axonometria "constrói-se" — a laje assenta enquanto o
- * traço se desenha (stroke-dashoffset), as paredes de fundo sobem, e as
- * divisões e o mobiliário aparecem em stagger. Tudo numa timeline única para
- * poder ser interrompida/morta se o utilizador mudar de piso a meio.
+ * Momento assinatura: a planta real "imprime-se" no plano isométrico — a
+ * imagem é revelada por um wipe (clip-path) ao longo do comprimento do edifício
+ * e a espessura da laje surge a seguir. Tudo numa timeline única, para poder
+ * ser interrompida/morta se o utilizador mudar de piso a meio.
  */
-function buildAxon(svg: SVGSVGElement, tl: gsap.core.Timeline, at: number) {
-  const glow = svg.querySelector('[data-axon="glow"]')
-  const group = (name: string) =>
-    Array.from(svg.querySelectorAll<SVGPathElement>(`[data-axon="${name}"] path`))
-
-  const draw = (paths: SVGPathElement[], pos: number, dur: number, stagger: number) => {
-    if (!paths.length) return
+function drawPlan(container: HTMLElement, tl: gsap.core.Timeline, at: number) {
+  const img = container.querySelector<HTMLElement>('[data-plan]')
+  const face = container.querySelector<HTMLElement>('[data-face]')
+  if (img) {
     tl.fromTo(
-      paths,
-      {
-        strokeDasharray: (_i: number, el: SVGPathElement) => `${el.getTotalLength()}`,
-        strokeDashoffset: (_i: number, el: SVGPathElement) => el.getTotalLength(),
-        fillOpacity: 0,
-      },
-      { strokeDashoffset: 0, duration: dur, ease: EASE_DRAW, stagger },
-      pos
-    )
-    tl.to(paths, { fillOpacity: 1, duration: 0.5, ease: 'power2.out', stagger }, pos + dur * 0.5)
-  }
-
-  if (glow) {
-    tl.fromTo(
-      glow,
-      { opacity: 0, scale: 0.7, transformOrigin: '50% 50%' },
-      { opacity: 1, scale: 1, duration: 1, ease: 'power3.out' },
-      at + 0.35
+      img,
+      { clipPath: 'inset(0 0 100% 0)' },
+      { clipPath: 'inset(0 0 0% 0)', duration: 0.95, ease: EASE_DRAW },
+      at
     )
   }
-  // laje → paredes → divisões → mobiliário
-  draw(group('slab'), at, 0.75, 0.07)
-  const walls = group('walls')
-  if (walls.length) {
-    // paredes "sobem" do plano da laje enquanto o traço se desenha
-    tl.fromTo(
-      walls,
-      { y: 10, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.6, ease: 'power2.out', stagger: 0.09 },
-      at + 0.2
-    )
-    draw(walls, at + 0.2, 0.55, 0.09)
+  if (face) {
+    tl.fromTo(face, { opacity: 0 }, { opacity: 1, duration: 0.55, ease: 'power2.out' }, at + 0.3)
   }
-  draw(group('rooms'), at + 0.38, 0.5, 0.07)
-  draw(group('furn'), at + 0.52, 0.45, 0.05)
 }
 
 /**
@@ -232,8 +203,8 @@ export default function FloorPlanStory() {
           0.2
         )
         tl.set(axonRefs.current[0], { opacity: 1 }, 0.25)
-        const svg = axonRefs.current[0]?.querySelector('svg')
-        if (svg) buildAxon(svg, tl, 0.25)
+        const cont = axonRefs.current[0]
+        if (cont) drawPlan(cont, tl, 0.25)
       }
 
       const enterST = ScrollTrigger.create({
@@ -323,8 +294,7 @@ export default function FloorPlanStory() {
         { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out', immediateRender: true },
         0.16
       )
-      const svg = axonNext.querySelector('svg')
-      if (svg) buildAxon(svg, tl, 0.16)
+      drawPlan(axonNext, tl, 0.16)
     }
 
     animateTextIn(tl, 0.02, dir)
@@ -503,7 +473,7 @@ export default function FloorPlanStory() {
                     </p>
                     <h4 className="font-serif text-xl font-bold">{fl.title}</h4>
                   </div>
-                  <AxonFloor id={i} className="w-24 h-20 flex-shrink-0 opacity-80" />
+                  <AxonFloor id={i} iso={false} className="w-16 h-24 flex-shrink-0 opacity-80" />
                 </div>
                 <p className="text-white/70 text-sm leading-relaxed">{fl.desc}</p>
               </div>
