@@ -2,19 +2,18 @@ import Link from 'next/link'
 import { ArrowRight, Search, Building2, MapPin, TrendingUp, Shield, HardHat } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { getSettings } from '@/lib/settings'
-import PropertyCard from '@/components/PropertyCard'
-import ArtigoCard from '@/components/ArtigoCard'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import { EditableText } from '@/components/EditableText'
 import HomeHero from '@/components/home/HomeHero'
+import FeaturedCarousel from '@/components/home/FeaturedCarousel'
 import ProjectsScroller from '@/components/home/ProjectsScroller'
 import MerelimShowcase from '@/components/home/MerelimShowcase'
 import FloorPlanStory from '@/components/home/FloorPlanStory'
 import Reveal from '@/components/motion/Reveal'
 import TextReveal from '@/components/motion/TextReveal'
 import Counter from '@/components/motion/Counter'
-import type { Projeto, Artigo } from '@/types/database'
+import type { Projeto } from '@/types/database'
 
 async function getFeaturedImoveis() {
   const { data } = await supabase
@@ -51,12 +50,13 @@ async function getStats() {
 export default async function HomePage() {
   const [featured, stats, settings] = await Promise.all([getFeaturedImoveis(), getStats(), getSettings()])
 
-  const [{ data: projetosData }, { data: artigosData }] = await Promise.all([
-    supabase.from('projetos').select('*').eq('ativo', true).order('ordem').limit(4),
-    supabase.from('blog_posts').select('*').eq('publicado', true).order('publicado_em', { ascending: false }).limit(4),
-  ])
+  const { data: projetosData } = await supabase
+    .from('projetos')
+    .select('*')
+    .eq('ativo', true)
+    .order('ordem')
+    .limit(4)
   const projetos = (projetosData ?? []) as Projeto[]
-  const artigos = (artigosData ?? []) as Artigo[]
 
   return (
     <>
@@ -141,13 +141,11 @@ export default async function HomePage() {
               </Link>
             </Reveal>
 
-            <Reveal stagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featured.map((imovel) => (
-                <PropertyCard key={imovel.id} imovel={imovel} featured />
-              ))}
+            <Reveal from="up">
+              <FeaturedCarousel imoveis={featured} />
             </Reveal>
 
-            <div className="text-center mt-10 sm:hidden">
+            <div className="text-center mt-8 sm:hidden">
               <Link
                 href="/imoveis"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#1F3F44] text-white font-semibold hover:bg-[#1e293b] transition-colors"
@@ -250,23 +248,6 @@ export default async function HomePage() {
 
       {/* ── PROJETOS EM CURSO ── */}
       {projetos.length > 0 && <ProjectsScroller projetos={projetos} />}
-
-      {/* ── NOTAS / BLOG ── */}
-      {artigos.length > 0 && (
-        <section className="py-20 bg-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <Reveal from="up" className="flex items-end justify-between mb-10">
-              <h2 className="font-serif text-5xl sm:text-6xl font-bold text-[#1F3F44] tracking-tight">Notas</h2>
-              <Link href="/blog" className="hidden sm:flex items-center gap-2 text-[#00545F] font-semibold text-sm hover:gap-3 transition-all">
-                Ver todas <ArrowRight className="w-4 h-4" />
-              </Link>
-            </Reveal>
-            <Reveal stagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {artigos.map((a) => <ArtigoCard key={a.id} artigo={a} />)}
-            </Reveal>
-          </div>
-        </section>
-      )}
 
       {/* ── CTA ── */}
       <section className="py-20 bg-[#1F3F44] relative overflow-hidden">
