@@ -178,6 +178,54 @@ export default function SettingsForm({ initial }: Props) {
         </div>
       </section>
 
+      {/* ── Pré-visualização do Rodapé ── */}
+      <section className="bg-white rounded-2xl border border-[#E8E3E3] overflow-hidden">
+        <div className="px-6 py-4 border-b border-[#E8E3E3] bg-[#F2EEEE]/50">
+          <h2 className="font-serif font-semibold text-[#1F3F44] text-base">🖥️ Pré-visualização do Rodapé</h2>
+          <p className="text-[#64748b] text-xs mt-0.5">Atualiza em tempo real com os campos acima.</p>
+        </div>
+        <div className="p-0 overflow-hidden rounded-b-2xl">
+          <div className="bg-[#1F3F44] text-slate-300 p-8 text-sm">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-2xl">
+              {/* Brand col */}
+              <div className="sm:col-span-1">
+                <div className="font-serif font-bold text-white text-lg mb-3">painel<br /><span className="font-light tracking-widest text-xs text-[#4ecdc4] uppercase">temático</span></div>
+                <p className="text-xs text-slate-400 leading-relaxed mb-4">
+                  {form.sobre_texto || 'Texto sobre a empresa...'}
+                </p>
+                <div className="space-y-1.5 text-xs text-slate-400">
+                  <div>📞 {form.contacto_telefone || '—'}</div>
+                  <div>✉️ {form.contacto_email || '—'}</div>
+                  <div>📍 {form.contacto_morada || '—'}</div>
+                </div>
+              </div>
+              {/* Nav col */}
+              <div>
+                <p className="text-white text-xs font-semibold uppercase tracking-wider mb-3">Navegação</p>
+                <ul className="space-y-1.5 text-xs text-slate-400">
+                  {['Início', 'Todos os Imóveis', 'Para Venda', 'Para Arrendamento', 'Contacto'].map(l => (
+                    <li key={l}>{l}</li>
+                  ))}
+                </ul>
+              </div>
+              {/* Tipologias col */}
+              <div>
+                <p className="text-white text-xs font-semibold uppercase tracking-wider mb-3">Tipologias</p>
+                <ul className="space-y-1.5 text-xs text-slate-400">
+                  {['T0', 'T1', 'T2', 'T3', 'T4', 'T4+'].map(t => (
+                    <li key={t}>Apartamento {t}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <div className="mt-8 pt-5 border-t border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+              <p className="text-xs text-slate-500">© {new Date().getFullYear()} Painel Temático. Todos os direitos reservados.</p>
+              <p className="text-xs text-slate-500">AMI {form.ami_numero || '—'} · IMPIC {form.impic_numero || '—'}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Save button */}
       <div className="flex items-center gap-4 pt-2">
         <button
