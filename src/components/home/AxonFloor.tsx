@@ -22,7 +22,7 @@ const PLANS: PlanSpec[] = [
   { src: '/images/merelim/plano/piso-2.png', w: 250 }, // quartos
 ]
 
-const ISO = 'rotateX(56deg) rotateZ(-45deg)'
+const ISO = 'rotateX(45deg) rotateZ(-45deg)'
 
 export default function AxonFloor({
   id,
@@ -56,45 +56,31 @@ export default function AxonFloor({
       className={`relative flex items-center justify-center ${className}`}
       style={{ ...style, perspective: 'none' }}
     >
-      {/* Wrapper só para a sombra (filtro fora do contexto 3D) */}
-      <div style={{ filter: 'drop-shadow(0 24px 20px rgba(0,0,0,0.40))' }}>
-        {/* Plano isométrico (projeção paralela — sem perspetiva = axonometria) */}
+      {/* Plano isométrico (projeção paralela — sem perspetiva = axonometria).
+          Sem sombra nem glow: só as linhas brancas. */}
+      <div
+        data-axon-plane
+        className="relative will-change-transform"
+        style={{
+          width: plan.w,
+          transform: ISO,
+          transformStyle: 'preserve-3d',
+          transformOrigin: '50% 50%',
+        }}
+      >
+        {/* Espessura da laje — apenas o contorno branco da face inferior */}
         <div
-          data-axon-plane
-          className="relative will-change-transform"
+          data-face
+          aria-hidden="true"
+          className="absolute inset-0"
           style={{
-            width: plan.w,
-            transform: ISO,
-            transformStyle: 'preserve-3d',
-            transformOrigin: '50% 50%',
+            transform: 'translateZ(-16px)',
+            border: '1px solid rgba(255,255,255,0.30)',
+            background: 'transparent',
           }}
-        >
-          {/* Glow de chão — no mesmo plano, por baixo da laje: acompanha o
-              contorno da planta (paralelogramo), não é um círculo */}
-          <div
-            data-glow
-            aria-hidden="true"
-            className="absolute inset-0"
-            style={{
-              transform: 'translateZ(-44px)',
-              background: 'rgba(107,191,201,0.26)',
-              filter: 'blur(13px)',
-            }}
-          />
-          {/* Espessura da laje — face inferior */}
-          <div
-            data-face
-            aria-hidden="true"
-            className="absolute inset-0"
-            style={{
-              transform: 'translateZ(-18px)',
-              border: '1px solid rgba(255,255,255,0.26)',
-              background: 'rgba(31,63,68,0.55)',
-            }}
-          />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img data-plan src={plan.src} alt="" aria-hidden="true" className="block w-full h-auto" />
-        </div>
+        />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img data-plan src={plan.src} alt="" aria-hidden="true" className="block w-full h-auto" />
       </div>
     </div>
   )
