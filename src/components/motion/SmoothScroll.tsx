@@ -43,7 +43,16 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
     // Expõe globalmente para âncoras/CTA que queiram scroll suave programático.
     ;(window as unknown as { __lenis?: Lenis }).__lenis = lenis
 
+    // Recalcula posições dos triggers depois de imagens/fontes assentarem.
+    const refresh = () => ScrollTrigger.refresh()
+    window.addEventListener('load', refresh)
+    const t1 = window.setTimeout(refresh, 400)
+    const t2 = window.setTimeout(refresh, 1200)
+
     return () => {
+      window.removeEventListener('load', refresh)
+      window.clearTimeout(t1)
+      window.clearTimeout(t2)
       gsap.ticker.remove(onRaf)
       lenis.destroy()
       delete (window as unknown as { __lenis?: Lenis }).__lenis

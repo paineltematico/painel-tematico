@@ -2,11 +2,6 @@
 
 import { useEffect, useRef } from 'react'
 import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger)
-}
 
 interface TextRevealProps {
   text: string
@@ -18,7 +13,7 @@ interface TextRevealProps {
 
 /**
  * Revela um título palavra a palavra, subindo por trás de uma máscara
- * (efeito "curtain up" típico dos sites da Raman Studio).
+ * (efeito "curtain up"). Gatilho via IntersectionObserver + failsafe.
  * Sem-JS / reduced-motion: mostra o texto normal.
  */
 export default function TextReveal({ text, className, as = 'h2', delay = 0 }: TextRevealProps) {
@@ -30,19 +25,47 @@ export default function TextReveal({ text, className, as = 'h2', delay = 0 }: Te
     if (!el) return
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
-    const inner = el.querySelectorAll<HTMLElement>('[data-word-inner]')
-    const ctx = gsap.context(() => {
-      gsap.set(inner, { yPercent: 120 })
+    const inner = Array.from(el.querySelectorAll<HTMLElement>('[data-word-inner]'))
+    if (inner.length === 0) return
+    gsap.set(inner, { yPercent: 120 })
+
+    let done = false
+    const reveal = () => {
+      if (done) return
+      done = true
       gsap.to(inner, {
         yPercent: 0,
         duration: 1,
         delay,
         ease: 'power4.out',
         stagger: 0.08,
-        scrollTrigger: { trigger: el, start: 'top 88%' },
+        overwrite: true,
       })
-    }, el)
-    return () => ctx.revert()
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            reveal()
+            io.disconnect()
+            break
+          }
+        }
+      },
+      { threshold: 0.2, rootMargin: '0px 0px -6% 0px' }
+    )
+    io.observe(el)
+
+    const r = el.getBoundingClientRect()
+    if (r.top < window.innerHeight && r.bottom > 0) reveal()
+    const t = window.setTimeout(reveal, 2000)
+
+    return () => {
+      io.disconnect()
+      window.clearTimeout(t)
+      gsap.killTweensOf(inner)
+    }
   }, [delay])
 
   const Tag = as as React.ElementType

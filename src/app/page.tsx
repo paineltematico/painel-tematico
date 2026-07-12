@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowRight, Search, Building2, MapPin, TrendingUp, Shield } from 'lucide-react'
+import { ArrowRight, Search, Building2, MapPin, TrendingUp, Shield, HardHat } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { getSettings } from '@/lib/settings'
 import PropertyCard from '@/components/PropertyCard'
@@ -10,6 +10,7 @@ import { EditableText } from '@/components/EditableText'
 import HomeHero from '@/components/home/HomeHero'
 import ProjectsScroller from '@/components/home/ProjectsScroller'
 import MerelimShowcase from '@/components/home/MerelimShowcase'
+import FloorPlanStory from '@/components/home/FloorPlanStory'
 import Reveal from '@/components/motion/Reveal'
 import TextReveal from '@/components/motion/TextReveal'
 import Counter from '@/components/motion/Counter'
@@ -206,11 +207,46 @@ export default async function HomePage() {
               </p>
             </div>
           </Reveal>
+
+          {/* Âncora para a página de Construção */}
+          <Reveal from="up" className="mt-14">
+            <Link
+              href="/construcao"
+              className="group flex flex-col sm:flex-row items-center justify-between gap-6 rounded-2xl bg-[#1F3F44] px-8 py-8 sm:py-10 overflow-hidden relative"
+            >
+              <div
+                className="absolute inset-0 opacity-[0.06] pointer-events-none"
+                style={{
+                  backgroundImage: 'radial-gradient(circle at 1px 1px, #ffffff 1px, transparent 0)',
+                  backgroundSize: '34px 34px',
+                }}
+              />
+              <div className="relative flex items-center gap-5">
+                <div className="w-14 h-14 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center flex-shrink-0">
+                  <HardHat className="w-7 h-7 text-[#6BBFC9]" />
+                </div>
+                <div>
+                  <p className="text-[#6BBFC9] text-xs font-semibold uppercase tracking-widest mb-1">
+                    Não vendemos apenas — construímos
+                  </p>
+                  <h3 className="font-serif text-2xl sm:text-3xl font-bold text-white leading-tight">
+                    Conheça o nosso processo de construção
+                  </h3>
+                </div>
+              </div>
+              <span className="relative inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white text-[#1F3F44] font-semibold text-sm whitespace-nowrap group-hover:gap-3 transition-all">
+                Ver Construção <ArrowRight className="w-4 h-4" />
+              </span>
+            </Link>
+          </Reveal>
         </div>
       </section>
 
       {/* ── EMPREENDIMENTO EM DESTAQUE: MERELIM ── */}
       <MerelimShowcase />
+
+      {/* ── PERCURSO PELA PLANTA (scrollytelling) ── */}
+      <FloorPlanStory />
 
       {/* ── PROJETOS EM CURSO ── */}
       {projetos.length > 0 && <ProjectsScroller projetos={projetos} />}

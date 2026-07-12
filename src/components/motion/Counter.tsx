@@ -2,11 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger)
-}
 
 interface CounterProps {
   to: number
@@ -16,7 +11,8 @@ interface CounterProps {
 }
 
 /**
- * Conta de 0 até `to` quando entra no viewport. Sem-JS mostra o valor final.
+ * Conta de 0 até `to` quando entra no viewport (IntersectionObserver + failsafe).
+ * Sem-JS / reduced-motion: mostra o valor final.
  */
 export default function Counter({ to, suffix = '', className }: CounterProps) {
   const ref = useRef<HTMLSpanElement>(null)
@@ -31,17 +27,43 @@ export default function Counter({ to, suffix = '', className }: CounterProps) {
     }
 
     setValue(0)
-    const obj = { n: 0 }
-    const ctx = gsap.context(() => {
-      gsap.to(obj, {
+    let done = false
+    let tween: gsap.core.Tween | null = null
+    const run = () => {
+      if (done) return
+      done = true
+      const obj = { n: 0 }
+      tween = gsap.to(obj, {
         n: to,
         duration: 1.6,
         ease: 'power2.out',
         onUpdate: () => setValue(Math.round(obj.n)),
-        scrollTrigger: { trigger: el, start: 'top 90%', once: true },
       })
-    }, el)
-    return () => ctx.revert()
+    }
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting) {
+            run()
+            io.disconnect()
+            break
+          }
+        }
+      },
+      { threshold: 0.4 }
+    )
+    io.observe(el)
+
+    const r = el.getBoundingClientRect()
+    if (r.top < window.innerHeight && r.bottom > 0) run()
+    const t = window.setTimeout(run, 2000)
+
+    return () => {
+      io.disconnect()
+      window.clearTimeout(t)
+      tween?.kill()
+    }
   }, [to])
 
   return (

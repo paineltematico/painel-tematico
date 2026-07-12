@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowRight, Home, Layers, Trees, MapPin, FileText } from 'lucide-react'
+import { ArrowRight, Home, Layers, Trees, MapPin } from 'lucide-react'
 import Reveal from '@/components/motion/Reveal'
 import TextReveal from '@/components/motion/TextReveal'
 import Parallax from '@/components/motion/Parallax'
@@ -94,44 +94,6 @@ export default function MerelimShowcase() {
             </div>
           ))}
         </Reveal>
-
-        {/* Plantas / Tipologia */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center mb-16">
-          <Reveal from="left">
-            <p className="text-[#6BBFC9] text-sm font-semibold uppercase tracking-widest mb-3">
-              Plantas · Lote 6
-            </p>
-            <h3 className="font-serif text-3xl sm:text-4xl font-bold mb-4">
-              Espaços amplos, luz e privacidade
-            </h3>
-            <p className="text-white/70 leading-relaxed mb-6 max-w-md">
-              Cada moradia desenvolve-se em três pisos: garagem e entrada ao nível da rua,
-              uma zona social em open space — sala, jantar e cozinha — e, no piso superior,
-              três quartos com duas casas de banho, uma delas em suíte.
-            </p>
-            <Magnetic>
-              <a
-                href="/images/merelim/planta-lote6.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 text-white text-sm font-semibold hover:bg-white/20 transition-colors"
-              >
-                <FileText className="w-4 h-4" /> Descarregar planta (PDF)
-              </a>
-            </Magnetic>
-          </Reveal>
-          <Reveal from="right" className="rounded-2xl overflow-hidden bg-white p-4 sm:p-6">
-            <div className="relative w-full aspect-[3/4]">
-              <Image
-                src="/images/merelim/planta-lote6-1.png"
-                alt="Planta de arquitetura do Lote 6 — Merelim S. Pedro"
-                fill
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-contain"
-              />
-            </div>
-          </Reveal>
-        </div>
 
         {/* Mapa de implantação + CTA */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
