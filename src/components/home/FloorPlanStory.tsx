@@ -50,24 +50,29 @@ const EASE_MASK = 'power4.out'
 const EASE_DRAW = 'power2.inOut'
 
 /**
- * Momento assinatura: a planta real "imprime-se" no plano isométrico — a
- * imagem é revelada por um wipe (clip-path) ao longo do comprimento do edifício
- * e a espessura da laje surge a seguir. Tudo numa timeline única, para poder
- * ser interrompida/morta se o utilizador mudar de piso a meio.
+ * Momento assinatura: a planta real "imprime-se" no chão (wipe/clip-path) e a
+ * seguir a caixa levanta-se — as linhas verticais crescem em altura e o teto
+ * aparece. Tudo numa timeline única, para poder ser interrompida/morta se o
+ * utilizador mudar de piso a meio.
  */
 function drawPlan(container: HTMLElement, tl: gsap.core.Timeline, at: number) {
   const img = container.querySelector<HTMLElement>('[data-plan]')
-  const face = container.querySelector<HTMLElement>('[data-face]')
+  const ceil = container.querySelector<HTMLElement>('[data-ceil]')
+  const posts = container.querySelectorAll<HTMLElement>('[data-post]')
   if (img) {
     tl.fromTo(
       img,
       { clipPath: 'inset(0 0 100% 0)' },
-      { clipPath: 'inset(0 0 0% 0)', duration: 0.95, ease: EASE_DRAW },
+      { clipPath: 'inset(0 0 0% 0)', duration: 0.85, ease: EASE_DRAW },
       at
     )
   }
-  if (face) {
-    tl.fromTo(face, { opacity: 0 }, { opacity: 1, duration: 0.55, ease: 'power2.out' }, at + 0.3)
+  if (posts.length) {
+    // paredes a "crescer" em altura (a largura do segmento é o pé-direito)
+    tl.from(posts, { width: 0, duration: 0.5, ease: 'power2.out', stagger: 0.06 }, at + 0.4)
+  }
+  if (ceil) {
+    tl.from(ceil, { opacity: 0, duration: 0.5, ease: 'power2.out' }, at + 0.7)
   }
 }
 

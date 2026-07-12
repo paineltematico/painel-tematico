@@ -36,6 +36,10 @@ export default function AxonFloor({
   iso?: boolean
 }) {
   const plan = PLANS[Math.max(0, Math.min(PLANS.length - 1, id))]
+  // Altura à escala: as plantas têm 7 m de largura e o pé-direito é ~2,4 m,
+  // logo a altura da caixa é (2.4 / 7) da largura projetada.
+  const H = Math.round((plan.w * 2.4) / 7)
+  const line = 'rgba(255,255,255,0.42)'
 
   // Variante plana (mobile): apenas a planta, contida.
   if (!iso) {
@@ -68,19 +72,40 @@ export default function AxonFloor({
           transformOrigin: '50% 50%',
         }}
       >
-        {/* Espessura da laje — apenas o contorno branco da face inferior */}
+        {/* Teto — mesmo footprint, elevado a H (contorno branco) */}
         <div
-          data-face
+          data-ceil
           aria-hidden="true"
           className="absolute inset-0"
-          style={{
-            transform: 'translateZ(-16px)',
-            border: '1px solid rgba(255,255,255,0.30)',
-            background: 'transparent',
-          }}
+          style={{ transform: `translateZ(${H}px)`, border: `1px solid ${line}` }}
         />
+        {/* Linhas verticais nos 4 cantos — simulam a altura (pé-direito) */}
+        {(
+          [
+            { left: 0, top: 0 },
+            { left: '100%', top: 0 },
+            { left: 0, top: '100%' },
+            { left: '100%', top: '100%' },
+          ] as const
+        ).map((pos, i) => (
+          <span
+            key={i}
+            data-post
+            aria-hidden="true"
+            className="absolute"
+            style={{
+              left: pos.left,
+              top: pos.top,
+              height: 1,
+              width: H,
+              background: line,
+              transformOrigin: 'left center',
+              transform: 'rotateY(-90deg)',
+            }}
+          />
+        ))}
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img data-plan src={plan.src} alt="" aria-hidden="true" className="block w-full h-auto" />
+        <img data-plan src={plan.src} alt="" aria-hidden="true" className="relative block w-full h-auto" />
       </div>
     </div>
   )
