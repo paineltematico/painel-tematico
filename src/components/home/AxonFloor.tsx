@@ -1,10 +1,17 @@
 'use client'
 
+import { useId } from 'react'
+
 /**
  * Desenho axonométrico (isométrico) de cada piso do Lote 6, em traço branco
  * sobre fundo escuro — substitui a planta fotográfica por um esquema 3D leve
  * e discreto. Projeção iso 2:1; laje flutuante + paredes de fundo + divisões
  * e mobiliário desenhados a linha.
+ *
+ * Os elementos estão agrupados semanticamente (`data-axon="slab|walls|rooms|furn"`)
+ * para que o FloorPlanStory possa orquestrar a animação de "construção":
+ * laje a assentar → paredes a subir → divisões → mobiliário. Sem JS, o SVG
+ * renderiza completo e visível (os grupos não têm estados escondidos inline).
  */
 
 type Pt = [number, number]
@@ -87,6 +94,9 @@ export default function AxonFloor({
   className?: string
   style?: React.CSSProperties
 }) {
+  // id único (sanitizado) para o gradiente do glow — evita colisões quando o
+  // mesmo piso é renderizado no desktop e no mobile em simultâneo.
+  const uid = useId().replace(/[^a-zA-Z0-9_-]/g, '')
   const f = FLOORS[Math.max(0, Math.min(FLOORS.length - 1, id))]
   const { W, D } = f
   const pts: Pt[] = []
@@ -99,7 +109,10 @@ export default function AxonFloor({
   const mid = 'rgba(255,255,255,0.5)'
   const soft = 'rgba(255,255,255,0.32)'
 
-  const els: React.ReactElement[] = []
+  const slabEls: React.ReactElement[] = []
+  const wallEls: React.ReactElement[] = []
+  const roomEls: React.ReactElement[] = []
+  const furnEls: React.ReactElement[] = []
   let k = 0
 
   // Laje (topo)
@@ -107,7 +120,7 @@ export default function AxonFloor({
   const B = track(proj(D, 0))
   const Cc = track(proj(D, W))
   const Dd = track(proj(0, W))
-  els.push(
+  slabEls.push(
     <path key={k++} d={`${d(A, B, Cc, Dd)} Z`} fill="rgba(255,255,255,0.03)" stroke={strong} strokeWidth={1.3} />
   )
 
@@ -115,15 +128,15 @@ export default function AxonFloor({
   const Blo = track(proj(D, 0, -TH))
   const Clo = track(proj(D, W, -TH))
   const Dlo = track(proj(0, W, -TH))
-  els.push(<path key={k++} d={`${d(B, Cc, Clo, Blo)} Z`} fill="rgba(255,255,255,0.05)" stroke={strong} strokeWidth={1.1} />)
-  els.push(<path key={k++} d={`${d(Dd, Cc, Clo, Dlo)} Z`} fill="rgba(255,255,255,0.05)" stroke={strong} strokeWidth={1.1} />)
+  slabEls.push(<path key={k++} d={`${d(B, Cc, Clo, Blo)} Z`} fill="rgba(255,255,255,0.05)" stroke={strong} strokeWidth={1.1} />)
+  slabEls.push(<path key={k++} d={`${d(Dd, Cc, Clo, Dlo)} Z`} fill="rgba(255,255,255,0.05)" stroke={strong} strokeWidth={1.1} />)
 
   // Paredes de fundo (nas duas arestas traseiras)
   const Aup = track(proj(0, 0, WH))
   const Bup = track(proj(D, 0, WH))
   const Dup = track(proj(0, W, WH))
-  els.push(<path key={k++} d={`${d(A, B, Bup, Aup)} Z`} fill="rgba(255,255,255,0.025)" stroke={mid} strokeWidth={1} />)
-  els.push(<path key={k++} d={`${d(A, Dd, Dup, Aup)} Z`} fill="rgba(255,255,255,0.025)" stroke={mid} strokeWidth={1} />)
+  wallEls.push(<path key={k++} d={`${d(A, B, Bup, Aup)} Z`} fill="rgba(255,255,255,0.025)" stroke={mid} strokeWidth={1} />)
+  wallEls.push(<path key={k++} d={`${d(A, Dd, Dup, Aup)} Z`} fill="rgba(255,255,255,0.025)" stroke={mid} strokeWidth={1} />)
 
   // Divisões (contornos das salas, no plano da laje)
   f.rooms.forEach(([x, y, dx, dy]) => {
@@ -131,7 +144,7 @@ export default function AxonFloor({
     const p2 = track(proj(x + dx, y))
     const p3 = track(proj(x + dx, y + dy))
     const p4 = track(proj(x, y + dy))
-    els.push(<path key={k++} d={`${d(p1, p2, p3, p4)} Z`} fill="none" stroke={mid} strokeWidth={1} strokeLinejoin="round" />)
+    roomEls.push(<path key={k++} d={`${d(p1, p2, p3, p4)} Z`} fill="none" stroke={mid} strokeWidth={1} strokeLinejoin="round" />)
   })
 
   // Mobiliário
@@ -141,25 +154,25 @@ export default function AxonFloor({
     const p2 = track(proj(x + dx, y))
     const p3 = track(proj(x + dx, y + dy))
     const p4 = track(proj(x, y + dy))
-    els.push(<path key={k++} d={`${d(p1, p2, p3, p4)} Z`} fill="none" stroke={soft} strokeWidth={0.9} strokeLinejoin="round" />)
+    furnEls.push(<path key={k++} d={`${d(p1, p2, p3, p4)} Z`} fill="none" stroke={soft} strokeWidth={0.9} strokeLinejoin="round" />)
 
     if (it.type === 'bed') {
       // linha da almofada junto à cabeceira
       const q1 = track(proj(x + dx * 0.72, y))
       const q2 = track(proj(x + dx * 0.72, y + dy))
-      els.push(<path key={k++} d={d(q1, q2)} stroke={soft} strokeWidth={0.9} />)
+      furnEls.push(<path key={k++} d={d(q1, q2)} stroke={soft} strokeWidth={0.9} />)
     }
     if (it.type === 'car') {
       // para-brisas
       const q1 = track(proj(x + dx * 0.62, y + dy * 0.15))
       const q2 = track(proj(x + dx * 0.62, y + dy * 0.85))
-      els.push(<path key={k++} d={d(q1, q2)} stroke={soft} strokeWidth={0.9} />)
+      furnEls.push(<path key={k++} d={d(q1, q2)} stroke={soft} strokeWidth={0.9} />)
     }
     if (it.type === 'sofa') {
       // encosto
       const q1 = track(proj(x + dx * 0.28, y))
       const q2 = track(proj(x + dx * 0.28, y + dy))
-      els.push(<path key={k++} d={d(q1, q2)} stroke={soft} strokeWidth={0.9} />)
+      furnEls.push(<path key={k++} d={d(q1, q2)} stroke={soft} strokeWidth={0.9} />)
     }
     if (it.type === 'stairs') {
       const n = 5
@@ -167,7 +180,7 @@ export default function AxonFloor({
         const t = s / n
         const q1 = track(proj(x + dx * t, y))
         const q2 = track(proj(x + dx * t, y + dy))
-        els.push(<path key={k++} d={d(q1, q2)} stroke={soft} strokeWidth={0.8} />)
+        furnEls.push(<path key={k++} d={d(q1, q2)} stroke={soft} strokeWidth={0.8} />)
       }
     }
   })
@@ -176,21 +189,50 @@ export default function AxonFloor({
   const pad = 14
   const xs = pts.map((p) => p[0])
   const ys = pts.map((p) => p[1])
-  const minX = Math.min(...xs) - pad
-  const minY = Math.min(...ys) - pad
-  const vw = Math.max(...xs) - Math.min(...xs) + pad * 2
-  const vh = Math.max(...ys) - Math.min(...ys) + pad * 2
+  const minX = Math.min(...xs)
+  const maxX = Math.max(...xs)
+  const minY = Math.min(...ys)
+  const maxY = Math.max(...ys)
+
+  // Glow de "chão" — poça de luz teal muito ténue sob a laje flutuante
+  const glowRx = (maxX - minX) * 0.44
+  const glowRy = glowRx * 0.24
+  const glowCx = (minX + maxX) / 2
+  const glowCy = maxY + glowRy * 0.55
+
+  const vbX = minX - pad
+  const vbY = minY - pad
+  const vbW = maxX - minX + pad * 2
+  const vbH = Math.max(maxY, glowCy + glowRy) - minY + pad * 2
 
   return (
     <svg
-      viewBox={`${minX.toFixed(1)} ${minY.toFixed(1)} ${vw.toFixed(1)} ${vh.toFixed(1)}`}
+      viewBox={`${vbX.toFixed(1)} ${vbY.toFixed(1)} ${vbW.toFixed(1)} ${vbH.toFixed(1)}`}
       className={className}
       style={style}
       fill="none"
       strokeLinecap="round"
       aria-hidden="true"
     >
-      {els}
+      <defs>
+        <radialGradient id={`axg-${uid}`} cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="rgba(107,191,201,0.16)" />
+          <stop offset="55%" stopColor="rgba(107,191,201,0.05)" />
+          <stop offset="100%" stopColor="rgba(107,191,201,0)" />
+        </radialGradient>
+      </defs>
+      <ellipse
+        data-axon="glow"
+        cx={glowCx.toFixed(1)}
+        cy={glowCy.toFixed(1)}
+        rx={glowRx.toFixed(1)}
+        ry={glowRy.toFixed(1)}
+        fill={`url(#axg-${uid})`}
+      />
+      <g data-axon="slab">{slabEls}</g>
+      <g data-axon="walls">{wallEls}</g>
+      <g data-axon="rooms">{roomEls}</g>
+      <g data-axon="furn">{furnEls}</g>
     </svg>
   )
 }
