@@ -44,6 +44,24 @@ const floors: Floor[] = [
     desc: 'A zona privada: três quartos e duas casas de banho, uma delas em suíte. Descanso e privacidade no piso de cima.',
     photo: '/images/merelim/quarto-real-3.jpeg',
   },
+  {
+    n: '04',
+    tag: 'Lote 6 · Moradia T3',
+    title: 'A casa completa',
+    desc: 'Do logradouro ajardinado à zona privada dos quartos: três pisos que encaixam num único volume, pensado ao pormenor.',
+    photo: '/images/merelim/render-2.jpeg',
+  },
+]
+
+/** Número de pisos com vista individual (o passo seguinte é o empilhamento). */
+const SOLO = 3
+/** Largura partilhada dos planos no empilhamento (mesma escala entre pisos). */
+const STACK_W = 150
+/** Posições (px, pré-scale) de cada piso na axonometria explodida. */
+const STACK_POS = [
+  { x: 0, y: 140 },
+  { x: 74, y: 28 },
+  { x: 58, y: -159 },
 ]
 
 const EASE_MASK = 'power4.out'
@@ -101,6 +119,8 @@ export default function FloorPlanStory() {
   const descRef = useRef<HTMLParagraphElement>(null)
   const barsRef = useRef<HTMLDivElement>(null)
   const metaRef = useRef<HTMLDivElement>(null)
+  const stackRef = useRef<HTMLDivElement>(null)
+  const stackFloorRefs = useRef<(HTMLDivElement | null)[]>([])
 
   // 'full' = desktop animado · 'reduced' = desktop com reduced-motion ·
   // 'off' = mobile (a versão empilhada é a única visível)
@@ -141,6 +161,14 @@ export default function FloorPlanStory() {
     if (!outer) return
     const mm = gsap.matchMedia()
 
+    // Coloca cada piso na sua posição do empilhamento (layer começa oculto)
+    const placeStack = () => {
+      gsap.set(stackRef.current, { autoAlpha: 0 })
+      stackFloorRefs.current.forEach((el, i) => {
+        if (el) gsap.set(el, { xPercent: -50, yPercent: -50, x: STACK_POS[i].x, y: STACK_POS[i].y })
+      })
+    }
+
     const makeST = (full: boolean) =>
       ScrollTrigger.create({
         trigger: outer,
@@ -167,6 +195,7 @@ export default function FloorPlanStory() {
     mm.add('(min-width: 1024px) and (prefers-reduced-motion: no-preference)', () => {
       modeRef.current = 'full'
       stRef.current = makeST(true)
+      placeStack()
 
       // Esconde só DEPOIS de montar (se o JS falhar, o conteúdo SSR fica visível)
       if (!enteredRef.current) {
@@ -195,7 +224,8 @@ export default function FloorPlanStory() {
           gsap.set([tagRef.current, titleRef.current, numRef.current], { yPercent: 0 })
           gsap.set(descRef.current, { opacity: 1, y: 0 })
           gsap.set(photoRefs.current[i], { opacity: 1 })
-          gsap.set(axonRefs.current[i], { opacity: 1, y: 0 })
+          if (i < SOLO) gsap.set(axonRefs.current[i], { opacity: 1, y: 0 })
+          else gsap.set(stackRef.current, { autoAlpha: 1 })
           return
         }
         const tl = gsap.timeline()
@@ -236,6 +266,7 @@ export default function FloorPlanStory() {
     mm.add('(min-width: 1024px) and (prefers-reduced-motion: reduce)', () => {
       modeRef.current = 'reduced'
       stRef.current = makeST(false)
+      placeStack()
       return () => {
         stRef.current = null
         modeRef.current = 'off'
@@ -267,6 +298,7 @@ export default function FloorPlanStory() {
       if (photoNext) gsap.set(photoNext, { opacity: 1 })
       if (axonPrev) gsap.set(axonPrev, { opacity: 0 })
       if (axonNext) gsap.set(axonNext, { opacity: 1, y: 0 })
+      gsap.set(stackRef.current, { autoAlpha: active === SOLO ? 1 : 0 })
       return
     }
 
@@ -286,20 +318,55 @@ export default function FloorPlanStory() {
       )
     }
 
-    // axonometria — o piso antigo desce para fora, o novo assenta vindo de
-    // cima (a direção inverte quando se volta para trás), e constrói-se
-    if (axonPrev) {
-      tl.to(axonPrev, { opacity: 0, y: 28 * dir, duration: 0.45, ease: 'power2.in' }, 0)
-      tl.set(axonPrev, { y: 0 }, 0.5)
-    }
-    if (axonNext) {
-      tl.fromTo(
-        axonNext,
-        { opacity: 0, y: -36 * dir },
-        { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out', immediateRender: true },
-        0.16
-      )
-      drawPlan(axonNext, tl, 0.16)
+    // axonometria — três casos: montar a casa (entrar no passo 4), desmontar
+    // (sair do passo 4), ou a troca normal entre pisos individuais
+    if (active === SOLO) {
+      // a casa monta-se: o piso solo sai e os três pisos empilham-se em
+      // sequência, cada um a construir-se ao assentar
+      if (axonPrev) {
+        tl.to(axonPrev, { opacity: 0, y: 24, duration: 0.4, ease: 'power2.in' }, 0)
+        tl.set(axonPrev, { y: 0 }, 0.45)
+      }
+      tl.set(stackRef.current, { autoAlpha: 1 }, 0.2)
+      stackFloorRefs.current.forEach((el, i) => {
+        if (!el) return
+        const at = 0.25 + i * 0.3
+        tl.fromTo(
+          el,
+          { y: STACK_POS[i].y - 110, autoAlpha: 0 },
+          { y: STACK_POS[i].y, autoAlpha: 1, duration: 0.85, ease: 'power3.out', immediateRender: true },
+          at
+        )
+        drawPlan(el, tl, at)
+      })
+    } else if (prev === SOLO) {
+      // desmonta: a casa completa sai e volta a vista de um piso
+      tl.to(stackRef.current, { autoAlpha: 0, duration: 0.45, ease: 'power2.out' }, 0)
+      if (axonNext) {
+        tl.fromTo(
+          axonNext,
+          { opacity: 0, y: -36 * dir },
+          { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out', immediateRender: true },
+          0.2
+        )
+        drawPlan(axonNext, tl, 0.2)
+      }
+    } else {
+      // troca normal — o piso antigo desce para fora, o novo assenta vindo de
+      // cima (a direção inverte quando se volta para trás), e constrói-se
+      if (axonPrev) {
+        tl.to(axonPrev, { opacity: 0, y: 28 * dir, duration: 0.45, ease: 'power2.in' }, 0)
+        tl.set(axonPrev, { y: 0 }, 0.5)
+      }
+      if (axonNext) {
+        tl.fromTo(
+          axonNext,
+          { opacity: 0, y: -36 * dir },
+          { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out', immediateRender: true },
+          0.16
+        )
+        drawPlan(axonNext, tl, 0.16)
+      }
     }
 
     animateTextIn(tl, 0.02, dir)
@@ -419,10 +486,10 @@ export default function FloorPlanStory() {
               </div>
             </div>
 
-            {/* Axonometria — constrói-se traço a traço a cada piso */}
+            {/* Axonometria — constrói-se a cada piso; no fim a casa empilha-se */}
             <div className="flex flex-col">
               <div className="relative h-[26rem]">
-                {floors.map((fl, i) => (
+                {floors.slice(0, SOLO).map((fl, i) => (
                   <div
                     key={fl.n}
                     ref={(el) => {
@@ -434,20 +501,43 @@ export default function FloorPlanStory() {
                     <AxonFloor id={i} className="w-full h-full" />
                   </div>
                 ))}
+
+                {/* Passo 4 — a casa completa em axonometria explodida */}
+                <div
+                  ref={stackRef}
+                  aria-hidden="true"
+                  className="absolute inset-0 pointer-events-none"
+                  style={{ opacity: 0, transform: 'scale(0.62)' }}
+                >
+                  {floors.slice(0, SOLO).map((fl, i) => (
+                    <div
+                      key={fl.n}
+                      ref={(el) => {
+                        stackFloorRefs.current[i] = el
+                      }}
+                      className="absolute left-1/2 top-1/2 w-[150px] will-change-transform"
+                    >
+                      <AxonFloor id={i} width={STACK_W} className="w-full" />
+                    </div>
+                  ))}
+                </div>
               </div>
-              {/* indicador de nível (tipo elevador) — referência visual do piso */}
+              {/* indicador de nível (tipo elevador) — na casa completa acendem todos */}
               <div ref={metaRef} className="mt-6 flex items-center justify-center">
                 <div className="flex flex-col-reverse gap-[5px]" aria-hidden="true">
-                  {floors.map((fl, i) => (
-                    <span
-                      key={fl.n}
-                      className="block h-[2px] rounded-full transition-all duration-500 motion-reduce:transition-none"
-                      style={{
-                        width: i === active ? 28 : 14,
-                        backgroundColor: i === active ? '#6BBFC9' : 'rgba(255,255,255,0.22)',
-                      }}
-                    />
-                  ))}
+                  {floors.slice(0, SOLO).map((fl, i) => {
+                    const lit = i === active || active === SOLO
+                    return (
+                      <span
+                        key={fl.n}
+                        className="block h-[2px] rounded-full transition-all duration-500 motion-reduce:transition-none"
+                        style={{
+                          width: lit ? 28 : 14,
+                          backgroundColor: lit ? '#6BBFC9' : 'rgba(255,255,255,0.22)',
+                        }}
+                      />
+                    )
+                  })}
                 </div>
               </div>
             </div>
@@ -462,7 +552,7 @@ export default function FloorPlanStory() {
         </p>
         <h3 className="font-serif text-3xl font-bold mb-8">Um percurso pela planta</h3>
         <div className="space-y-8">
-          {floors.map((fl, i) => (
+          {floors.slice(0, SOLO).map((fl, i) => (
             <div key={fl.n} className="rounded-2xl overflow-hidden bg-white/5 border border-white/10">
               <div className="relative w-full aspect-[16/10]">
                 <Image src={fl.photo} alt={fl.title} fill sizes="100vw" className="object-cover" />

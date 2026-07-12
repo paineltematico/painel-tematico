@@ -29,16 +29,20 @@ export default function AxonFloor({
   className = '',
   style,
   iso = true,
+  width,
 }: {
   id: number
   className?: string
   style?: React.CSSProperties
   iso?: boolean
+  /** Largura do plano em px — para vistas onde os pisos partilham escala. */
+  width?: number
 }) {
   const plan = PLANS[Math.max(0, Math.min(PLANS.length - 1, id))]
+  const w = width ?? plan.w
   // Altura à escala: as plantas têm 7 m de largura e o pé-direito é ~2,4 m,
   // logo a altura da caixa é (2.4 / 7) da largura projetada.
-  const H = Math.round((plan.w * 2.4) / 7)
+  const H = Math.round((w * 2.4) / 7)
   const line = 'rgba(255,255,255,0.42)'
 
   // Variante plana (mobile): apenas a planta, contida.
@@ -66,7 +70,7 @@ export default function AxonFloor({
         data-axon-plane
         className="relative will-change-transform"
         style={{
-          width: plan.w,
+          width: w,
           transform: ISO,
           transformStyle: 'preserve-3d',
           transformOrigin: '50% 50%',
