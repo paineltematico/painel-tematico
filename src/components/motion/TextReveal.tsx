@@ -6,6 +6,7 @@ import { gsap } from 'gsap'
 interface TextRevealProps {
   text: string
   className?: string
+  style?: React.CSSProperties
   /** Elemento a renderizar (h1, h2, p...). */
   as?: keyof React.JSX.IntrinsicElements
   delay?: number
@@ -16,7 +17,7 @@ interface TextRevealProps {
  * (efeito "curtain up"). Gatilho via IntersectionObserver + failsafe.
  * Sem-JS / reduced-motion: mostra o texto normal.
  */
-export default function TextReveal({ text, className, as = 'h2', delay = 0 }: TextRevealProps) {
+export default function TextReveal({ text, className, style, as = 'h2', delay = 0 }: TextRevealProps) {
   const ref = useRef<HTMLElement>(null)
   const words = text.split(' ')
 
@@ -70,7 +71,7 @@ export default function TextReveal({ text, className, as = 'h2', delay = 0 }: Te
 
   const Tag = as as React.ElementType
   return (
-    <Tag ref={ref} className={className}>
+    <Tag ref={ref} className={className} style={style}>
       {words.map((w, i) => (
         <span key={i}>
           <span style={{ display: 'inline-block', overflow: 'hidden', verticalAlign: 'top' }}>

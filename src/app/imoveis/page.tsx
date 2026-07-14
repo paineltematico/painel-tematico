@@ -1,9 +1,11 @@
 import { Suspense } from 'react'
 import { supabase } from '@/lib/supabase'
-import PropertyCard from '@/components/PropertyCard'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
-import ImovelFilters from '@/components/ImovelFilters'
+import ListingCard from '@/components/imoveis/ListingCard'
+import FilterBar from '@/components/imoveis/FilterBar'
+import Reveal from '@/components/motion/Reveal'
+import TextReveal from '@/components/motion/TextReveal'
 import type { Imovel } from '@/types/database'
 
 interface SearchParams {
@@ -47,62 +49,65 @@ export default async function ImoveisPage({
   const imoveis = await getImoveis(filters)
 
   const activeFilters = Object.values(filters).filter(Boolean).length
+  const titulo =
+    filters.tipo === 'Venda'
+      ? 'Imóveis para venda'
+      : filters.tipo === 'Arrendamento'
+      ? 'Imóveis para arrendamento'
+      : 'Todos os imóveis'
 
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-[#f8fafc] pt-20">
-
-        {/* Header */}
-        <div className="bg-white border-b border-[#e2e8f0]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <h1 className="font-serif text-3xl font-bold text-[#1F3F44] mb-1">
-              {filters.tipo === 'Venda'
-                ? 'Imóveis para Venda'
-                : filters.tipo === 'Arrendamento'
-                ? 'Imóveis para Arrendamento'
-                : 'Todos os Imóveis'}
-            </h1>
-            <p className="text-[#64748b] text-sm">
-              {imoveis.length} imóve{imoveis.length !== 1 ? 'is' : 'l'} encontrado{imoveis.length !== 1 ? 's' : ''}
-              {activeFilters > 0 && ' com os filtros aplicados'}
+      <main className="min-h-screen bg-[#FAF9F7] pt-20">
+        {/* ── Cabeçalho editorial ── */}
+        <header className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-16 pb-8 sm:pb-12">
+          <Reveal from="up">
+            <p className="text-[#00545F] text-xs font-semibold uppercase tracking-[0.25em] mb-3">
+              Painel Temático · Braga
             </p>
-          </div>
-        </div>
+          </Reveal>
+          <TextReveal
+            as="h1"
+            text={titulo}
+            className="font-serif font-bold text-[#1F3F44] tracking-tight"
+            style={{ fontSize: 'clamp(2.2rem, 6vw, 4.5rem)', lineHeight: 1.02 }}
+          />
+          <Reveal from="up">
+            <p className="text-[#6b7572] text-sm mt-4">
+              {imoveis.length} imóve{imoveis.length !== 1 ? 'is' : 'l'}
+              {activeFilters > 0 ? ' com os filtros aplicados' : ' disponíveis'} — fotografias reais,
+              informação verificada pela nossa equipa.
+            </p>
+          </Reveal>
+        </header>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex flex-col lg:flex-row gap-8">
+        {/* ── Filtros (barra pegajosa) ── */}
+        <Suspense fallback={null}>
+          <FilterBar currentFilters={filters} />
+        </Suspense>
 
-            {/* Sidebar Filters */}
-            <aside className="lg:w-72 flex-shrink-0">
-              <Suspense fallback={null}>
-                <ImovelFilters currentFilters={filters} />
-              </Suspense>
-            </aside>
-
-            {/* Grid */}
-            <div className="flex-1">
-              {imoveis.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-24 text-center">
-                  <div className="w-16 h-16 rounded-2xl bg-[#e2e8f0] flex items-center justify-center mb-4">
-                    <span className="text-2xl">🏠</span>
-                  </div>
-                  <h3 className="font-serif text-xl font-semibold text-[#1F3F44] mb-2">
-                    Nenhum imóvel encontrado
-                  </h3>
-                  <p className="text-[#64748b] text-sm max-w-xs">
-                    Tente ajustar os filtros ou pesquisar por outros termos.
-                  </p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-                  {imoveis.map((imovel) => (
-                    <PropertyCard key={imovel.id} imovel={imovel} featured={imovel.destaque} />
-                  ))}
-                </div>
-              )}
+        {/* ── Grelha ── */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+          {imoveis.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-28 text-center">
+              <div className="w-16 h-16 rounded-2xl bg-white ring-1 ring-[#ECE7DE] flex items-center justify-center mb-5">
+                <span className="text-2xl">🏠</span>
+              </div>
+              <h3 className="font-serif text-xl font-semibold text-[#1F3F44] mb-2">
+                Nenhum imóvel encontrado
+              </h3>
+              <p className="text-[#8a8377] text-sm max-w-xs">
+                Experimente ajustar os filtros ou pesquisar por outros termos.
+              </p>
             </div>
-          </div>
+          ) : (
+            <Reveal stagger className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
+              {imoveis.map((imovel) => (
+                <ListingCard key={imovel.id} imovel={imovel} />
+              ))}
+            </Reveal>
+          )}
         </div>
       </main>
       <Footer />

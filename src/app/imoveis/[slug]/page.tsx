@@ -1,7 +1,8 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { supabaseAdmin } from '@/lib/supabase-admin'
-import ImovelLuxury from './ImovelLuxury'
+import ImovelShowcase from './ImovelShowcase'
+import Footer from '@/components/Footer'
 import type { Imovel } from '@/types/database'
 
 interface Props {
@@ -49,5 +50,10 @@ export default async function ImovelPage({ params }: Props) {
     }
   }
 
-  return <ImovelLuxury imovel={imovel} angariador={angariador} />
+  return (
+    <>
+      <ImovelShowcase imovel={imovel} angariador={angariador} />
+      <Footer />
+    </>
+  )
 }
