@@ -80,6 +80,60 @@ export type LeadPrioridade = 'fria' | 'baixa' | 'normal' | 'alta'
 export type AtividadeTipo = 'nota' | 'chamada' | 'email' | 'visita' | 'reuniao' | 'mudanca_estado' | 'arquivamento' | 'transferencia'
 export type LeadTemperatura = 'frio' | 'morno' | 'quente' | 'muito_quente'
 
+export type OportunidadeTipo = 'venda' | 'compra' | 'arrendamento'
+export type OportunidadeEstado = 'nova' | 'em_analise' | 'convertida' | 'arquivada'
+export type OportunidadeAtividadeTipo = 'nota' | 'chamada' | 'email' | 'mudanca_estado'
+
+/** Linha do orçamento de uma oportunidade. Valor negativo = custo. */
+export type LinhaEstimativa = {
+  id: string
+  label: string
+  valor: number
+}
+
+export type Oportunidade = {
+  id: string
+  tipo: OportunidadeTipo
+  estado: OportunidadeEstado
+  pessoa_nome: string
+  pessoa_email: string | null
+  pessoa_telefone: string | null
+  localizacao: string | null
+  morada: string | null
+  cidade: string | null
+  codigo_postal: string | null
+  mapa_url: string | null
+  tipologia: string | null
+  area_m2: number | null
+  preco_esperado_min: number | null
+  preco_esperado_max: number | null
+  estimativa: LinhaEstimativa[]
+  notas: string | null
+  descricao: string | null
+  fotos: string[]
+  documentos: string[]
+  follow_up_data: string | null
+  follow_up_nota: string | null
+  follow_up_email_sent: boolean
+  gcal_event_id: string | null
+  convertido_tipo: 'lead' | 'imovel' | null
+  convertido_id: string | null
+  criado_por: string | null
+  arquivado_em: string | null
+  created_at: string
+  updated_at: string
+}
+
+export type OportunidadeAtividade = {
+  id: string
+  oportunidade_id: string
+  tipo: OportunidadeAtividadeTipo
+  conteudo: string | null
+  estado_anterior: string | null
+  estado_novo: string | null
+  created_at: string
+}
+
 export type Unidade = {
   id: string
   projeto_id: string
@@ -290,6 +344,21 @@ export type Database = {
         Row: Parceiro
         Insert: Omit<Parceiro, 'id' | 'created_at' | 'arquivado' | 'arquivado_em' | 'arquivado_por'> & { id?: string; created_at?: string; arquivado?: boolean; arquivado_em?: string | null; arquivado_por?: string | null }
         Update: Partial<Omit<Parceiro, 'id' | 'created_at'>>
+        Relationships: []
+      }
+      oportunidades: {
+        Row: Oportunidade
+        Insert: { pessoa_nome: string; tipo?: OportunidadeTipo } & Partial<Omit<Oportunidade, 'pessoa_nome' | 'tipo'>>
+        Update: Partial<Omit<Oportunidade, 'id' | 'created_at' | 'updated_at'>>
+        Relationships: []
+      }
+      oportunidade_atividades: {
+        Row: OportunidadeAtividade
+        Insert: Omit<OportunidadeAtividade, 'id' | 'created_at' | 'conteudo' | 'estado_anterior' | 'estado_novo'> & {
+          id?: string; created_at?: string
+          conteudo?: string | null; estado_anterior?: string | null; estado_novo?: string | null
+        }
+        Update: Partial<Omit<OportunidadeAtividade, 'id' | 'created_at'>>
         Relationships: []
       }
     }

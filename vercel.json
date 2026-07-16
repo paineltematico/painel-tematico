@@ -1,0 +1,6 @@
+{
+  "crons": [
+    { "path": "/api/cron/avaliacoes-followup", "schedule": "0 9 * * *" },
+    { "path": "/api/cron/oportunidades-followup", "schedule": "0 9 * * *" }
+  ]
+}

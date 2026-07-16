@@ -15,6 +15,10 @@ export type Permission =
   | 'leads.delete'
   | 'leads.archive'
   | 'leads.comerciais'
+  | 'oportunidades.view'
+  | 'oportunidades.create'
+  | 'oportunidades.edit'
+  | 'oportunidades.delete'
   | 'parceiros.archive'
   | 'parceiros.delete'
   | 'estatisticas.view'
@@ -51,6 +55,7 @@ const ROLE_PERMISSIONS: Record<AdminRole, Permission[]> = {
     'dashboard.view',
     'imoveis.view', 'imoveis.create', 'imoveis.edit', 'imoveis.delete',
     'leads.view', 'leads.view_all', 'leads.create', 'leads.edit', 'leads.delete', 'leads.archive', 'leads.comerciais',
+    'oportunidades.view', 'oportunidades.create', 'oportunidades.edit', 'oportunidades.delete',
     'parceiros.archive', 'parceiros.delete', 'estatisticas.view', 'avaliacoes.view',
     'projetos.view', 'projetos.create', 'projetos.edit', 'projetos.delete',
     'unidades.view', 'unidades.edit',
