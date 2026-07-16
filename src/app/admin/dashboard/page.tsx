@@ -9,7 +9,7 @@ import {
   TrendingUp, Users, Home, Building2, Calendar,
   ArrowRight, ArrowUpRight, Activity, Target,
   AlertTriangle, Flame, Clock, Phone, CheckCircle,
-  Star, BarChart2,
+  Star, BarChart2, CalendarClock,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -432,8 +432,29 @@ const PIPELINE = [
   { key: 'ganho',          label: 'Ganhos',        color: 'bg-emerald-500' },
 ]
 
-async function AdminDashboard({ nome, role }: { nome: string; role: string }) {
-  const d = await getAdminData()
+/**
+ * Oportunidades com follow-up para hoje ou já vencido.
+ * Tolerante a falhas: se a tabela ainda não existir, devolve lista vazia
+ * em vez de rebentar o dashboard.
+ */
+async function getFollowUpsPendentes() {
+  const hoje = new Date().toISOString().slice(0, 10)
+  const { data, error } = await supabaseAdmin
+    .from('oportunidades')
+    .select('id, pessoa_nome, localizacao, cidade, follow_up_data, follow_up_nota')
+    .lte('follow_up_data', hoje)
+    .in('estado', ['nova', 'em_analise'])
+    .order('follow_up_data', { ascending: true })
+    .limit(5)
+  if (error) return []
+  return data ?? []
+}
+
+async function AdminDashboard({ nome, role, verOportunidades }: { nome: string; role: string; verOportunidades: boolean }) {
+  const [d, followUps] = await Promise.all([
+    getAdminData(),
+    verOportunidades ? getFollowUpsPendentes() : Promise.resolve([]),
+  ])
   const maxCount = Math.max(...PIPELINE.map(p => d.counts[p.key] ?? 0), 1)
 
   return (
@@ -444,6 +465,43 @@ async function AdminDashboard({ nome, role }: { nome: string; role: string }) {
           {ROLE_LABELS[role as keyof typeof ROLE_LABELS]} · {new Intl.DateTimeFormat('pt-PT', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date())}
         </p>
       </div>
+
+      {/* Follow-ups de oportunidades para hoje / vencidos */}
+      {followUps.length > 0 && (
+        <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <CalendarClock className="w-4 h-4 text-amber-600 flex-shrink-0" />
+            <p className="text-sm text-amber-900">
+              <strong>{followUps.length} {followUps.length === 1 ? 'oportunidade' : 'oportunidades'}</strong> para rever
+            </p>
+          </div>
+          <div className="space-y-2">
+            {followUps.map((op) => (
+              <Link
+                key={op.id}
+                href={`/admin/oportunidades/${op.id}`}
+                className="flex items-center gap-3 bg-white rounded-xl border border-amber-200/70 px-3.5 py-2.5 hover:border-amber-300 hover:shadow-sm transition-all group"
+              >
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-[#1F3F44] group-hover:text-[#00545F] transition-colors">{op.pessoa_nome}</p>
+                  {(op.follow_up_nota || op.cidade || op.localizacao) && (
+                    <p className="text-xs text-[#64748b] truncate">
+                      {op.follow_up_nota ?? op.cidade ?? op.localizacao}
+                    </p>
+                  )}
+                </div>
+                <span className="text-xs text-amber-700 font-medium flex-shrink-0">
+                  {op.follow_up_data === new Date().toISOString().slice(0, 10) ? 'hoje' : `há ${diasSem(op.follow_up_data!)} dias`}
+                </span>
+                <ArrowRight className="w-3.5 h-3.5 text-[#94a3b8] flex-shrink-0" />
+              </Link>
+            ))}
+          </div>
+          <Link href="/admin/oportunidades" className="inline-flex items-center gap-1 text-amber-700 text-xs font-semibold hover:gap-2 transition-all mt-3">
+            Ver todas as oportunidades <ArrowRight className="w-3 h-3" />
+          </Link>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <KpiCard label="Leads este mês"     value={d.leadsThisMonth}     sub="novos contactos"                icon={TrendingUp} accent href="/admin/leads" />
@@ -525,5 +583,5 @@ export default async function DashboardPage() {
     return <ComercialDashboard userId={user.id} nome={user.nome} role={user.role} />
   }
 
-  return <AdminDashboard nome={user.nome} role={user.role} />
+  return <AdminDashboard nome={user.nome} role={user.role} verOportunidades={canUser(user, 'oportunidades.view')} />
 }
