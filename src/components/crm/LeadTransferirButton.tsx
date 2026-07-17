@@ -45,9 +45,10 @@ export default function LeadTransferirButton({ leadId, responsavelId, users }: P
     <>
       <button
         onClick={() => setOpen(true)}
-        className="px-4 py-2 rounded-xl border border-[#e2e8f0] text-[#475569] text-sm font-semibold hover:bg-[#f8fafc] transition-colors flex items-center gap-2"
+        className="p-2 sm:px-4 rounded-xl border border-[#e2e8f0] text-[#475569] text-sm font-semibold hover:bg-[#f8fafc] transition-colors flex items-center gap-2"
+        title="Transferir"
       >
-        <ArrowRightLeft className="w-3.5 h-3.5" /> Transferir
+        <ArrowRightLeft className="w-4 h-4 sm:w-3.5 sm:h-3.5" /> <span className="hidden sm:inline">Transferir</span>
       </button>
 
       {open && (

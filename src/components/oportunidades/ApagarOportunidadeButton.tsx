@@ -24,9 +24,10 @@ export default function ApagarOportunidadeButton({ oportunidadeId }: { oportunid
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-red-200 text-red-600 text-sm font-semibold hover:bg-red-50 transition-colors"
+        className="flex items-center gap-1.5 p-2 sm:px-3 rounded-xl border border-red-200 text-red-600 text-sm font-semibold hover:bg-red-50 transition-colors"
+        title="Apagar"
       >
-        <Trash2 className="w-3.5 h-3.5" /> Apagar
+        <Trash2 className="w-4 h-4 sm:w-3.5 sm:h-3.5" /> <span className="hidden sm:inline">Apagar</span>
       </button>
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={() => !loading && setOpen(false)}>

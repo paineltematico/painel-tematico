@@ -100,16 +100,16 @@ export default async function LeadDetailPage({ params }: Props) {
       )}
 
       {/* Header card */}
-      <div className="bg-white rounded-2xl border border-[#e2e8f0] p-6 mb-6">
-        <div className="flex items-start gap-4 flex-wrap">
+      <div className="bg-white rounded-2xl border border-[#e2e8f0] p-4 sm:p-6 mb-6">
+        <div className="flex items-start gap-3 sm:gap-4 flex-wrap">
           {/* Avatar */}
-          <div className="w-14 h-14 rounded-2xl bg-[#1F3F44] flex items-center justify-center flex-shrink-0">
-            <span className="text-white font-serif font-bold text-xl">{lead.nome.charAt(0).toUpperCase()}</span>
+          <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-2xl bg-[#1F3F44] flex items-center justify-center flex-shrink-0">
+            <span className="text-white font-serif font-bold text-lg sm:text-xl">{lead.nome.charAt(0).toUpperCase()}</span>
           </div>
 
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-3 flex-wrap mb-1">
-              <h1 className="font-serif text-2xl font-bold text-[#1F3F44]">{lead.nome}</h1>
+            <div className="flex items-center gap-2 sm:gap-3 flex-wrap mb-1.5">
+              <h1 className="font-serif text-lg sm:text-2xl font-bold text-[#1F3F44] leading-tight">{lead.nome}</h1>
               <span className={cn('inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border', est.bg, est.color)}>
                 <span className={cn('w-1.5 h-1.5 rounded-full', est.dot)} />{est.label}
               </span>
@@ -117,9 +117,9 @@ export default async function LeadDetailPage({ params }: Props) {
                 {pri.emoji} {pri.label}
               </span>
             </div>
-            <div className="flex flex-wrap items-center gap-4">
-              <a href={`mailto:${lead.email}`} className="flex items-center gap-1.5 text-sm text-[#475569] hover:text-[#00545F] transition-colors">
-                <Mail className="w-3.5 h-3.5" />{lead.email}
+            <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-1.5 sm:gap-4">
+              <a href={`mailto:${lead.email}`} className="flex items-center gap-1.5 text-sm text-[#475569] hover:text-[#00545F] transition-colors min-w-0">
+                <Mail className="w-3.5 h-3.5 flex-shrink-0" /><span className="truncate">{lead.email}</span>
               </a>
               {lead.telefone && (
                 <a href={`tel:${lead.telefone}`} className="flex items-center gap-1.5 text-sm text-[#475569] hover:text-[#00545F] transition-colors">
@@ -137,9 +137,10 @@ export default async function LeadDetailPage({ params }: Props) {
             {!lead.arquivado && (
               <Link
                 href={`/admin/leads/${lead.id}/editar`}
-                className="px-4 py-2 rounded-xl border border-[#e2e8f0] text-[#475569] text-sm font-semibold hover:bg-[#f8fafc] transition-colors flex items-center gap-2"
+                className="p-2 sm:px-4 rounded-xl border border-[#e2e8f0] text-[#475569] text-sm font-semibold hover:bg-[#f8fafc] transition-colors flex items-center gap-2"
+                title="Editar"
               >
-                <Pencil className="w-3.5 h-3.5" /> Editar
+                <Pencil className="w-4 h-4 sm:w-3.5 sm:h-3.5" /> <span className="hidden sm:inline">Editar</span>
               </Link>
             )}
             {canTransfer && !lead.arquivado && (
@@ -177,7 +178,7 @@ export default async function LeadDetailPage({ params }: Props) {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
 
         {/* LEFT: CRM controls */}
         <div className="space-y-5">

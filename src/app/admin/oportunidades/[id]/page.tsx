@@ -22,7 +22,7 @@ interface Props { params: Promise<{ id: string }> }
 
 function Card({ titulo, children, className }: { titulo: string; children: React.ReactNode; className?: string }) {
   return (
-    <div className={cn('bg-white rounded-2xl border border-[#e2e8f0] p-5', className)}>
+    <div className={cn('bg-white rounded-2xl border border-[#e2e8f0] p-4 sm:p-5', className)}>
       <h3 className="text-sm font-semibold text-[#1F3F44] mb-3">{titulo}</h3>
       {children}
     </div>
@@ -56,34 +56,37 @@ export default async function OportunidadeDetailPage({ params }: Props) {
       </Link>
 
       {/* Header */}
-      <div className="bg-white rounded-2xl border border-[#e2e8f0] p-6 mb-6">
-        <div className="flex items-start justify-between gap-4 flex-wrap">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-[#f1f5f9] flex items-center justify-center text-2xl flex-shrink-0">{tipo.emoji}</div>
-            <div>
-              <div className="flex items-center gap-3 flex-wrap">
-                <h1 className="font-serif text-2xl font-bold text-[#1F3F44]">{op.pessoa_nome}</h1>
-                <span className={cn('inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border', est.bg, est.color)}>
-                  <span className={cn('w-1.5 h-1.5 rounded-full', est.dot)} />{est.label}
-                </span>
-              </div>
-              <p className="text-[#64748b] text-sm mt-1">{tipo.label}</p>
-              <div className="flex items-center gap-4 mt-3 flex-wrap">
-                {op.pessoa_email && <a href={`mailto:${op.pessoa_email}`} className="flex items-center gap-1.5 text-sm text-[#475569] hover:text-[#00545F]"><Mail className="w-4 h-4" />{op.pessoa_email}</a>}
-                {op.pessoa_telefone && <a href={`tel:${op.pessoa_telefone}`} className="flex items-center gap-1.5 text-sm text-[#475569] hover:text-[#00545F]"><Phone className="w-4 h-4" />{op.pessoa_telefone}</a>}
-              </div>
+      <div className="bg-white rounded-2xl border border-[#e2e8f0] p-4 sm:p-6 mb-6">
+        <div className="flex items-start gap-3 sm:gap-4">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#f1f5f9] flex items-center justify-center text-xl sm:text-2xl flex-shrink-0">{tipo.emoji}</div>
+          <div className="flex-1 min-w-0">
+            <h1 className="font-serif text-lg sm:text-2xl font-bold text-[#1F3F44] leading-tight">{op.pessoa_nome}</h1>
+            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+              <span className={cn('inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border', est.bg, est.color)}>
+                <span className={cn('w-1.5 h-1.5 rounded-full', est.dot)} />{est.label}
+              </span>
+              <span className="text-[#64748b] text-sm">{tipo.label}</span>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Link href={`/admin/oportunidades/${id}/editar`} className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[#e2e8f0] text-[#1F3F44] text-sm font-semibold hover:bg-[#f8fafc] transition-colors">
-              <Pencil className="w-3.5 h-3.5" /> Editar
+          {/* Ações: só ícones em mobile, ícone+texto em ecrãs maiores */}
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            <Link href={`/admin/oportunidades/${id}/editar`} className="flex items-center gap-1.5 p-2 sm:px-3 rounded-xl border border-[#e2e8f0] text-[#1F3F44] text-sm font-semibold hover:bg-[#f8fafc] transition-colors" title="Editar">
+              <Pencil className="w-4 h-4 sm:w-3.5 sm:h-3.5" /> <span className="hidden sm:inline">Editar</span>
             </Link>
             {canDelete && <ApagarOportunidadeButton oportunidadeId={id} />}
           </div>
         </div>
 
+        {/* Contactos */}
+        {(op.pessoa_email || op.pessoa_telefone) && (
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-3">
+            {op.pessoa_email && <a href={`mailto:${op.pessoa_email}`} className="flex items-center gap-1.5 text-sm text-[#475569] hover:text-[#00545F] min-w-0"><Mail className="w-4 h-4 flex-shrink-0" /><span className="truncate">{op.pessoa_email}</span></a>}
+            {op.pessoa_telefone && <a href={`tel:${op.pessoa_telefone}`} className="flex items-center gap-1.5 text-sm text-[#475569] hover:text-[#00545F]"><Phone className="w-4 h-4 flex-shrink-0" />{op.pessoa_telefone}</a>}
+          </div>
+        )}
+
         {/* Meta */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-5 pt-5 border-t border-[#f1f5f9]">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4 sm:mt-5 pt-4 sm:pt-5 border-t border-[#f1f5f9]">
           <div>
             <p className="text-xs text-[#94a3b8] uppercase tracking-wider">Tipologia</p>
             <p className="text-sm font-semibold text-[#1F3F44] mt-0.5">{op.tipologia ?? '—'}</p>
@@ -127,9 +130,9 @@ export default async function OportunidadeDetailPage({ params }: Props) {
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Coluna esquerda — ações */}
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           <Card titulo="Conversão">
             <ConverterButtons oportunidadeId={id} jaConvertida={op.estado === 'convertida'} convertidoTipo={op.convertido_tipo} convertidoId={op.convertido_id} />
           </Card>
@@ -142,7 +145,7 @@ export default async function OportunidadeDetailPage({ params }: Props) {
         </div>
 
         {/* Coluna direita — trabalho */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
           <Card titulo="Estimativa / Orçamento">
             <EstimativaEditor oportunidadeId={id} initial={op.estimativa ?? []} />
           </Card>

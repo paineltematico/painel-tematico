@@ -81,24 +81,27 @@ export default function LeadArchivarButton({ leadId, arquivado, isSuperAdmin }: 
             <>
               <button
                 onClick={() => setModal('restaurar')}
-                className="px-4 py-2 rounded-xl border border-emerald-200 text-emerald-700 text-sm font-semibold hover:bg-emerald-50 transition-colors flex items-center gap-2"
+                className="p-2 sm:px-4 rounded-xl border border-emerald-200 text-emerald-700 text-sm font-semibold hover:bg-emerald-50 transition-colors flex items-center gap-2"
+                title="Restaurar"
               >
-                <RotateCcw className="w-3.5 h-3.5" /> Restaurar
+                <RotateCcw className="w-4 h-4 sm:w-3.5 sm:h-3.5" /> <span className="hidden sm:inline">Restaurar</span>
               </button>
               <button
                 onClick={() => setModal('destruir')}
-                className="px-4 py-2 rounded-xl border border-red-200 text-red-700 text-sm font-semibold hover:bg-red-50 transition-colors flex items-center gap-2"
+                className="p-2 sm:px-4 rounded-xl border border-red-200 text-red-700 text-sm font-semibold hover:bg-red-50 transition-colors flex items-center gap-2"
+                title="Destruir"
               >
-                <Trash2 className="w-3.5 h-3.5" /> Destruir
+                <Trash2 className="w-4 h-4 sm:w-3.5 sm:h-3.5" /> <span className="hidden sm:inline">Destruir</span>
               </button>
             </>
           )
         ) : (
           <button
             onClick={() => setModal('arquivar')}
-            className="px-4 py-2 rounded-xl border border-[#e2e8f0] text-[#64748b] text-sm font-semibold hover:bg-red-50 hover:border-red-200 hover:text-red-700 transition-colors flex items-center gap-2"
+            className="p-2 sm:px-4 rounded-xl border border-[#e2e8f0] text-[#64748b] text-sm font-semibold hover:bg-red-50 hover:border-red-200 hover:text-red-700 transition-colors flex items-center gap-2"
+            title="Arquivar"
           >
-            <Archive className="w-3.5 h-3.5" /> Arquivar
+            <Archive className="w-4 h-4 sm:w-3.5 sm:h-3.5" /> <span className="hidden sm:inline">Arquivar</span>
           </button>
         )}
       </div>
