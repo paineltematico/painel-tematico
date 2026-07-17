@@ -1,9 +1,15 @@
 'use client'
 
+import { usePathname } from 'next/navigation'
+
 export default function WhatsAppButton() {
+  const pathname = usePathname()
   const phone = '351913440800'
   const message = encodeURIComponent('Olá! Gostaria de obter mais informações sobre os vossos imóveis.')
   const url = `https://wa.me/${phone}?text=${message}`
+
+  // Elemento do site público — não mostrar no painel de administração
+  if (pathname?.startsWith('/admin')) return null
 
   return (
     <a

@@ -5,14 +5,13 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import {
-  LayoutDashboard, Home, Users, Settings, Building2, FileText,
-  LogOut, Plus, ExternalLink, UserCog, HardHat, UsersRound, Handshake, ShieldCheck, X, UserCheck, BarChart2, ClipboardList, Globe, Lightbulb,
+  LogOut, Plus, ExternalLink, ShieldCheck, X, Globe,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { AdminRole } from '@/lib/auth'
 import { ROLE_LABELS, ROLE_COLORS } from '@/lib/auth'
 import { canUser } from '@/lib/permissions'
-import type { Permission } from '@/lib/permissions'
+import { visibleNavItems, activeHref } from '@/lib/admin-nav'
 
 const LANGS = [
   { code: 'pt', flag: '🇵🇹', label: 'PT' },
@@ -59,31 +58,6 @@ function SidebarLang() {
   )
 }
 
-interface NavItem {
-  href: string
-  label: string
-  icon: React.ElementType
-  permission: Permission
-  superAdminOnly?: boolean
-}
-
-const NAV_ITEMS: NavItem[] = [
-  { href: '/admin/dashboard',    label: 'Dashboard',    icon: LayoutDashboard, permission: 'dashboard.view' },
-  { href: '/admin/imoveis',      label: 'Imóveis',      icon: Home,            permission: 'imoveis.view' },
-  { href: '/admin/leads',        label: 'Leads / CRM',  icon: Users,           permission: 'leads.view' },
-  { href: '/admin/leads/comerciais', label: 'Comerciais', icon: UserCheck,   permission: 'leads.comerciais' },
-  { href: '/admin/oportunidades', label: 'Oportunidades', icon: Lightbulb,   permission: 'oportunidades.view', superAdminOnly: true },
-  { href: '/admin/estatisticas', label: 'Estatísticas', icon: BarChart2,      permission: 'estatisticas.view' },
-  { href: '/admin/avaliacoes',   label: 'Avaliações',   icon: ClipboardList,  permission: 'avaliacoes.view' },
-  { href: '/admin/projetos',     label: 'Projetos',     icon: Building2,       permission: 'projetos.view' },
-  { href: '/admin/blog',         label: 'Blog',         icon: FileText,        permission: 'blog.view' },
-  { href: '/admin/construcao',   label: 'Construção',   icon: HardHat,         permission: 'construcao.view' },
-  { href: '/admin/equipa',       label: 'Equipa',       icon: UsersRound,      permission: 'equipa.view' },
-  { href: '/admin/parceiros',    label: 'Parceiros',    icon: Handshake,       permission: 'leads.view' },
-  { href: '/admin/definicoes',   label: 'Definições',   icon: Settings,        permission: 'definicoes.view' },
-  { href: '/admin/utilizadores', label: 'Utilizadores', icon: UserCog,         permission: 'utilizadores.view' },
-]
-
 interface Props {
   user?: {
     nome: string
@@ -106,19 +80,10 @@ export default function AdminSidebar({ user, onClose }: Props) {
     router.refresh()
   }
 
-  const visibleItems = NAV_ITEMS.filter((item) => {
-    if (item.superAdminOnly && role !== 'super_admin') return false
-    return canUser(
-      { role: role as AdminRole, permissions_extra: user?.permissions_extra, permissions_denied: user?.permissions_denied },
-      item.permission
-    )
-  })
+  const visibleItems = visibleNavItems(user ? { role, permissions_extra: user.permissions_extra, permissions_denied: user.permissions_denied } : null)
 
   // Realce: escolhe o item cujo href é o prefixo mais longo do caminho atual
-  const activeHref = visibleItems
-    .map((i) => i.href)
-    .filter((h) => pathname === h || pathname.startsWith(h + '/'))
-    .sort((a, b) => b.length - a.length)[0]
+  const active = activeHref(visibleItems, pathname)
 
   return (
     <aside className="w-72 lg:w-64 flex-shrink-0 bg-[#1F3F44] min-h-screen flex flex-col">
@@ -173,7 +138,7 @@ export default function AdminSidebar({ user, onClose }: Props) {
             onClick={onClose}
             className={cn(
               'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all',
-              href === activeHref
+              href === active
                 ? 'bg-[#00545F] text-white'
                 : 'text-slate-300 hover:text-white hover:bg-white/10'
             )}

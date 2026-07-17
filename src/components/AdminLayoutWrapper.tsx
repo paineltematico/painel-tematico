@@ -1,8 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { Menu, X } from 'lucide-react'
+import { Menu } from 'lucide-react'
 import AdminSidebar from '@/components/AdminSidebar'
+import AdminBottomNav from '@/components/AdminBottomNav'
 import type { AdminRole } from '@/lib/auth'
 
 interface Props {
@@ -57,10 +58,16 @@ export default function AdminLayoutWrapper({ user, children }: Props) {
           <span className="text-white font-semibold text-sm">Painel Temático</span>
         </div>
 
-        <main className="flex-1 p-4 lg:p-8 overflow-x-hidden">
+        <main className="flex-1 p-4 lg:p-8 overflow-x-hidden pb-24 lg:pb-8">
           {children}
         </main>
       </div>
+
+      {/* ── Mobile bottom nav ── */}
+      <AdminBottomNav
+        user={user ? { role: user.role, permissions_extra: user.permissions_extra, permissions_denied: user.permissions_denied } : null}
+        onMore={() => setOpen(true)}
+      />
     </div>
   )
 }
