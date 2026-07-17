@@ -25,6 +25,8 @@ export async function POST(
   if (destino !== 'lead' && destino !== 'imovel') {
     return NextResponse.json({ error: 'Destino inválido' }, { status: 400 })
   }
+  // O login master (bootstrap) não tem UUID — guardar null nesse caso
+  const meId = me.id === 'bootstrap' ? null : me.id
 
   const { data: op, error: opErr } = await supabaseAdmin
     .from('oportunidades')
@@ -64,8 +66,8 @@ export async function POST(
         temperatura: 'frio',
         score: 0,
         lido: true,
-        criado_por: me.id,
-        responsavel_id: me.id,
+        criado_por: meId,
+        responsavel_id: meId,
       })
       .select('id')
       .single()

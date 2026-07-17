@@ -34,7 +34,8 @@ export async function POST(req: NextRequest) {
       descricao:        body.descricao || null,
       notas:            body.notas || null,
       estado:           'nova',
-      criado_por:       me.id,
+      // O login master (bootstrap) não tem UUID — guardar null nesse caso
+      criado_por:       me.id === 'bootstrap' ? null : me.id,
     })
     .select()
     .single()
