@@ -320,7 +320,7 @@ export default function ParceirosPage() {
       )}
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
         {[
           { label: 'Total visitas',  value: visitas.length },
           { label: 'Pendentes',      value: visitas.filter(v => v.estado === 'pendente').length, warn: true },
@@ -376,7 +376,8 @@ export default function ParceirosPage() {
               <p className="text-[#94a3b8] text-sm mt-1">{verArquivados ? 'As visitas arquivadas aparecem aqui.' : 'Partilha o link com os mediadores parceiros.'}</p>
             </div>
           ) : (
-            <table className="w-full">
+            <div className="overflow-x-auto">
+            <table className="w-full min-w-[640px]">
               <thead>
                 <tr className="border-b border-[#e2e8f0] bg-[#f8fafc]">
                   {['Data', 'Imóvel', 'Mediador', 'Cliente', 'Estado', 'Ações'].map(h => (
@@ -426,6 +427,7 @@ export default function ParceirosPage() {
                 ))}
               </tbody>
             </table>
+            </div>
           )}
         </div>
       )}

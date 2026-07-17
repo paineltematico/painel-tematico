@@ -94,7 +94,7 @@ export default function EditarLeadPage() {
 
       <form onSubmit={submit} className="space-y-5">
         <div className="bg-white rounded-2xl border border-[#e2e8f0] p-6 space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="col-span-2">
               <label className={label}>Nome *</label>
               <input required value={form.nome} onChange={set('nome')} className={field} />
@@ -119,7 +119,7 @@ export default function EditarLeadPage() {
         </div>
 
         <div className="bg-white rounded-2xl border border-[#e2e8f0] p-6">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className={label}>Prioridade</label>
               <select value={form.prioridade} onChange={set('prioridade')} className={field}>

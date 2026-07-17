@@ -77,7 +77,7 @@ export default function NovoLeadPage() {
 
       <form onSubmit={submit} className="space-y-5">
         <div className="bg-white rounded-2xl border border-[#e2e8f0] p-6 space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="col-span-2">
               <label className={label}>Nome *</label>
               <input required value={form.nome} onChange={e => setForm({...form, nome: e.target.value})} placeholder="Nome completo" className={field} />
@@ -122,7 +122,7 @@ export default function NovoLeadPage() {
         </div>
 
         <div className="bg-white rounded-2xl border border-[#e2e8f0] p-6 space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className={label}>Prioridade</label>
               <select value={form.prioridade} onChange={e => setForm({...form, prioridade: e.target.value})} className={field}>
