@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ChevronLeft, Loader2 } from 'lucide-react'
+import { ChevronLeft, Loader2, ImageIcon } from 'lucide-react'
 import OportunidadeCampos, { FORM_VAZIO, toPayload, type FormOportunidade } from '@/components/oportunidades/OportunidadeCampos'
 
 export default function NovaOportunidadePage() {
@@ -38,6 +38,13 @@ export default function NovaOportunidadePage() {
 
       <form onSubmit={submit} className="space-y-6">
         <OportunidadeCampos form={form} setForm={setForm} />
+
+        <div className="flex items-start gap-2.5 rounded-xl bg-[#00545F]/5 border border-[#00545F]/15 px-4 py-3">
+          <ImageIcon className="w-4 h-4 text-[#00545F] mt-0.5 flex-shrink-0" />
+          <p className="text-sm text-[#475569]">
+            <strong className="text-[#1F3F44]">Fotos e documentos</strong> adicionam-se já a seguir — assim que criares a oportunidade, abre a página dela e verás os campos para carregar imagens e PDFs.
+          </p>
+        </div>
 
         {erro && <p className="text-red-500 text-sm">{erro}</p>}
         <div className="flex justify-end gap-3">
