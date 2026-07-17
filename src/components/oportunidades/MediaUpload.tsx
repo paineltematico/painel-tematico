@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { Upload, X, Loader2, FileText } from 'lucide-react'
+import { Upload, X, Loader2, FileText, Check } from 'lucide-react'
 import { isImagem } from '@/lib/oportunidades'
 
 interface Props {
@@ -31,16 +31,21 @@ export default function MediaUpload({ oportunidadeId, initial, campo }: Props) {
   const [urls, setUrls] = useState<string[]>(initial ?? [])
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
+  const [saved, setSaved] = useState(false)
   const router = useRouter()
   const cfg = CONFIG[campo]
 
   const persist = async (next: string[]) => {
     setUrls(next)
-    await fetch(`/api/admin/oportunidades/${oportunidadeId}`, {
+    const res = await fetch(`/api/admin/oportunidades/${oportunidadeId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ [campo]: next }),
     })
+    if (res.ok) {
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2500)
+    }
     router.refresh()
   }
 
@@ -104,7 +109,16 @@ export default function MediaUpload({ oportunidadeId, initial, campo }: Props) {
       </div>
       <input ref={inputRef} type="file" multiple accept={cfg.accept} onChange={(e) => upload(e.target.files)} className="hidden" />
       {error && <p className="text-red-500 text-xs mb-1">{error}</p>}
-      <p className="text-xs text-[#94a3b8]">{cfg.hint}</p>
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-xs text-[#94a3b8]">{cfg.hint}</p>
+        {saved
+          ? <span className="flex items-center gap-1 text-xs text-emerald-600 flex-shrink-0"><Check className="w-3 h-3" /> Guardado</span>
+          : uploading
+            ? <span className="flex items-center gap-1 text-xs text-[#00545F] flex-shrink-0"><Loader2 className="w-3 h-3 animate-spin" /> A guardar…</span>
+            : urls.length > 0
+              ? <span className="text-xs text-[#94a3b8] flex-shrink-0">Guarda automaticamente</span>
+              : null}
+      </div>
     </div>
   )
 }
