@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react'
 import Image from 'next/image'
-import { Upload, X, Loader2, ImageIcon, GripVertical } from 'lucide-react'
+import { Upload, X, Loader2, ImageIcon, GripVertical, FileText } from 'lucide-react'
 
 interface Props {
   urls: string[]
@@ -10,9 +10,12 @@ interface Props {
   folder?: string   // ex: "imoveis", "projetos", "equipa"
   max?: number      // máximo de fotos (default: 20)
   single?: boolean  // modo single (ex: foto de perfil)
+  allowPdf?: boolean // aceitar PDF além de imagens (ex: plantas)
 }
 
-export default function ImageUpload({ urls, onChange, folder = 'geral', max = 20, single = false }: Props) {
+const isPdf = (url: string) => /\.pdf($|\?)/i.test(url)
+
+export default function ImageUpload({ urls, onChange, folder = 'geral', max = 20, single = false, allowPdf = false }: Props) {
   const inputRef   = useRef<HTMLInputElement>(null)
   const [uploading, setUploading] = useState(false)
   const [error, setError]         = useState('')
@@ -80,13 +83,20 @@ export default function ImageUpload({ urls, onChange, folder = 'geral', max = 20
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
           {urls.map((url, i) => (
             <div key={url} className="relative group aspect-square rounded-xl overflow-hidden border border-[#e2e8f0] bg-[#f8fafc]">
-              <Image
-                src={url}
-                alt={`Foto ${i + 1}`}
-                fill
-                className="object-cover"
-                sizes="120px"
-              />
+              {isPdf(url) ? (
+                <a href={url} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center justify-center h-full text-[#64748b] hover:text-[#00545F] p-2 transition-colors">
+                  <FileText className="w-7 h-7 mb-1" />
+                  <span className="text-[10px] font-medium">PDF</span>
+                </a>
+              ) : (
+                <Image
+                  src={url}
+                  alt={`Foto ${i + 1}`}
+                  fill
+                  className="object-cover"
+                  sizes="120px"
+                />
+              )}
               {/* Overlay */}
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-200" />
               {/* Remove button */}
@@ -130,7 +140,7 @@ export default function ImageUpload({ urls, onChange, folder = 'geral', max = 20
           <input
             ref={inputRef}
             type="file"
-            accept="image/jpeg,image/jpg,image/png,image/webp,image/heic,image/heif,.heic,.heif"
+            accept={`image/jpeg,image/jpg,image/png,image/webp,image/heic,image/heif,.heic,.heif${allowPdf ? ',application/pdf,.pdf' : ''}`}
             multiple={!single}
             className="hidden"
             onChange={(e) => upload(e.target.files)}
@@ -148,10 +158,10 @@ export default function ImageUpload({ urls, onChange, folder = 'geral', max = 20
               </div>
               <div>
                 <p className="text-sm font-semibold text-[#1F3F44]">
-                  {urls.length > 0 ? 'Adicionar mais fotos' : 'Carregar fotos'}
+                  {urls.length > 0 ? (allowPdf ? 'Adicionar mais' : 'Adicionar mais fotos') : (allowPdf ? 'Carregar ficheiros' : 'Carregar fotos')}
                 </p>
                 <p className="text-xs text-[#94a3b8] mt-0.5">
-                  Arrasta aqui ou clica para selecionar · JPEG, PNG, WebP, HEIC · máx. 20MB
+                  Arrasta aqui ou clica para selecionar · JPEG, PNG, WebP, HEIC{allowPdf ? ', PDF' : ''} · máx. 20MB
                 </p>
               </div>
             </div>

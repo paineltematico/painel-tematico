@@ -271,6 +271,7 @@ export default function ImovelForm({ imovel }: Props) {
           onChange={(urls) => set('plantas', urls)}
           folder="imoveis/plantas"
           max={10}
+          allowPdf
         />
       </section>
 
