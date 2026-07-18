@@ -197,7 +197,15 @@ export default function ImovelForm({ imovel }: Props) {
           </div>
           <div>
             <label className={label}>Preço (€)</label>
-            <input type="number" value={form.preco} onChange={(e) => set('preco', e.target.value)} placeholder={form.tipo === 'Arrendamento' ? 'ex: 1200 (por mês)' : 'ex: 295000'} className={field} />
+            <input
+              type="text"
+              inputMode="numeric"
+              value={form.preco ? Number(form.preco).toLocaleString('pt-PT') : ''}
+              onChange={(e) => set('preco', e.target.value.replace(/[.,]\d{1,2}$/, '').replace(/\D/g, ''))}
+              placeholder={form.tipo === 'Arrendamento' ? 'ex: 1.200 (por mês)' : 'ex: 295.000'}
+              className={field}
+            />
+            <p className="text-[#94a3b8] text-xs mt-1.5">Valor exato em euros, com separador de milhares. Guardamos exatamente o que escreves — sem arredondamentos.</p>
           </div>
         </div>
       </section>
