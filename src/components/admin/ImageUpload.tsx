@@ -34,8 +34,8 @@ export default function ImageUpload({ urls, onChange, folder = 'geral', max = 20
     const newUrls: string[] = []
 
     for (const file of toUpload) {
-      if (file.size > 10 * 1024 * 1024) {
-        setError(`"${file.name}" excede o limite de 10MB.`)
+      if (file.size > 20 * 1024 * 1024) {
+        setError(`"${file.name}" excede o limite de 20MB.`)
         continue
       }
       const fd = new FormData()
@@ -151,7 +151,7 @@ export default function ImageUpload({ urls, onChange, folder = 'geral', max = 20
                   {urls.length > 0 ? 'Adicionar mais fotos' : 'Carregar fotos'}
                 </p>
                 <p className="text-xs text-[#94a3b8] mt-0.5">
-                  Arrasta aqui ou clica para selecionar · JPEG, PNG, WebP · máx. 10MB
+                  Arrasta aqui ou clica para selecionar · JPEG, PNG, WebP, HEIC · máx. 20MB
                 </p>
               </div>
             </div>
