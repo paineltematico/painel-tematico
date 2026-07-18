@@ -15,12 +15,12 @@ interface Props {
 
 const CONFIG = {
   fotos: {
-    accept: 'image/jpeg,image/jpg,image/png,image/webp',
-    hint: 'JPG, PNG ou WebP · máx. 20MB cada',
+    accept: 'image/jpeg,image/jpg,image/png,image/webp,image/heic,image/heif,.heic,.heif',
+    hint: 'JPG, PNG, WebP ou HEIC (iPhone) · máx. 20MB cada',
     empty: 'Adicionar foto',
   },
   documentos: {
-    accept: 'application/pdf,image/jpeg,image/jpg,image/png,image/webp',
+    accept: 'application/pdf,image/jpeg,image/jpg,image/png,image/webp,image/heic,image/heif,.heic,.heif',
     hint: 'PDF ou imagem (cadernetas, plantas, certidões) · máx. 20MB',
     empty: 'Adicionar documento',
   },

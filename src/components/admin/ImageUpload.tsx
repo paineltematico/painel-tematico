@@ -130,7 +130,7 @@ export default function ImageUpload({ urls, onChange, folder = 'geral', max = 20
           <input
             ref={inputRef}
             type="file"
-            accept="image/jpeg,image/jpg,image/png,image/webp"
+            accept="image/jpeg,image/jpg,image/png,image/webp,image/heic,image/heif,.heic,.heif"
             multiple={!single}
             className="hidden"
             onChange={(e) => upload(e.target.files)}
