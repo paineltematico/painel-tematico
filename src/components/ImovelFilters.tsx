@@ -1,8 +1,8 @@
 'use client'
 
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
-import { useCallback } from 'react'
-import { X } from 'lucide-react'
+import { useCallback, useState } from 'react'
+import { X, Search, SlidersHorizontal, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const TIPOLOGIAS = ['T0', 'T1', 'T2', 'T3', 'T4', 'T4+']
@@ -28,6 +28,7 @@ export default function ImovelFilters({ currentFilters }: Props) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const [open, setOpen] = useState(false) // painel recolhido em mobile
 
   const updateFilter = useCallback(
     (key: string, value: string) => {
@@ -45,19 +46,49 @@ export default function ImovelFilters({ currentFilters }: Props) {
   const clearAll = () => router.push(pathname)
 
   const hasFilters = currentFilters.tipo || currentFilters.tipologia || currentFilters.min || currentFilters.max || currentFilters.q
+  const nFiltros = [currentFilters.tipo, currentFilters.tipologia, (currentFilters.min || currentFilters.max), currentFilters.q].filter(Boolean).length
 
   return (
-    <div className="bg-white rounded-2xl border border-[#e2e8f0] p-6 space-y-6 sticky top-24">
-      <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-[#1F3F44] text-sm">Filtros</h3>
-        {hasFilters && (
-          <button
-            onClick={clearAll}
-            className="flex items-center gap-1 text-xs text-[#94a3b8] hover:text-[#1F3F44] transition-colors"
-          >
-            <X className="w-3 h-3" /> Limpar
-          </button>
-        )}
+    <div className="bg-white rounded-2xl border border-[#e2e8f0] lg:sticky lg:top-24">
+      {/* Barra de topo — em mobile funciona como toggle */}
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="w-full flex items-center justify-between p-4 sm:p-5 lg:cursor-default"
+      >
+        <span className="flex items-center gap-2 font-semibold text-[#1F3F44] text-sm">
+          <SlidersHorizontal className="w-4 h-4" /> Filtros
+          {nFiltros > 0 && <span className="inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-[#00545F] text-white text-[11px] font-bold">{nFiltros}</span>}
+        </span>
+        <span className="flex items-center gap-3">
+          {hasFilters && (
+            <span
+              onClick={(e) => { e.stopPropagation(); clearAll() }}
+              className="flex items-center gap-1 text-xs text-[#94a3b8] hover:text-[#1F3F44] transition-colors"
+            >
+              <X className="w-3 h-3" /> Limpar
+            </span>
+          )}
+          <ChevronDown className={cn('w-4 h-4 text-[#94a3b8] transition-transform lg:hidden', open && 'rotate-180')} />
+        </span>
+      </button>
+
+      <div className={cn('px-4 sm:px-5 pb-5 space-y-6', open ? 'block' : 'hidden lg:block')}>
+      {/* Pesquisa */}
+      <div>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8] pointer-events-none" />
+          <input
+            type="search"
+            defaultValue={currentFilters.q}
+            onChange={(e) => {
+              const v = e.target.value
+              clearTimeout((window as unknown as { __imf?: number }).__imf)
+              ;(window as unknown as { __imf?: number }).__imf = window.setTimeout(() => updateFilter('q', v), 400)
+            }}
+            placeholder="Cidade, zona, título…"
+            className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-[#e2e8f0] text-sm text-[#1F3F44] placeholder:text-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-[#00545F]/20 focus:border-[#00545F] transition-all"
+          />
+        </div>
       </div>
 
       {/* Tipo */}
@@ -134,6 +165,7 @@ export default function ImovelFilters({ currentFilters }: Props) {
             )
           })}
         </div>
+      </div>
       </div>
     </div>
   )

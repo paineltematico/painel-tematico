@@ -4,6 +4,7 @@ import WhatsAppButton from '@/components/WhatsAppButton'
 import EditModeBar from '@/components/EditModeBar'
 import LanguageSwitcher from '@/components/LanguageSwitcher'
 import SmoothScroll from '@/components/motion/SmoothScroll'
+import Analytics from '@/components/Analytics'
 import { EditModeProvider } from '@/context/EditModeContext'
 import { getCurrentUser } from '@/lib/auth-server'
 import localFont from 'next/font/local'
@@ -62,6 +63,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="pt" className={`${ceraPro.variable} ${playfair.variable}`}>
       <body className="min-h-screen flex flex-col">
+        <Analytics />
         <EditModeProvider initialEditMode={editMode}>
           <SmoothScroll>{children}</SmoothScroll>
           <WhatsAppButton />

@@ -227,6 +227,52 @@ export function emailAdminNovoLead(data: Record<string, unknown>): string {
 </body></html>`
 }
 
+export function emailBoasVindasLead(nome: string, interesse?: string): string {
+  const primeiroNome = nome.split(' ')[0]
+  return `
+<!DOCTYPE html>
+<html lang="pt"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#f1f5f9;font-family:'Helvetica Neue',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f1f5f9;padding:40px 20px;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+        <tr><td style="background:#1F3F44;padding:40px;text-align:center;">
+          <p style="color:#4ecdc4;font-size:11px;letter-spacing:3px;text-transform:uppercase;margin:0 0 12px;">Painel Temático</p>
+          <h1 style="color:#fff;font-size:26px;margin:0;font-weight:700;">Recebemos o seu contacto!</h1>
+        </td></tr>
+        <tr><td style="padding:40px;">
+          <p style="color:#1F3F44;font-size:16px;margin:0 0 20px;">Olá <strong>${escapeHtml(primeiroNome)}</strong>,</p>
+          <p style="color:#475569;font-size:15px;line-height:1.7;margin:0 0 24px;">
+            Obrigado pelo seu interesse${interesse ? ` em <strong>${escapeHtml(interesse)}</strong>` : ''}.
+            A sua mensagem chegou à nossa equipa e entraremos em contacto <strong>o mais breve possível</strong>,
+            normalmente em 24 horas úteis.
+          </p>
+          <div style="background:#f8fafc;border-left:4px solid #00545F;border-radius:0 8px 8px 0;padding:20px;margin:0 0 28px;">
+            <p style="color:#1F3F44;font-weight:700;margin:0 0 8px;font-size:14px;">Entretanto, pode:</p>
+            <ul style="color:#475569;font-size:14px;line-height:1.8;margin:0;padding-left:20px;">
+              <li>Explorar os nossos imóveis e projetos no site</li>
+              <li>Falar connosco diretamente pelo +351 913 440 800</li>
+            </ul>
+          </div>
+          <div style="text-align:center;">
+            <a href="https://painel-tematico.vercel.app/imoveis"
+               style="display:inline-block;background:#00545F;color:#fff;padding:14px 32px;border-radius:10px;text-decoration:none;font-weight:700;font-size:15px;">
+              Ver os nossos imóveis
+            </a>
+          </div>
+        </td></tr>
+        <tr><td style="background:#f8fafc;padding:24px 40px;border-top:1px solid #e2e8f0;text-align:center;">
+          <p style="color:#94a3b8;font-size:12px;margin:0;">Painel Temático · Braga, Portugal · AMI 25031</p>
+          <p style="color:#94a3b8;font-size:12px;margin:8px 0 0;">
+            <a href="https://painel-tematico.vercel.app" style="color:#00545F;text-decoration:none;">painel-tematico.vercel.app</a>
+          </p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>`
+}
+
 export function emailLembreteOportunidade(opts: {
   pessoaNome: string
   localizacao: string

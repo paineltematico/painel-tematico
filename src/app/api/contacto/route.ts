@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase-admin'
 import { rateLimit, clientIp } from '@/lib/rate-limit'
-import { sendAdminEmail, emailAdminNovoLead } from '@/lib/email'
+import { sendAdminEmail, sendEmail, emailAdminNovoLead, emailBoasVindasLead } from '@/lib/email'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -70,16 +70,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Erro ao enviar mensagem.' }, { status: 500 })
   }
 
-  await sendAdminEmail(
-    `📩 Novo contacto — ${nome}${imovelTitulo ? ` · ${imovelTitulo}` : ''}`,
-    emailAdminNovoLead({
-      Nome: nome,
-      Email: email,
-      Telefone: telefone || '—',
-      Interesse: imovelTitulo || '—',
-      Mensagem: mensagem || '—',
-    })
-  )
+  // Notificação ao admin + email de boas-vindas ao cliente (não bloqueia a resposta)
+  await Promise.allSettled([
+    sendAdminEmail(
+      `📩 Novo contacto — ${nome}${imovelTitulo ? ` · ${imovelTitulo}` : ''}`,
+      emailAdminNovoLead({
+        Nome: nome,
+        Email: email,
+        Telefone: telefone || '—',
+        Interesse: imovelTitulo || '—',
+        Mensagem: mensagem || '—',
+      })
+    ),
+    sendEmail(email, 'Recebemos o seu contacto — Painel Temático', emailBoasVindasLead(nome, imovelTitulo || undefined)),
+  ])
 
   return NextResponse.json({ ok: true, id: data.id })
 }
