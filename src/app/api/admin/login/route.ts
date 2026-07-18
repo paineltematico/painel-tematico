@@ -57,12 +57,21 @@ export async function POST(request: Request) {
     return response
   }
 
-  // ── Path B: legacy shared password (bootstrap / backward compat) ─────────
-  if (password !== process.env.ADMIN_PASSWORD) {
-    return NextResponse.json({ error: 'Palavra-passe incorreta' }, { status: 401 })
+  // ── Path B: password master só para setup inicial (sem utilizadores) ─────
+  // Assim que existe pelo menos um utilizador real, este acesso partilhado
+  // fica desativado — obriga a entrar com email + palavra-passe.
+  const { count } = await supabaseAdmin.from('admin_users').select('*', { count: 'exact', head: true })
+
+  if ((count ?? 0) > 0) {
+    return NextResponse.json(
+      { error: 'Introduza o seu email e palavra-passe.' },
+      { status: 401 }
+    )
   }
 
-  const { count } = await supabaseAdmin.from('admin_users').select('*', { count: 'exact', head: true })
+  if (!process.env.ADMIN_PASSWORD || password !== process.env.ADMIN_PASSWORD) {
+    return NextResponse.json({ error: 'Palavra-passe incorreta' }, { status: 401 })
+  }
 
   const bootstrapToken = createToken({
     id: 'bootstrap',
@@ -75,7 +84,7 @@ export async function POST(request: Request) {
     ok: true,
     role: 'super_admin',
     nome: 'Super Admin',
-    noUsers: (count ?? 0) === 0,
+    noUsers: true,
   })
   response.cookies.set(COOKIE_NAME, bootstrapToken, COOKIE_OPTS)
   response.cookies.set('admin_session', 'authenticated', COOKIE_OPTS)
