@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup — Contacto · Painel Temático</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<style>
+  body { background: var(--cream); }
+  .nav { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,.94); backdrop-filter: blur(12px); border-bottom: 1px solid var(--warm-border); }
+  .nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 68px; }
+  .nav .logo { font-family: var(--serif); font-weight: 700; color: var(--brand-dark); letter-spacing: .04em; }
+  .nav a.tel { font-size: var(--text-small); font-weight: 700; color: var(--brand); min-height: 44px; display: inline-flex; align-items: center; }
+
+  .hero { background: var(--brand-dark); padding: var(--section-sm) 0; position: relative; overflow: hidden; }
+  .hero::before { content:''; position: absolute; inset: 0;
+    background: url('https://images.unsplash.com/photo-1487958449943-2429e8be8625?auto=format&fit=crop&w=1600&q=80') center/cover; opacity: .18; }
+  .hero .wrap { position: relative; }
+  .hero h1 { color: #fff; font-size: var(--text-h1); margin: .5rem 0; }
+  .hero p { color: rgba(255,255,255,.8); max-width: 44ch; }
+
+  main { padding: var(--section-sm) 0 var(--section); }
+  .grid { display: grid; gap: 2.5rem; }
+  @media (min-width: 1024px) { .grid { grid-template-columns: 5fr 4fr; gap: 4rem; align-items: start; } }
+
+  form { background: var(--paper); border: 1px solid var(--warm-border); border-radius: var(--radius-card); padding: 2rem; box-shadow: var(--shadow-card); }
+  form h2 { font-size: var(--text-h3); color: var(--brand-dark); margin-bottom: 1.5rem; }
+  .f { margin-bottom: 1.15rem; }
+  label { display: block; font-size: var(--text-label); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: .45rem; }
+  input, textarea, select { width: 100%; min-height: 48px; padding: .75rem .9rem; border-radius: .65rem; border: 1px solid var(--warm-border);
+    font-family: var(--sans); font-size: var(--text-small); color: var(--ink); background: var(--paper); }
+  textarea { min-height: 110px; resize: none; }
+  input:focus, textarea:focus, select:focus { outline: 2px solid var(--brand); outline-offset: -1px; border-color: var(--brand); }
+  .rgpd { display: flex; gap: .6rem; align-items: flex-start; font-size: .8rem; color: var(--ink-mute); margin: 1rem 0 1.25rem; }
+  .rgpd input { width: 18px; height: 18px; min-height: 18px; margin-top: 2px; accent-color: var(--brand); }
+  .rgpd a { color: var(--brand); text-decoration: underline; }
+
+  .side .block { background: var(--paper); border: 1px solid var(--warm-border); border-radius: var(--radius-card);
+    padding: 1.5rem; margin-bottom: 1.25rem; box-shadow: var(--shadow-card); }
+  .side h3 { font-size: var(--text-label); letter-spacing: .2em; text-transform: uppercase; color: var(--ink-mute); font-family: var(--sans); font-weight: 700; margin-bottom: 1rem; }
+  .side .big { font-family: var(--serif); font-size: 1.35rem; color: var(--brand-dark); font-weight: 700; }
+  .side p { font-size: var(--text-small); color: var(--ink-soft); }
+  .side a.row { display: flex; align-items: center; gap: .75rem; min-height: 48px; font-weight: 600; color: var(--ink); font-size: var(--text-small); }
+  .side a.row:hover { color: var(--brand); }
+  .map { border-radius: var(--radius-card); overflow: hidden; aspect-ratio: 16/10; background: var(--warm); position: relative; }
+  .map img { width: 100%; height: 100%; object-fit: cover; filter: saturate(.8); }
+  .map .pin { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -100%);
+    background: var(--brand-dark); color: #fff; padding: .5rem .9rem; border-radius: .6rem; font-size: var(--text-label);
+    font-weight: 700; box-shadow: var(--shadow-hover); }
+  .map .pin::after { content:''; position: absolute; left: 50%; top: 100%; transform: translateX(-50%); border: 7px solid transparent; border-top-color: var(--brand-dark); }
+</style>
+</head>
+<body>
+<span class="mock-note" style="background:rgba(255,255,255,.9); color: var(--brand); border-color: rgba(0,84,95,.3);">Mockup · Contacto <a href="index.html" style="color: var(--ink-mute);">← índice</a></span>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="logo" href="homepage.html">PAINEL TEMÁTICO</a>
+    <a class="tel" href="tel:+351913440800">☎ 913 440 800</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="label" style="color: var(--gold);">Estamos em Braga</span>
+    <h1>Fale connosco</h1>
+    <p>Resposta no próprio dia útil. Se preferir, ligue diretamente — atende quem constrói.</p>
+  </div>
+</header>
+
+<main>
+  <div class="wrap grid">
+    <form onsubmit="return false;">
+      <h2>Envie-nos uma mensagem</h2>
+      <div class="f"><label for="assunto">Assunto</label>
+        <select id="assunto"><option>Tenho interesse num imóvel</option><option>Quero informações de um projeto</option><option>Quero vender o meu imóvel</option><option>Outro assunto</option></select></div>
+      <div class="f"><label for="nome">Nome</label><input id="nome" placeholder="O seu nome" required></div>
+      <div style="display:grid; gap:1.15rem; grid-template-columns:1fr 1fr;">
+        <div class="f"><label for="email">Email</label><input id="email" type="email" placeholder="email@exemplo.pt" required></div>
+        <div class="f"><label for="tel">Telefone</label><input id="tel" type="tel" placeholder="+351 9xx xxx xxx"></div>
+      </div>
+      <div class="f"><label for="msg">Mensagem</label><textarea id="msg" placeholder="Como podemos ajudar?"></textarea></div>
+      <label class="rgpd"><input type="checkbox" required>
+        <span>Autorizo o tratamento dos meus dados para este contacto, nos termos da <a href="#">Política de Privacidade</a>.</span></label>
+      <button class="btn btn-primary" style="width: 100%;">Enviar mensagem</button>
+    </form>
+
+    <aside class="side">
+      <div class="block">
+        <h3>Contacto direto</h3>
+        <a class="row" href="tel:+351913440800">☎&ensp;<span><span class="big">913 440 800</span><br><span style="color:var(--ink-mute); font-weight:400;">Seg–Sex 8h–20h · Sáb 9h–13h</span></span></a>
+        <a class="row" href="#">✆&ensp;WhatsApp — resposta imediata</a>
+        <a class="row" href="mailto:geral@paineltematico.pt">✉&ensp;geral@paineltematico.pt</a>
+      </div>
+      <div class="block">
+        <h3>Morada</h3>
+        <p>Rua Mário Valença, n55<br>Nogueira, Braga</p>
+        <div class="map" style="margin-top: 1rem;">
+          <img src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=900&q=80" alt="Mapa (placeholder)">
+          <span class="pin">Painel Temático</span>
+        </div>
+      </div>
+      <div class="block" style="background: var(--brand-dark); border: 0;">
+        <h3 style="color: rgba(255,255,255,.6);">Prefere que liguemos nós?</h3>
+        <p style="color: rgba(255,255,255,.85); margin-bottom: 1rem;">Deixe o número e ligamos no horário que indicar.</p>
+        <a class="btn btn-gold" href="#" style="width: 100%;">Quero ser contactado</a>
+      </div>
+    </aside>
+  </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup — Menu & Footer · Painel Temático</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<style>
+  body { background: var(--cream); }
+  .demo { padding: var(--section-sm) 0; }
+  .demo h2 { font-size: var(--text-h2); color: var(--brand-dark); margin-bottom: .5rem; }
+  .demo .note { color: var(--ink-mute); font-size: var(--text-small); margin-bottom: 1.75rem; max-width: 60ch; }
+
+  /* ── NAVBAR (2 estados) ── */
+  .navdemo { border-radius: var(--radius-card); overflow: hidden; box-shadow: var(--shadow-card); margin-bottom: 1.5rem; }
+  .navdemo .state { padding: 0; }
+  .bar { display: flex; align-items: center; justify-content: space-between; height: 72px; padding: 0 1.5rem; }
+  .bar .logo { font-family: var(--serif); font-weight: 700; letter-spacing: .04em; }
+  .bar .links { display: flex; gap: .25rem; align-items: center; }
+  .bar .links a { padding: .6rem 1rem; border-radius: .5rem; font-size: var(--text-small); font-weight: 500; min-height: 44px; display: inline-flex; align-items: center; }
+  .bar .burger { width: 44px; height: 44px; border-radius: .6rem; border: 0; background: transparent; cursor: pointer; font-size: 1.3rem; display: none; }
+
+  .state-a { background: linear-gradient(rgba(7,16,15,.55), rgba(7,16,15,.55)), url('https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1400&q=80') center/cover; }
+  .state-a .logo { color: #fff; }
+  .state-a .links a { color: rgba(255,255,255,.85); }
+  .state-a .links a:hover { background: rgba(255,255,255,.12); color: #fff; }
+
+  .state-b { background: rgba(255,255,255,.96); border-top: 1px solid var(--warm-border); }
+  .state-b .logo { color: var(--brand-dark); }
+  .state-b .links a { color: var(--ink-soft); }
+  .state-b .links a:hover { background: var(--warm); color: var(--ink); }
+  .state-b .links a.active { color: var(--brand); background: rgba(0,84,95,.08); }
+
+  /* ── MENU MOBILE ecrã completo ── */
+  .phone { width: min(375px, 100%); margin: 0 auto; border-radius: 2rem; overflow: hidden; border: 8px solid var(--brand-dark);
+    background: var(--dark); aspect-ratio: 375/720; position: relative; box-shadow: var(--shadow-hover); }
+  .mmenu { position: absolute; inset: 0; display: flex; flex-direction: column; padding: 1.25rem 1.5rem 2rem; }
+  .mmenu .top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2.5rem; }
+  .mmenu .logo { font-family: var(--serif); color: #fff; font-weight: 700; }
+  .mmenu .close { width: 44px; height: 44px; border-radius: 999px; border: 1px solid rgba(255,255,255,.2);
+    background: transparent; color: #fff; font-size: 1.1rem; cursor: pointer; }
+  .mmenu nav { flex: 1; display: flex; flex-direction: column; gap: .25rem; }
+  .mmenu nav a { font-family: var(--serif); font-size: 2rem; color: var(--on-dark-soft); padding: .55rem 0;
+    display: flex; align-items: baseline; gap: .75rem; transition: color var(--fast); }
+  .mmenu nav a:hover, .mmenu nav a.active { color: var(--gold); }
+  .mmenu nav a small { font-family: var(--sans); font-size: .7rem; letter-spacing: .2em; color: var(--on-dark-mute); text-transform: uppercase; }
+  .mmenu nav a { opacity: 0; transform: translateY(12px); animation: rise 500ms var(--ease) both; }
+  .mmenu nav a:nth-child(1) { animation-delay: 60ms } .mmenu nav a:nth-child(2) { animation-delay: 120ms }
+  .mmenu nav a:nth-child(3) { animation-delay: 180ms } .mmenu nav a:nth-child(4) { animation-delay: 240ms }
+  .mmenu nav a:nth-child(5) { animation-delay: 300ms } .mmenu nav a:nth-child(6) { animation-delay: 360ms }
+  @keyframes rise { from { opacity: 0; transform: translateY(12px) } to { opacity: 1; transform: none } }
+  .mmenu .foot { display: flex; flex-direction: column; gap: .6rem; }
+
+  /* ── FOOTER v2 ── */
+  .footer { background: var(--dark); color: var(--on-dark-soft); padding: 3.5rem 0 2rem; border-radius: var(--radius-card); }
+  .footer .inner { padding: 0 2rem; }
+  .footer .cols { display: grid; gap: 2.5rem; grid-template-columns: 1fr; margin-bottom: 3rem; }
+  @media (min-width: 900px) { .footer .cols { grid-template-columns: 2fr 1fr 1fr 1fr; } }
+  .footer h4 { font-size: var(--text-label); letter-spacing: .2em; text-transform: uppercase; color: var(--on-dark); margin: 0 0 1rem; font-family: var(--sans); }
+  .footer ul { list-style: none; margin: 0; padding: 0; }
+  .footer li { margin-bottom: .6rem; }
+  .footer a { font-size: var(--text-small); color: var(--on-dark-mute); }
+  .footer a:hover { color: var(--on-dark); }
+  .footer .brand { font-family: var(--serif); font-size: 1.25rem; color: var(--on-dark); letter-spacing: .05em; margin-bottom: 1rem; }
+  .footer .legal { border-top: 1px solid rgba(255,255,255,.08); padding-top: 1.5rem; display: flex; flex-wrap: wrap;
+    justify-content: space-between; gap: 1rem; font-size: .78rem; color: var(--on-dark-mute); }
+  .footer .legal .lnks { display: flex; flex-wrap: wrap; gap: 1.25rem; }
+  .footer .selo { display: inline-flex; align-items: center; gap: .5rem; margin-top: 1rem; padding: .5rem .9rem;
+    border: 1px solid rgba(201,169,110,.35); border-radius: .6rem; color: var(--gold); font-size: var(--text-label);
+    letter-spacing: .1em; text-transform: uppercase; font-weight: 700; }
+</style>
+</head>
+<body>
+<span class="mock-note" style="background:rgba(255,255,255,.9); color: var(--brand); border-color: rgba(0,84,95,.3);">Mockup · Menu & Footer <a href="index.html" style="color: var(--ink-mute);">← índice</a></span>
+
+<section class="demo">
+  <div class="wrap">
+    <h2>Navbar — dois estados</h2>
+    <p class="note">Transparente sobre o hero; sólida ao rolar. Novidades: telefone sempre visível no desktop
+    (o funil é telefónico), item "Imóveis" na navegação (hoje só existe como botão) e alvos ≥44px.</p>
+    <div class="navdemo">
+      <div class="state state-a">
+        <div class="bar">
+          <span class="logo">PAINEL TEMÁTICO</span>
+          <span class="links">
+            <a href="#">Imóveis</a><a href="#">Projetos</a><a href="#">Construção</a><a href="#">Sobre</a><a href="#">Contacto</a>
+            <a href="#" style="font-weight:700; color:#fff;">☎ 913 440 800</a>
+            <a class="btn btn-gold" style="min-height: 44px;" href="#">Ver Imóveis</a>
+          </span>
+        </div>
+      </div>
+      <div class="state state-b">
+        <div class="bar">
+          <span class="logo">PAINEL TEMÁTICO</span>
+          <span class="links">
+            <a href="#" class="active">Imóveis</a><a href="#">Projetos</a><a href="#">Construção</a><a href="#">Sobre</a><a href="#">Contacto</a>
+            <a href="#" style="font-weight:700; color: var(--brand);">☎ 913 440 800</a>
+            <a class="btn btn-primary" style="min-height: 44px;" href="#">Ver Imóveis</a>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="demo" style="background: var(--warm);">
+  <div class="wrap">
+    <h2>Menu mobile — ecrã completo</h2>
+    <p class="note">Substitui o dropdown atual: tipografia serif grande (Fitts — alvos generosos), entrada em stagger,
+    contactos diretos no fundo. Fecha com X (44px) ou swipe.</p>
+    <div class="phone">
+      <div class="mmenu">
+        <div class="top"><span class="logo">PAINEL TEMÁTICO</span><button class="close" aria-label="Fechar menu">✕</button></div>
+        <nav>
+          <a href="#" class="active">Imóveis <small>12 disponíveis</small></a>
+          <a href="#">Projetos <small>lançamento Trandeiras</small></a>
+          <a href="#">Construção</a>
+          <a href="#">Sobre</a>
+          <a href="#">Contacto</a>
+        </nav>
+        <div class="foot">
+          <a class="btn btn-gold" href="#">☎&ensp;Ligar agora</a>
+          <a class="btn btn-outline-dark" href="#">✆&ensp;WhatsApp</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="demo">
+  <div class="wrap">
+    <h2>Footer v2</h2>
+    <p class="note">Ganha a coluna legal completa (Privacidade, Termos, Livro de Reclamações — obrigatório em PT),
+    social, e o selo de construtor+promotor. AMI/IMPIC mantêm-se.</p>
+    <div class="footer">
+      <div class="inner">
+        <div class="cols">
+          <div>
+            <p class="brand">PAINEL TEMÁTICO</p>
+            <p style="font-size: var(--text-small); max-width: 30ch; color: var(--on-dark-mute);">Construção e promoção imobiliária em Braga. Média gama, execução premium.</p>
+            <span class="selo">◆ Construtor + Promotor</span>
+            <p style="margin-top: 1rem; font-size: var(--text-small);">☎ +351 913 440 800<br>✉ geral@paineltematico.pt<br>Rua Mário Valença n55, Nogueira, Braga</p>
+          </div>
+          <div><h4>Navegação</h4><ul><li><a href="#">Imóveis</a></li><li><a href="#">Projetos</a></li><li><a href="#">Construção</a></li><li><a href="#">Sobre</a></li><li><a href="#">Contacto</a></li></ul></div>
+          <div><h4>Comprar</h4><ul><li><a href="#">Apartamentos T2</a></li><li><a href="#">Apartamentos T3</a></li><li><a href="#">Moradias</a></li><li><a href="#">Lançamentos</a></li><li><a href="#">Vender o meu imóvel</a></li></ul></div>
+          <div><h4>Legal</h4><ul><li><a href="#">Política de Privacidade</a></li><li><a href="#">Termos e Condições</a></li><li><a href="#">Livro de Reclamações</a></li><li><a href="#">RGPD</a></li></ul></div>
+        </div>
+        <div class="legal">
+          <span>© <span id="ano"></span> Painel Temático · AMI 25031 · IMPIC 69636</span>
+          <div class="lnks"><a href="#">Instagram</a><a href="#">Facebook</a><a href="#">LinkedIn</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>document.getElementById('ano').textContent = new Date().getFullYear();</script>
+</body>
+</html>

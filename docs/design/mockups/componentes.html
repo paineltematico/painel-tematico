@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup — Componentes · Design System v2 · Painel Temático</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<style>
+  body { background: var(--cream); }
+  header.page { background: var(--brand-dark); padding: var(--section-sm) 0; }
+  header.page h1 { color: #fff; font-size: var(--text-h1); margin: .5rem 0; }
+  header.page p { color: rgba(255,255,255,.75); font-size: var(--text-small); max-width: 56ch; }
+  header.page .label { color: var(--gold); }
+
+  .sec { padding: var(--section-sm) 0; }
+  .sec > .wrap > h2 { font-size: var(--text-h2); color: var(--brand-dark); margin-bottom: .4rem; }
+  .sec .hint { color: var(--ink-mute); font-size: var(--text-small); margin-bottom: 1.75rem; max-width: 62ch; }
+  .sec.dark { background: var(--dark-2); }
+  .sec.dark > .wrap > h2 { color: var(--on-dark); }
+  .sec.dark .hint { color: var(--on-dark-mute); }
+
+  /* paleta */
+  .swatches { display: grid; gap: .75rem; grid-template-columns: repeat(2, 1fr); }
+  @media (min-width: 700px) { .swatches { grid-template-columns: repeat(4, 1fr); } }
+  .sw { border-radius: var(--radius-card); overflow: hidden; border: 1px solid var(--warm-border); background: var(--paper); }
+  .sw .c { height: 72px; }
+  .sw .i { padding: .75rem .9rem; }
+  .sw .i strong { display: block; font-size: var(--text-small); color: var(--ink); }
+  .sw .i span { font-size: .72rem; color: var(--ink-mute); font-family: ui-monospace, monospace; }
+  .sw .i em { display: block; font-style: normal; font-size: .7rem; margin-top: .25rem; font-weight: 700; }
+  .sw .i em.pass { color: #1a7f4e; } .sw .i em.warn { color: #b45309; }
+
+  /* type scale */
+  .type div { padding: 1rem 0; border-bottom: 1px solid var(--warm-border); display: flex; flex-wrap: wrap; align-items: baseline; gap: 1rem; }
+  .type .t { font-family: var(--serif); color: var(--brand-dark); font-weight: 700; }
+  .type .m { font-size: .72rem; color: var(--ink-mute); font-family: ui-monospace, monospace; margin-left: auto; }
+
+  .row { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; }
+  .grid3 { display: grid; gap: 1.25rem; grid-template-columns: 1fr; }
+  @media (min-width: 900px) { .grid3 { grid-template-columns: repeat(3, 1fr); } }
+
+  /* card demo (claro) */
+  .card { background: var(--paper); border-radius: var(--radius-card); overflow: hidden; border: 1px solid var(--warm-border);
+    box-shadow: var(--shadow-card); transition: box-shadow var(--base) var(--ease); display: block; max-width: 360px; }
+  .card:hover { box-shadow: var(--shadow-hover); }
+  .card .ph { position: relative; aspect-ratio: 4/3; overflow: hidden; }
+  .card .ph img { width: 100%; height: 100%; object-fit: cover; transition: transform 700ms var(--ease); }
+  .card:hover .ph img { transform: scale(1.03); }
+  .card .tag { position: absolute; top: .8rem; left: .8rem; background: rgba(7,16,15,.78); color: #fff;
+    font-size: var(--text-label); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: .35rem .8rem; border-radius: 999px; }
+  .card .body { padding: 1.15rem 1.3rem 1.4rem; }
+  .card h3 { font-size: var(--text-h3); color: var(--brand-dark); margin: .3rem 0 .6rem; }
+  .card .loc { font-size: var(--text-label); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-mute); }
+  .card .price { font-family: var(--serif); font-weight: 700; font-size: 1.3rem; color: var(--brand); }
+
+  /* form demo */
+  .fdemo { max-width: 420px; }
+  .fdemo label { display: block; font-size: var(--text-label); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: .45rem; }
+  .fdemo input { width: 100%; min-height: 48px; padding: .75rem .9rem; border-radius: .65rem; border: 1px solid var(--warm-border);
+    font-family: var(--sans); font-size: var(--text-small); margin-bottom: 1rem; }
+  .fdemo input:focus { outline: 2px solid var(--brand); outline-offset: -1px; }
+  .sec.dark .fdemo label { color: var(--on-dark-mute); }
+  .sec.dark .fdemo input { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.12); color: var(--on-dark); }
+  .sec.dark .fdemo input:focus { outline-color: var(--gold); }
+
+  /* motion demo */
+  .motion { display: flex; flex-wrap: wrap; gap: 1rem; }
+  .mbox { width: 130px; padding: 1.25rem 1rem; text-align: center; border-radius: var(--radius-card);
+    background: var(--paper); border: 1px solid var(--warm-border); font-size: .75rem; color: var(--ink-mute); cursor: pointer; }
+  .mbox b { display: block; color: var(--ink); font-size: 1.4rem; margin-bottom: .35rem; transition: transform var(--fast) var(--ease); }
+  .mbox:nth-child(1):hover b { transform: translateY(-3px); }
+  .mbox:nth-child(2):hover b { transform: scale(1.15); }
+  .mbox:nth-child(3):hover b { transform: rotate(8deg); }
+  .mono { font-family: ui-monospace, monospace; font-size: .72rem; color: var(--ink-mute); }
+</style>
+</head>
+<body>
+<span class="mock-note" style="background:rgba(255,255,255,.9); color: var(--brand); border-color: rgba(0,84,95,.3);">Mockup · Componentes <a href="index.html" style="color: var(--ink-mute);">← índice</a></span>
+
+<header class="page">
+  <div class="wrap">
+    <span class="label">Design System v2 · styleguide vivo</span>
+    <h1>Componentes</h1>
+    <p>Todos os elementos abaixo usam exclusivamente os tokens de <code>tokens.css</code> — a mesma folha
+    que alimenta os 6 mockups. Na implementação, isto passa a ser o <code>@theme</code> do Tailwind v4.</p>
+  </div>
+</header>
+
+<section class="sec">
+  <div class="wrap">
+    <h2>Paleta</h2>
+    <p class="hint">Contraste calculado contra o fundo de uso real. Regra: gold com avareza; slate proibido; texto sobre dark só nos 3 steps.</p>
+    <div class="swatches">
+      <div class="sw"><div class="c" style="background: var(--brand-dark);"></div><div class="i"><strong>brand-dark</strong><span>#1F3F44</span><em class="pass">branco sobre → 10.9:1 AA ✓</em></div></div>
+      <div class="sw"><div class="c" style="background: var(--brand);"></div><div class="i"><strong>brand</strong><span>#00545F</span><em class="pass">branco sobre → 7.8:1 AA ✓</em></div></div>
+      <div class="sw"><div class="c" style="background: var(--gold);"></div><div class="i"><strong>gold</strong><span>#C9A96E</span><em class="pass">sobre dark → 8.1:1 AA ✓</em></div></div>
+      <div class="sw"><div class="c" style="background: var(--accent);"></div><div class="i"><strong>accent</strong><span>#4ecdc4</span><em class="warn">só decorativo (1.9:1 s/ branco)</em></div></div>
+      <div class="sw"><div class="c" style="background: var(--dark);"></div><div class="i"><strong>dark</strong><span>#07100f</span><em class="pass">fundo produto</em></div></div>
+      <div class="sw"><div class="c" style="background: var(--dark-2);"></div><div class="i"><strong>dark-2</strong><span>#0d1a1c</span><em class="pass">secções alternadas</em></div></div>
+      <div class="sw"><div class="c" style="background: var(--warm); border-bottom: 1px solid var(--warm-border);"></div><div class="i"><strong>warm / cream</strong><span>#F2EEEE · #FAF8F5</span><em class="pass">fundos institucionais</em></div></div>
+      <div class="sw"><div class="c" style="background: linear-gradient(90deg, var(--on-dark) 33%, var(--on-dark-soft) 33% 66%, var(--on-dark-mute) 66%);"></div><div class="i"><strong>on-dark · 3 steps</strong><span>#F5F5F3 · #C3C9C7 · #8FA09E</span><em class="pass">mute = piso 4.6:1 AA ✓</em></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" style="background: var(--paper);">
+  <div class="wrap">
+    <h2>Escala tipográfica</h2>
+    <p class="hint">Fluida com clamp() — redimensiona a janela. Serif (Playfair) para display e valores; Cera Pro para tudo o resto. Corpo nunca abaixo de 1rem.</p>
+    <div class="type">
+      <div><span class="t" style="font-size: var(--text-display);">Display</span><span class="m">--text-display · clamp(2.5rem→5.5rem)</span></div>
+      <div><span class="t" style="font-size: var(--text-h1);">Heading 1</span><span class="m">--text-h1 · clamp(2rem→3.5rem)</span></div>
+      <div><span class="t" style="font-size: var(--text-h2);">Heading 2</span><span class="m">--text-h2 · clamp(1.5rem→2.5rem)</span></div>
+      <div><span class="t" style="font-size: var(--text-h3);">Heading 3</span><span class="m">--text-h3 · clamp(1.25rem→1.75rem)</span></div>
+      <div><span style="font-family: var(--serif); font-size: var(--text-lead); color: var(--ink);">Lead — descrições de imóvel e projeto.</span><span class="m">--text-lead</span></div>
+      <div><span style="font-size: var(--text-body); color: var(--ink);">Body — texto corrente, 1rem mínimo.</span><span class="m">--text-body · 1rem</span></div>
+      <div><span class="label" style="color: var(--ink-mute);">Label uppercase</span><span class="m">--text-label · .75rem piso</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap">
+    <h2>Botões — tema claro</h2>
+    <p class="hint">1 primário por ecrã. Altura ≥48px mobile. Focus ring visível — testa com Tab.</p>
+    <div class="row">
+      <button class="btn btn-primary">Primário — ação do funil</button>
+      <button class="btn btn-outline">Secundário</button>
+      <a class="ghost" href="#">Ghost — ver todos →</a>
+    </div>
+  </div>
+</section>
+
+<section class="sec dark">
+  <div class="wrap">
+    <h2>Botões — tema produto (dark)</h2>
+    <p class="hint">O gold é o primário premium. Secundário nunca compete.</p>
+    <div class="row" style="margin-bottom: 2.5rem;">
+      <button class="btn btn-gold">Agendar visita</button>
+      <button class="btn btn-outline-dark">✆&ensp;WhatsApp</button>
+      <a class="ghost on-dark" href="#">Todos os projetos →</a>
+    </div>
+    <h2>Badges de estado (lógica comercial §5)</h2>
+    <p class="hint">Disponível é o único estado "quente" — pulsa. Reservado sem preço. Vendido apagado. Em breve com CTA de pré-registo.</p>
+    <div class="row" style="margin-bottom: 2.5rem;">
+      <span class="badge badge-disponivel"><span class="dot"></span>Disponível</span>
+      <span class="badge badge-reservado">Reservado</span>
+      <span class="badge badge-vendido">Vendido</span>
+      <span class="badge badge-embreve">Em breve</span>
+    </div>
+    <h2>Formulário — dark</h2>
+    <div class="fdemo">
+      <label for="d1">Nome</label>
+      <input id="d1" placeholder="O seu nome — testa o focus">
+    </div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap">
+    <h2>PropertyCard v2</h2>
+    <p class="hint">Hover: só a imagem faz zoom (700ms) e a sombra sobe — o conteúdo não salta. Placeholder sem foto: gradiente de marca (corrige o `to-navy` quebrado).</p>
+    <div class="grid3">
+      <a class="card" href="#">
+        <div class="ph"><img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80" alt="" loading="lazy"><span class="tag">Venda</span></div>
+        <div class="body"><p class="loc">Esporões · Braga</p><h3>Moradia com Piscina</h3><p class="price">495 000 €</p></div>
+      </a>
+      <a class="card" href="#">
+        <div class="ph" style="background: linear-gradient(135deg, var(--brand-dark), var(--dark-2)); display: flex; align-items: center; justify-content: center;">
+          <span style="font-family: var(--serif); font-size: 3.5rem; color: rgba(255,255,255,.14); font-weight: 700;">PT</span>
+          <span class="tag">Venda</span>
+        </div>
+        <div class="body"><p class="loc">Merelim · Braga</p><h3>Sem foto — placeholder de marca</h3><p class="price" style="color: var(--ink-mute); font-size: var(--text-small); font-family: var(--sans); font-weight: 600;">Sob consulta</p></div>
+      </a>
+      <div>
+        <h2 style="font-size: var(--text-h3); color: var(--brand-dark); margin-bottom: .75rem;">Microinterações</h2>
+        <div class="motion">
+          <div class="mbox"><b>↑</b>hover 150ms<br>translate + sombra</div>
+          <div class="mbox"><b>◻</b>zoom 1.03<br>700ms ease-premium</div>
+          <div class="mbox"><b>✦</b>reveal stagger<br>60ms por item</div>
+        </div>
+        <p class="mono" style="margin-top: 1rem;">--ease: cubic-bezier(.22,1,.36,1)<br>--fast 150ms · --base 300ms · --reveal 700ms<br>reveals só com prefers-reduced-motion: no-preference</p>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>

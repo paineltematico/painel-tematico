@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup — Projeto Trandeiras · Guia de Frações · Painel Temático</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<style>
+  body { background: var(--dark); color: var(--on-dark); }
+
+  .pnav { position: fixed; inset: 0 0 auto; z-index: 50; display: flex; align-items: center; justify-content: space-between;
+    padding: .75rem 1.25rem; background: linear-gradient(to bottom, rgba(7,16,15,.92), transparent); }
+  .pnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .75rem; }
+  .pnav .back { color: var(--on-dark-soft); font-size: var(--text-small); font-weight: 600; }
+  .pnav .contactar { border: 1px solid var(--gold); color: var(--gold); border-radius: 999px; padding: 0 1.25rem;
+    font-size: var(--text-label); font-weight: 700; letter-spacing: .18em; text-transform: uppercase; transition: all var(--fast) var(--ease); }
+  .pnav .contactar:hover { background: var(--gold); color: #0A0A08; }
+
+  .hero { position: relative; min-height: 100svh; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; }
+  .hero-img { position: absolute; inset: 0; background: var(--dark-2) url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1800&q=80') center/cover; }
+  .hero::after { content:''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(7,16,15,.97), rgba(7,16,15,.25) 55%, rgba(7,16,15,.6)); }
+  .hero .wrap { position: relative; z-index: 2; padding-bottom: 2.5rem; width: 100%; }
+  .hero h1 { font-size: var(--text-display); font-weight: 700; letter-spacing: -.02em; margin: .75rem 0; }
+  .hero .sub { color: var(--on-dark-soft); font-size: var(--text-lead); font-weight: 300; max-width: 44ch; }
+  .hero-stats { display: flex; flex-wrap: wrap; gap: 2rem; margin-top: 1.75rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,.12); }
+  .hero-stats strong { font-family: var(--serif); font-size: 1.6rem; display: block; }
+  .hero-stats .g { color: var(--gold); }
+  .hero-stats span { font-size: var(--text-label); letter-spacing: .15em; text-transform: uppercase; color: var(--on-dark-mute); }
+  .hero-ctas { display: flex; gap: .6rem; flex-wrap: wrap; margin-top: 1.5rem; }
+
+  section { padding: var(--section) 0; }
+  .s-label { color: var(--gold); margin-bottom: 1.25rem; display: block; }
+
+  /* ── GUIA DE FRAÇÕES ── */
+  .filtros { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1.5rem 0 2rem; }
+  .chip { min-height: 44px; padding: 0 1.1rem; border-radius: 999px; border: 1px solid rgba(255,255,255,.15);
+    background: transparent; color: var(--on-dark-soft); font-family: var(--sans); font-size: var(--text-small);
+    font-weight: 600; cursor: pointer; transition: all var(--fast) var(--ease); }
+  .chip:hover { border-color: rgba(201,169,110,.5); }
+  .chip.active { background: var(--gold); border-color: var(--gold); color: #0A0A08; }
+  .chip:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+  .fracoes { display: grid; gap: 1rem; grid-template-columns: 1fr; }
+  @media (min-width: 640px) { .fracoes { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1024px) { .fracoes { grid-template-columns: repeat(4, 1fr); } }
+
+  .fracao { position: relative; border-radius: var(--radius-card); padding: 1.4rem; display: flex; flex-direction: column;
+    background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.09); transition: all var(--base) var(--ease); }
+  .fracao.disponivel { background: var(--gold-soft); border-color: rgba(201,169,110,.4); }
+  .fracao.disponivel:hover { box-shadow: var(--shadow-gold); transform: translateY(-2px); }
+  .fracao.reservado { opacity: .8; }
+  .fracao.reservado::before { content: 'RESERVADO'; position: absolute; inset: 0; display: flex; align-items: center;
+    justify-content: center; font-family: var(--serif); font-size: 1.6rem; letter-spacing: .25em; color: var(--reservado);
+    opacity: .3; transform: rotate(-24deg); pointer-events: none; }
+  .fracao.vendido { opacity: .45; filter: saturate(.3); }
+  .fracao.embreve { border-style: dashed; }
+  .fracao.hide { display: none; }
+
+  .fracao .top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.1rem; }
+  .fracao .ref { font-family: var(--serif); font-size: 1.6rem; font-weight: 700; }
+  .fracao .tip { color: var(--gold); font-weight: 700; font-size: var(--text-small); margin-bottom: .75rem; }
+  .fracao dl { margin: 0 0 1rem; flex: 1; }
+  .fracao dl div { display: flex; justify-content: space-between; padding: .45rem 0; border-bottom: 1px solid rgba(255,255,255,.06); }
+  .fracao dt { font-size: var(--text-label); letter-spacing: .12em; text-transform: uppercase; color: var(--on-dark-mute); }
+  .fracao dd { margin: 0; font-size: var(--text-small); color: var(--on-dark-soft); font-weight: 600; }
+  .fracao .preco { font-family: var(--serif); font-size: 1.3rem; font-weight: 700; color: var(--gold); margin-bottom: 1rem; }
+  .fracao .preco.na { color: var(--on-dark-mute); font-size: var(--text-small); font-family: var(--sans); font-weight: 400; }
+  .fracao .btn { width: 100%; min-height: 44px; font-size: .8rem; }
+  .fracao .cmp { position: absolute; top: 1.1rem; right: 1.1rem; display: none; }
+  .fracao.disponivel .cmp { display: flex; align-items: center; gap: .35rem; font-size: .7rem; color: var(--on-dark-mute); cursor: pointer; }
+  .fracao .cmp input { width: 16px; height: 16px; accent-color: var(--gold); }
+  .fracao.disponivel .top { padding-right: 5.5rem; }
+
+  /* comparador */
+  .compare-bar { position: sticky; bottom: 76px; z-index: 40; margin-top: 1.5rem; display: none;
+    align-items: center; justify-content: space-between; gap: 1rem; padding: .8rem 1.1rem;
+    background: rgba(16,31,34,.97); border: 1px solid rgba(201,169,110,.35); border-radius: var(--radius-card); backdrop-filter: blur(10px); }
+  .compare-bar.visible { display: flex; }
+  .compare-bar p { font-size: var(--text-small); color: var(--on-dark-soft); }
+  .compare-bar strong { color: var(--gold); }
+  @media (min-width: 1024px) { .compare-bar { bottom: 1rem; } }
+
+  /* planta com overlay (esboço) */
+  .planta { position: relative; border-radius: var(--radius-card); overflow: hidden; border: 1px solid rgba(255,255,255,.08);
+    background: var(--dark-3); aspect-ratio: 16/9; }
+  .planta img { width: 100%; height: 100%; object-fit: cover; opacity: .5; }
+  .planta .unit { position: absolute; border: 2px solid var(--gold); background: rgba(201,169,110,.15); border-radius: 6px;
+    display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: var(--text-small);
+    color: var(--gold); cursor: pointer; transition: background var(--fast); }
+  .planta .unit:hover { background: rgba(201,169,110,.35); }
+  .planta .unit.off { border-color: rgba(255,255,255,.2); background: rgba(255,255,255,.04); color: var(--on-dark-mute); }
+
+  /* obra / confiança */
+  .obra { display: grid; gap: 2rem; }
+  @media (min-width: 1024px) { .obra { grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; } }
+  .obra .bar { height: 4px; border-radius: 99px; background: rgba(255,255,255,.08); margin: 1rem 0 .5rem; }
+  .obra .bar div { height: 100%; width: 35%; border-radius: 99px; background: var(--gold); }
+  .obra img { border-radius: var(--radius-card); aspect-ratio: 4/3; object-fit: cover; }
+
+  /* form */
+  .contact-grid { display: grid; gap: 2.5rem; }
+  @media (min-width: 1024px) { .contact-grid { grid-template-columns: 1fr 1fr; gap: 4rem; } }
+  form { background: #101d20; border: 1px solid rgba(255,255,255,.07); border-radius: var(--radius-card); padding: 1.75rem; }
+  form .f { margin-bottom: 1.1rem; }
+  form label { display: block; font-size: var(--text-label); letter-spacing: .18em; text-transform: uppercase; color: var(--on-dark-mute); margin-bottom: .45rem; }
+  form input, form select, form textarea { width: 100%; min-height: 48px; padding: .75rem .9rem; border-radius: 10px;
+    background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12); color: var(--on-dark);
+    font-family: var(--sans); font-size: var(--text-small); }
+  form select option { color: #111; }
+  form input:focus, form select:focus, form textarea:focus { outline: none; border-color: var(--gold); }
+  .rgpd { display: flex; gap: .6rem; align-items: flex-start; font-size: .8rem; color: var(--on-dark-mute); margin: 1rem 0 1.25rem; }
+  .rgpd input { width: 18px; height: 18px; min-height: 18px; margin-top: 2px; accent-color: var(--gold); }
+  .rgpd a { color: var(--gold); text-decoration: underline; }
+  .contact-ctas { display: flex; flex-direction: column; gap: .75rem; margin-top: 1.75rem; }
+  .contact-ctas .btn { justify-content: flex-start; }
+
+  /* comparador lado-a-lado (modal) */
+  .cmp-modal { position: fixed; inset: 0; z-index: 90; display: none; align-items: flex-end; justify-content: center;
+    background: rgba(7,16,15,.85); backdrop-filter: blur(6px); }
+  .cmp-modal.open { display: flex; }
+  @media (min-width: 900px) { .cmp-modal.open { align-items: center; } }
+  .cmp-panel { background: var(--dark-3); border: 1px solid rgba(201,169,110,.3); border-radius: var(--radius-card) var(--radius-card) 0 0;
+    width: 100%; max-width: 860px; max-height: 88svh; overflow: auto; padding: 1.5rem; }
+  @media (min-width: 900px) { .cmp-panel { border-radius: var(--radius-card); } }
+  .cmp-panel .top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+  .cmp-panel h3 { font-size: var(--text-h3); color: var(--on-dark); }
+  .cmp-panel .close { width: 44px; height: 44px; border-radius: 999px; border: 1px solid rgba(255,255,255,.2);
+    background: transparent; color: #fff; cursor: pointer; font-size: 1rem; }
+  table.cmp-t { width: 100%; border-collapse: collapse; }
+  .cmp-t th, .cmp-t td { padding: .8rem .6rem; text-align: left; border-bottom: 1px solid rgba(255,255,255,.07); font-size: var(--text-small); }
+  .cmp-t th { font-size: var(--text-label); letter-spacing: .15em; text-transform: uppercase; color: var(--on-dark-mute); font-weight: 600; }
+  .cmp-t thead td { font-family: var(--serif); font-size: 1.5rem; color: var(--gold); font-weight: 700; }
+  .cmp-t td { color: var(--on-dark-soft); }
+  .cmp-t .preco td { font-family: var(--serif); font-weight: 700; color: var(--gold); font-size: 1.1rem; }
+  .cmp-t .cta td .btn { min-height: 42px; font-size: .75rem; padding: 0 1rem; }
+
+  /* acabamentos */
+  .acab { display: grid; gap: 1rem; grid-template-columns: 1fr; }
+  @media (min-width: 700px) { .acab { grid-template-columns: repeat(3, 1fr); } }
+  .acab figure { margin: 0; border-radius: var(--radius-card); overflow: hidden; position: relative; aspect-ratio: 4/5; }
+  .acab img { width: 100%; height: 100%; object-fit: cover; transition: transform 900ms var(--ease); }
+  .acab figure:hover img { transform: scale(1.04); }
+  .acab figcaption { position: absolute; inset: auto 0 0; padding: 2.5rem 1.25rem 1.15rem;
+    background: linear-gradient(to top, rgba(7,16,15,.92), transparent); }
+  .acab figcaption strong { color: var(--on-dark); font-size: 1rem; display: block; }
+  .acab figcaption span { color: var(--on-dark-mute); font-size: .8rem; }
+
+  /* FAQ de lançamento */
+  .faq details { border-bottom: 1px solid rgba(255,255,255,.08); }
+  .faq summary { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 56px;
+    padding: 1rem 0; cursor: pointer; font-weight: 600; color: var(--on-dark-soft); font-size: var(--text-body); list-style: none; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: '+'; font-family: var(--serif); font-size: 1.5rem; color: var(--gold); transition: transform var(--base) var(--ease); }
+  .faq details[open] summary::after { transform: rotate(45deg); }
+  .faq details[open] summary { color: var(--on-dark); }
+  .faq .a { padding: 0 0 1.25rem; color: var(--on-dark-mute); font-size: var(--text-small); line-height: 1.7; max-width: 62ch; }
+
+  .pfoot { padding: 2rem 1.25rem calc(2rem + 72px); border-top: 1px solid rgba(255,255,255,.06);
+    display: flex; flex-direction: column; align-items: center; gap: 1rem; text-align: center; }
+  .pfoot .legal { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.25rem; }
+  .pfoot a { font-size: var(--text-label); letter-spacing: .12em; text-transform: uppercase; color: var(--on-dark-mute); }
+  .pfoot .fine { font-size: .75rem; color: var(--on-dark-mute); }
+</style>
+</head>
+<body>
+<span class="mock-note">Mockup · Projeto + Guia de Frações <a href="index.html">← índice</a></span>
+
+<nav class="pnav">
+  <a class="back" href="#">← Todos os projetos</a>
+  <a class="contactar" href="#contacto">Contactar</a>
+</nav>
+
+<header class="hero">
+  <div class="hero-img"></div>
+  <div class="wrap">
+    <span class="badge badge-disponivel reveal"><span class="dot"></span>Lançamento · 5 disponíveis</span>
+    <h1 class="reveal">Trandeiras</h1>
+    <p class="sub reveal">Oito apartamentos com assinatura de construtor, entre o centro de Braga e o rio Este.
+    Tipologias T2 e T3, acabamentos premium, entrega em 2027.</p>
+    <div class="hero-stats reveal">
+      <div><strong>8</strong><span>Frações</span></div>
+      <div><strong class="g">5</strong><span>Disponíveis</span></div>
+      <div><strong class="g">Desde 240 000 €</strong><span>Preço</span></div>
+      <div><strong>2027</strong><span>Entrega</span></div>
+    </div>
+    <div class="hero-ctas reveal">
+      <a class="btn btn-gold" href="#fracoes">Escolher a minha fração</a>
+      <a class="btn btn-outline-dark" href="#contacto">Falar com o comercial</a>
+    </div>
+  </div>
+</header>
+
+<!-- GUIA DE FRAÇÕES: o cliente é guiado, não confrontado com 8 anúncios -->
+<section id="fracoes" style="background: var(--dark-2);">
+  <div class="wrap">
+    <span class="label s-label">Guia de frações</span>
+    <h2 style="font-size: var(--text-h2);">Encontre a sua opção</h2>
+    <p style="color: var(--on-dark-mute); font-size: var(--text-small); margin-top: .5rem;">Filtre por tipologia — cada fração tem preço, área e piso. Selecione até 3 para comparar.</p>
+
+    <div class="filtros" role="group" aria-label="Filtrar frações">
+      <button class="chip active" data-f="todas">Todas (8)</button>
+      <button class="chip" data-f="T2">T2 (4)</button>
+      <button class="chip" data-f="T3">T3 (4)</button>
+      <button class="chip" data-f="disp">Só disponíveis (5)</button>
+    </div>
+
+    <div class="fracoes">
+      <article class="fracao disponivel" data-tip="T2" data-estado="disp">
+        <label class="cmp"><input type="checkbox" data-ref="A"> comparar</label>
+        <div class="top"><span class="ref">A</span></div>
+        <p class="tip">T2 · Piso 0 · Jardim</p>
+        <dl><div><dt>Área</dt><dd>96 m²</dd></div><div><dt>Exterior</dt><dd>Jardim 40 m²</dd></div><div><dt>Garagem</dt><dd>1 lugar</dd></div></dl>
+        <p class="preco">240 000 €</p>
+        <a class="btn btn-gold" href="#contacto" data-fr="A">Quero saber mais</a>
+      </article>
+
+      <article class="fracao disponivel" data-tip="T2" data-estado="disp">
+        <label class="cmp"><input type="checkbox" data-ref="B"> comparar</label>
+        <div class="top"><span class="ref">B</span></div>
+        <p class="tip">T2 · Piso 1 · Varanda</p>
+        <dl><div><dt>Área</dt><dd>98 m²</dd></div><div><dt>Exterior</dt><dd>Varanda 12 m²</dd></div><div><dt>Garagem</dt><dd>1 lugar</dd></div></dl>
+        <p class="preco">252 000 €</p>
+        <a class="btn btn-gold" href="#contacto" data-fr="B">Quero saber mais</a>
+      </article>
+
+      <article class="fracao reservado" data-tip="T3" data-estado="res">
+        <div class="top"><span class="ref">C</span><span class="badge badge-reservado">Reservado</span></div>
+        <p class="tip">T3 · Piso 1</p>
+        <dl><div><dt>Área</dt><dd>124 m²</dd></div><div><dt>Exterior</dt><dd>Varanda 14 m²</dd></div><div><dt>Garagem</dt><dd>2 lugares</dd></div></dl>
+        <p class="preco na">Preço reservado</p>
+      </article>
+
+      <article class="fracao disponivel" data-tip="T3" data-estado="disp">
+        <label class="cmp"><input type="checkbox" data-ref="D"> comparar</label>
+        <div class="top"><span class="ref">D</span></div>
+        <p class="tip">T3 · Piso 2 · Vista rio</p>
+        <dl><div><dt>Área</dt><dd>126 m²</dd></div><div><dt>Exterior</dt><dd>Varanda 16 m²</dd></div><div><dt>Garagem</dt><dd>2 lugares</dd></div></dl>
+        <p class="preco">298 000 €</p>
+        <a class="btn btn-gold" href="#contacto" data-fr="D">Quero saber mais</a>
+      </article>
+
+      <article class="fracao vendido" data-tip="T2" data-estado="ven">
+        <div class="top"><span class="ref">E</span><span class="badge badge-vendido">Vendido</span></div>
+        <p class="tip">T2 · Piso 0</p>
+        <dl><div><dt>Área</dt><dd>95 m²</dd></div><div><dt>Exterior</dt><dd>Jardim 36 m²</dd></div></dl>
+      </article>
+
+      <article class="fracao disponivel" data-tip="T3" data-estado="disp">
+        <label class="cmp"><input type="checkbox" data-ref="F"> comparar</label>
+        <div class="top"><span class="ref">F</span></div>
+        <p class="tip">T3 · Piso 2</p>
+        <dl><div><dt>Área</dt><dd>122 m²</dd></div><div><dt>Exterior</dt><dd>Varanda 14 m²</dd></div><div><dt>Garagem</dt><dd>2 lugares</dd></div></dl>
+        <p class="preco">289 000 €</p>
+        <a class="btn btn-gold" href="#contacto" data-fr="F">Quero saber mais</a>
+      </article>
+
+      <article class="fracao embreve" data-tip="T2" data-estado="brev">
+        <div class="top"><span class="ref">G</span><span class="badge badge-embreve">Em breve</span></div>
+        <p class="tip">T2 · Piso 3 · Penthouse</p>
+        <dl><div><dt>Área</dt><dd>102 m²</dd></div><div><dt>Exterior</dt><dd>Terraço 30 m²</dd></div></dl>
+        <p class="preco na">Brevemente</p>
+        <a class="btn btn-outline-dark" href="#contacto">Avisar-me quando disponível</a>
+      </article>
+
+      <article class="fracao disponivel" data-tip="T3" data-estado="disp">
+        <label class="cmp"><input type="checkbox" data-ref="H"> comparar</label>
+        <div class="top"><span class="ref">H</span></div>
+        <p class="tip">T3 · Piso 3 · Duplex</p>
+        <dl><div><dt>Área</dt><dd>148 m²</dd></div><div><dt>Exterior</dt><dd>Terraço 22 m²</dd></div><div><dt>Garagem</dt><dd>2 lugares</dd></div></dl>
+        <p class="preco">345 000 €</p>
+        <a class="btn btn-gold" href="#contacto" data-fr="H">Quero saber mais</a>
+      </article>
+    </div>
+
+    <div class="compare-bar" id="cmpbar" aria-live="polite">
+      <p>A comparar: <strong id="cmplist">—</strong> <span style="color:var(--on-dark-mute)">(máx. 3)</span></p>
+      <button class="btn btn-gold" style="min-height:44px" onclick="abrirComparador()">Comparar lado a lado</button>
+    </div>
+  </div>
+</section>
+
+<!-- PLANTA COM OVERLAY (esboço da versão interativa) -->
+<section style="background: var(--dark);">
+  <div class="wrap">
+    <span class="label s-label" style="color: var(--on-dark-mute);">Planta do piso</span>
+    <h2 style="font-size: var(--text-h2); margin-bottom: 2rem;">Onde fica cada fração</h2>
+    <div class="planta">
+      <img src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=1600&q=80" alt="Planta do edifício (placeholder)">
+      <button class="unit" style="left: 8%; top: 20%; width: 26%; height: 55%;">A · T2</button>
+      <button class="unit" style="left: 38%; top: 20%; width: 26%; height: 55%;">B · T2</button>
+      <button class="unit off" style="left: 68%; top: 20%; width: 24%; height: 55%;">C · Reservado</button>
+    </div>
+    <p style="color: var(--on-dark-mute); font-size: var(--text-small); margin-top: 1rem;">Toque numa fração para ver os detalhes. (Versão final: planta SVG real com estados ao vivo.)</p>
+  </div>
+</section>
+
+<!-- ACABAMENTOS: o "premium" autêntico de quem constrói -->
+<section style="background: var(--dark-3);">
+  <div class="wrap">
+    <span class="label s-label">Acabamentos</span>
+    <h2 style="font-size: var(--text-h2); margin-bottom: .75rem;">Materiais escolhidos um a um</h2>
+    <p style="color: var(--on-dark-mute); font-size: var(--text-small); max-width: 52ch; margin-bottom: 2rem;">
+      Quem constrói escolhe — e responde pelo que escolhe. Garantia de construtor de 5 anos.</p>
+    <div class="acab">
+      <figure>
+        <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=800&q=80" alt="Pavimento em carvalho" loading="lazy">
+        <figcaption><strong>Carvalho francês</strong><span>Pavimento flutuante multicamada, 14 mm</span></figcaption>
+      </figure>
+      <figure>
+        <img src="https://images.unsplash.com/photo-1556912173-3bb406ef7e77?auto=format&fit=crop&w=800&q=80" alt="Cozinha lacada com bancada em pedra" loading="lazy">
+        <figcaption><strong>Cozinha equipada</strong><span>Bancada em pedra natural, eletrodomésticos Bosch</span></figcaption>
+      </figure>
+      <figure>
+        <img src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=800&q=80" alt="Casa de banho em microcimento" loading="lazy">
+        <figcaption><strong>Microcimento</strong><span>Casas de banho com loiça suspensa e duche italiano</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- CONFIANÇA DE CONSTRUTOR -->
+<section style="background: var(--dark-2);">
+  <div class="wrap obra">
+    <div>
+      <span class="label s-label">Quem constrói, mostra</span>
+      <h2 style="font-size: var(--text-h2); margin-bottom: 1rem;">Obra à vista</h2>
+      <p style="color: var(--on-dark-soft); font-size: var(--text-small); line-height: 1.7; max-width: 40ch;">
+        Somos o construtor e o promotor. Publicamos a evolução da obra todos os meses —
+        fundações concluídas, estrutura do piso 1 em curso.</p>
+      <div class="bar"><div></div></div>
+      <p style="font-size: var(--text-label); text-transform: uppercase; letter-spacing: .15em;"><strong style="color: var(--gold); font-family: var(--serif); font-size: 1.2rem;">35%</strong> <span style="color: var(--on-dark-mute);">· estrutura · atualizado há 12 dias</span></p>
+    </div>
+    <img src="https://images.unsplash.com/photo-1459767129954-1b1c1f9b9ace?auto=format&fit=crop&w=1200&q=80" alt="Obra em curso" loading="lazy">
+  </div>
+</section>
+
+<!-- FAQ DE LANÇAMENTO: as perguntas do telefonema, respondidas na página -->
+<section style="background: var(--dark-2);">
+  <div class="wrap" style="max-width: 780px;">
+    <span class="label s-label">Perguntas frequentes</span>
+    <h2 style="font-size: var(--text-h2); margin-bottom: 1.5rem;">Antes de ligar, já sabe</h2>
+    <div class="faq">
+      <details>
+        <summary>Quando é a entrega?</summary>
+        <p class="a">Conclusão prevista para o 2º semestre de 2027. A obra é publicada mês a mês nesta página —
+        acompanhe a evolução real, não promessas.</p>
+      </details>
+      <details>
+        <summary>Como funciona a reserva de uma fração?</summary>
+        <p class="a">Sinal de reserva de 5 000 €, devolvível durante 8 dias. Segue-se o CPCV (10–20%)
+        e o restante na escritura, à entrega da chave.</p>
+      </details>
+      <details>
+        <summary>Posso personalizar os acabamentos?</summary>
+        <p class="a">Sim — reservando antes do fecho da fase de acabamentos, pode escolher entre as gamas
+        definidas (pavimento, cozinha, cerâmicos) sem custo adicional.</p>
+      </details>
+      <details>
+        <summary>O preço inclui garagem e arrecadação?</summary>
+        <p class="a">Sim, todos os preços anunciados incluem o(s) lugar(es) de garagem e arrecadação indicados
+        na ficha de cada fração. Sem custos escondidos.</p>
+      </details>
+      <details>
+        <summary>Quem é o construtor?</summary>
+        <p class="a">A própria Painel Temático — somos promotor e construtor. Garantia de construção de 5 anos
+        e assistência direta, sem intermediários.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACTO com formulário (hoje a página não tem nenhum) -->
+<section id="contacto" style="background: var(--dark);">
+  <div class="wrap contact-grid">
+    <div>
+      <span class="label s-label">Contacto</span>
+      <h2 style="font-size: var(--text-h2); margin-bottom: 1rem;">Reserve a sua visita ao projeto</h2>
+      <p style="color: var(--on-dark-mute); font-size: var(--text-small); max-width: 36ch;">Stand de vendas no local, sábados 10h–13h — ou visita privada à sua medida.</p>
+      <div class="contact-ctas">
+        <a class="btn btn-gold" href="#">📅&ensp;Agendar visita ao stand</a>
+        <a class="btn btn-outline-dark" href="#">✆&ensp;WhatsApp — resposta imediata</a>
+        <a class="btn btn-outline-dark" href="#">☎&ensp;+351 913 440 800</a>
+      </div>
+    </div>
+    <form onsubmit="return false;">
+      <p style="font-family: var(--serif); font-size: var(--text-h3); color: var(--on-dark-soft); margin-bottom: 1.5rem;">Pedir informações</p>
+      <div class="f"><label for="fr">Fração de interesse</label>
+        <select id="fr"><option>Qualquer fração</option><option>A · T2 · 240 000 €</option><option>B · T2 · 252 000 €</option><option>D · T3 · 298 000 €</option><option>F · T3 · 289 000 €</option><option>H · T3 duplex · 345 000 €</option></select></div>
+      <div class="f"><label for="nome">Nome</label><input id="nome" placeholder="O seu nome" required></div>
+      <div class="f"><label for="tel">Telefone</label><input id="tel" type="tel" placeholder="+351 9xx xxx xxx" required></div>
+      <div class="f"><label for="email">Email</label><input id="email" type="email" placeholder="email@exemplo.pt"></div>
+      <label class="rgpd"><input type="checkbox" required>
+        <span>Autorizo o contacto da Painel Temático e li a <a href="#">Política de Privacidade</a>.</span></label>
+      <button class="btn btn-gold" style="width: 100%;">Quero ser contactado</button>
+    </form>
+  </div>
+</section>
+
+<footer class="pfoot">
+  <p style="font-family: var(--serif); color: var(--on-dark-soft); letter-spacing: .05em;">PAINEL TEMÁTICO</p>
+  <div class="legal"><a href="#">Imóveis</a><a href="#">Projetos</a><a href="#">Contacto</a><a href="#">Privacidade</a><a href="#">Livro de Reclamações</a></div>
+  <p class="fine">© <span id="ano"></span> Painel Temático · AMI 25031 · IMPIC 69636</p>
+</footer>
+
+<!-- MODAL COMPARADOR lado-a-lado -->
+<div class="cmp-modal" id="cmpmodal" role="dialog" aria-label="Comparar frações" onclick="if(event.target===this)fecharComparador()">
+  <div class="cmp-panel">
+    <div class="top">
+      <h3>Comparar frações</h3>
+      <button class="close" onclick="fecharComparador()" aria-label="Fechar">✕</button>
+    </div>
+    <table class="cmp-t" id="cmptable"></table>
+  </div>
+</div>
+
+<div class="stickybar" id="sticky">
+  <a class="btn btn-outline-dark btn-icon" href="#" aria-label="Ligar">☎</a>
+  <a class="btn btn-outline-dark btn-icon" href="#" aria-label="WhatsApp">✆</a>
+  <a class="btn btn-gold" style="flex: 1;" href="#fracoes">Ver frações disponíveis</a>
+</div>
+
+<script>
+  document.getElementById('ano').textContent = new Date().getFullYear();
+
+  /* filtros */
+  const chips = document.querySelectorAll('.chip');
+  chips.forEach(c => c.addEventListener('click', () => {
+    chips.forEach(x => x.classList.remove('active')); c.classList.add('active');
+    const f = c.dataset.f;
+    document.querySelectorAll('.fracao').forEach(fr => {
+      const show = f === 'todas' || (f === 'disp' ? fr.dataset.estado === 'disp' : fr.dataset.tip === f);
+      fr.classList.toggle('hide', !show);
+    });
+  }));
+
+  /* comparador (máx 3) */
+  const boxes = document.querySelectorAll('.cmp input');
+  const bar = document.getElementById('cmpbar'), list = document.getElementById('cmplist');
+  boxes.forEach(b => b.addEventListener('change', () => {
+    let sel = [...boxes].filter(x => x.checked);
+    if (sel.length > 3) { b.checked = false; sel = sel.filter(x => x !== b); }
+    list.textContent = sel.length ? sel.map(x => 'Fração ' + x.dataset.ref).join(' · ') : '—';
+    bar.classList.toggle('visible', sel.length >= 2);
+  }));
+
+  /* fração escolhida pré-seleciona o formulário */
+  document.querySelectorAll('[data-fr]').forEach(a => a.addEventListener('click', () => {
+    const sel = document.getElementById('fr');
+    [...sel.options].forEach(o => { if (o.textContent.startsWith(a.dataset.fr + ' ')) sel.value = o.value ?? o.textContent; o.selected = o.textContent.startsWith(a.dataset.fr + ' '); });
+  }));
+
+  /* comparador lado-a-lado: dados lidos dos próprios cards */
+  const DADOS = {
+    A: { tip: 'T2 · Piso 0', area: '96 m²', ext: 'Jardim 40 m²', gar: '1 lugar', preco: '240 000 €' },
+    B: { tip: 'T2 · Piso 1', area: '98 m²', ext: 'Varanda 12 m²', gar: '1 lugar', preco: '252 000 €' },
+    D: { tip: 'T3 · Piso 2', area: '126 m²', ext: 'Varanda 16 m²', gar: '2 lugares', preco: '298 000 €' },
+    F: { tip: 'T3 · Piso 2', area: '122 m²', ext: 'Varanda 14 m²', gar: '2 lugares', preco: '289 000 €' },
+    H: { tip: 'T3 duplex · Piso 3', area: '148 m²', ext: 'Terraço 22 m²', gar: '2 lugares', preco: '345 000 €' },
+  };
+  function abrirComparador() {
+    const sel = [...boxes].filter(x => x.checked).map(x => x.dataset.ref);
+    if (sel.length < 2) return;
+    const linha = (th, key) => `<tr class="${key === 'preco' ? 'preco' : ''}"><th>${th}</th>${sel.map(r => `<td>${DADOS[r][key]}</td>`).join('')}</tr>`;
+    document.getElementById('cmptable').innerHTML =
+      `<thead><tr><th></th>${sel.map(r => `<td>Fração ${r}</td>`).join('')}</tr></thead><tbody>` +
+      linha('Tipologia', 'tip') + linha('Área', 'area') + linha('Exterior', 'ext') +
+      linha('Garagem', 'gar') + linha('Preço', 'preco') +
+      `<tr class="cta"><th></th>${sel.map(r => `<td><a class="btn btn-gold" href="#contacto" onclick="fecharComparador()">Quero a ${r}</a></td>`).join('')}</tr></tbody>`;
+    document.getElementById('cmpmodal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function fecharComparador() {
+    document.getElementById('cmpmodal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  addEventListener('keydown', e => { if (e.key === 'Escape') fecharComparador(); });
+
+  /* sticky bar */
+  const sticky = document.getElementById('sticky'), contacto = document.getElementById('contacto');
+  addEventListener('scroll', () => {
+    const p = scrollY / (document.body.scrollHeight - innerHeight);
+    const inForm = contacto.getBoundingClientRect().top < innerHeight * .5;
+    sticky.classList.toggle('visible', p > 0.12 && !inForm);
+  }, { passive: true });
+</script>
+</body>
+</html>

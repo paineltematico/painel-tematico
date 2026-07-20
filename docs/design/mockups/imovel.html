@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup — Página de Imóvel · Painel Temático</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<style>
+  body { background: var(--dark); color: var(--on-dark); }
+
+  /* nav produto — alvos ≥44px */
+  .pnav { position: fixed; inset: 0 0 auto; z-index: 50; display: flex; align-items: center; justify-content: space-between;
+    padding: .75rem 1.25rem; background: linear-gradient(to bottom, rgba(7,16,15,.92), transparent); }
+  .pnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 .75rem; }
+  .pnav .back { color: var(--on-dark-soft); font-size: var(--text-small); font-weight: 600; gap: .35rem; }
+  .pnav .back:hover { color: var(--on-dark); }
+  .pnav .contactar { border: 1px solid var(--gold); color: var(--gold); border-radius: 999px; padding: 0 1.25rem;
+    font-size: var(--text-label); font-weight: 700; letter-spacing: .18em; text-transform: uppercase; transition: all var(--fast) var(--ease); }
+  .pnav .contactar:hover { background: var(--gold); color: #0A0A08; }
+
+  /* HERO — CTA above the fold */
+  .hero { position: relative; min-height: 100svh; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; }
+  .hero-img { position: absolute; inset: 0; background: var(--dark-2) url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1800&q=80') center/cover; }
+  .hero::after { content:''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(7,16,15,.97) 0%, rgba(7,16,15,.25) 55%, rgba(7,16,15,.55) 100%); }
+  .hero .wrap { position: relative; z-index: 2; padding-bottom: 2.5rem; width: 100%; }
+  .hero .meta { display: flex; align-items: center; gap: .75rem; margin-bottom: 1rem; }
+  .hero .meta .label { color: var(--on-dark-mute); }
+  .hero .meta .tipologia { color: var(--gold); }
+  .hero h1 { font-size: var(--text-display); font-weight: 700; letter-spacing: -.02em; margin-bottom: .75rem; }
+  .hero .loc { display: flex; align-items: center; gap: .5rem; color: var(--on-dark-mute); font-size: var(--text-small); margin-bottom: 1.75rem; }
+  .hero-foot { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 1.25rem;
+    padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,.12); }
+  .price .label { color: var(--on-dark-mute); display: block; margin-bottom: .3rem; }
+  .price strong { font-family: var(--serif); font-size: clamp(1.75rem, 4vw, 2.75rem); color: var(--gold); font-weight: 700; }
+  .hero-ctas { display: flex; gap: .6rem; flex-wrap: wrap; }
+  .specs-row { display: flex; gap: 1.75rem; margin-top: 1.25rem; }
+  .specs-row div { text-align: center; }
+  .specs-row strong { font-family: var(--serif); font-size: 1.35rem; color: var(--on-dark); display: block; }
+  .specs-row span { font-size: var(--text-label); letter-spacing: .15em; text-transform: uppercase; color: var(--on-dark-mute); }
+
+  /* secções */
+  section { padding: var(--section) 0; }
+  .s-label { color: var(--gold); margin-bottom: 1.25rem; display: block; }
+  .desc-grid { display: grid; gap: 2.5rem; }
+  @media (min-width: 1024px) { .desc-grid { grid-template-columns: 3fr 2fr; gap: 5rem; } }
+  .desc-grid .lead { font-family: var(--serif); font-size: var(--text-lead); line-height: 1.75; color: var(--on-dark-soft); }
+  .featlist { border-top: 1px solid rgba(255,255,255,.08); }
+  .featlist li { display: flex; align-items: center; justify-content: space-between; list-style: none;
+    padding: 1rem 0; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .featlist { margin: 0; padding: 0; }
+  .featlist .k { font-size: var(--text-label); letter-spacing: .18em; text-transform: uppercase; color: var(--on-dark-mute); }
+  .featlist .v { font-weight: 600; color: var(--on-dark); }
+
+  /* galeria */
+  .gal { display: grid; gap: .75rem; grid-template-columns: repeat(2, 1fr); }
+  @media (min-width: 768px) { .gal { grid-template-columns: repeat(3, 1fr); } }
+  .gal figure { margin: 0; border-radius: var(--radius-card); overflow: hidden; aspect-ratio: 4/3; background: var(--dark-3); cursor: zoom-in; }
+  .gal figure:first-child { grid-column: 1 / -1; aspect-ratio: 16/9; }
+  .gal img { width: 100%; height: 100%; object-fit: cover; transition: transform 700ms var(--ease); }
+  .gal figure:hover img { transform: scale(1.03); }
+
+  /* angariador + contacto */
+  .agent { display: flex; align-items: center; gap: 1.25rem; padding: 1.5rem; border: 1px solid rgba(255,255,255,.09);
+    border-radius: var(--radius-card); background: var(--dark-3); }
+  .agent .avatar { width: 64px; height: 64px; border-radius: 999px; background: var(--gold-soft);
+    border: 2px solid rgba(201,169,110,.4); display: flex; align-items: center; justify-content: center;
+    font-family: var(--serif); font-size: 1.5rem; color: var(--gold); font-weight: 700; flex-shrink: 0; }
+  .agent h3 { font-size: var(--text-h3); color: var(--on-dark); }
+  .agent .role { font-size: var(--text-label); letter-spacing: .18em; text-transform: uppercase; color: var(--gold); margin: .2rem 0 .6rem; }
+  .agent .direct { color: var(--on-dark-soft); font-size: var(--text-small); font-weight: 600; }
+
+  .contact-grid { display: grid; gap: 2.5rem; }
+  @media (min-width: 1024px) { .contact-grid { grid-template-columns: 1fr 1fr; gap: 4rem; } }
+  .contact-ctas { display: flex; flex-direction: column; gap: .75rem; margin-top: 1.75rem; }
+  .contact-ctas .btn { justify-content: flex-start; }
+
+  form { background: #101d20; border: 1px solid rgba(255,255,255,.07); border-radius: var(--radius-card); padding: 1.75rem; }
+  form .f { margin-bottom: 1.1rem; }
+  form label { display: block; font-size: var(--text-label); letter-spacing: .18em; text-transform: uppercase; color: var(--on-dark-mute); margin-bottom: .45rem; }
+  form input, form textarea { width: 100%; min-height: 48px; padding: .75rem .9rem; border-radius: 10px;
+    background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12); color: var(--on-dark);
+    font-family: var(--sans); font-size: var(--text-small); transition: border-color var(--fast); }
+  form textarea { min-height: 96px; resize: none; }
+  form input:focus, form textarea:focus { outline: none; border-color: var(--gold); }
+  .rgpd { display: flex; gap: .6rem; align-items: flex-start; font-size: .8rem; color: var(--on-dark-mute); margin: 1rem 0 1.25rem; }
+  .rgpd input { width: 18px; min-height: 18px; height: 18px; margin-top: 2px; accent-color: var(--gold); }
+  .rgpd a { color: var(--gold); text-decoration: underline; }
+
+  /* cross-sell */
+  .xsell { background: var(--dark-2); }
+  .cards { display: grid; gap: 1.25rem; grid-template-columns: 1fr; }
+  @media (min-width: 640px) { .cards { grid-template-columns: repeat(3, 1fr); } }
+  .card { border-radius: var(--radius-card); overflow: hidden; background: var(--dark-3); border: 1px solid rgba(255,255,255,.07); transition: all var(--base) var(--ease); }
+  .card:hover { box-shadow: 0 16px 48px rgba(0,0,0,.5); border-color: rgba(201,169,110,.35); }
+  .card .ph { aspect-ratio: 4/3; overflow: hidden; background: var(--dark-2); }
+  .card img { width: 100%; height: 100%; object-fit: cover; transition: transform 700ms var(--ease); }
+  .card:hover img { transform: scale(1.03); }
+  .card .body { padding: 1.1rem 1.25rem 1.35rem; }
+  .card h3 { font-size: 1.1rem; color: var(--on-dark); margin-bottom: .3rem; }
+  .card .meta { font-size: var(--text-label); letter-spacing: .1em; text-transform: uppercase; color: var(--on-dark-mute); }
+  .card .price { font-family: var(--serif); font-weight: 700; color: var(--gold); margin-top: .7rem; font-size: 1.15rem; }
+
+  /* lightbox da galeria */
+  .lb { position: fixed; inset: 0; z-index: 95; display: none; align-items: center; justify-content: center;
+    background: rgba(0,0,0,.96); flex-direction: column; }
+  .lb.open { display: flex; }
+  .lb img.main { max-height: 76svh; max-width: 92vw; object-fit: contain; border-radius: .75rem; }
+  .lb .close { position: absolute; top: 1rem; right: 1rem; width: 48px; height: 48px; border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.08); color: #fff; font-size: 1.1rem; cursor: pointer; }
+  .lb .count { position: absolute; top: 1.8rem; left: 50%; transform: translateX(-50%); color: var(--on-dark-mute); font-size: var(--text-small); }
+  .lb .arrow { position: absolute; top: 50%; transform: translateY(-50%); width: 48px; height: 48px; border-radius: 999px;
+    border: 0; background: rgba(255,255,255,.1); color: #fff; font-size: 1.2rem; cursor: pointer; transition: background var(--fast); }
+  .lb .arrow:hover { background: rgba(255,255,255,.22); }
+  .lb .prev { left: .75rem; } .lb .next { right: .75rem; }
+  .lb .thumbs { display: flex; gap: .5rem; margin-top: 1rem; max-width: 92vw; overflow-x: auto; padding: .25rem; }
+  .lb .thumbs button { flex-shrink: 0; width: 56px; height: 42px; border-radius: .4rem; overflow: hidden;
+    border: 2px solid transparent; padding: 0; cursor: pointer; opacity: .4; transition: all var(--fast); background: none; }
+  .lb .thumbs button.on { border-color: var(--gold); opacity: 1; }
+  .lb .thumbs img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* calculadora de prestação */
+  .calc { display: grid; gap: 2rem; }
+  @media (min-width: 1024px) { .calc { grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; } }
+  .calc-box { background: var(--dark-3); border: 1px solid rgba(255,255,255,.08); border-radius: var(--radius-card); padding: 1.75rem; }
+  .calc-box .row { margin-bottom: 1.4rem; }
+  .calc-box label { display: flex; justify-content: space-between; font-size: var(--text-label);
+    letter-spacing: .15em; text-transform: uppercase; color: var(--on-dark-mute); margin-bottom: .6rem; }
+  .calc-box label output { color: var(--gold); font-weight: 700; letter-spacing: 0; font-size: var(--text-small); }
+  .calc-box input[type=range] { width: 100%; accent-color: var(--gold); min-height: 32px; }
+  .calc-result { text-align: center; padding: 1.5rem; border-top: 1px solid rgba(255,255,255,.08); margin-top: .5rem; }
+  .calc-result strong { font-family: var(--serif); font-size: clamp(2rem, 5vw, 2.75rem); color: var(--gold); display: block; }
+  .calc-result span { font-size: var(--text-label); letter-spacing: .15em; text-transform: uppercase; color: var(--on-dark-mute); }
+  .calc-result .fine { display: block; font-size: .72rem; color: var(--on-dark-mute); margin-top: .75rem; text-transform: none; letter-spacing: 0; }
+
+  /* localização + POIs */
+  .mapa { position: relative; border-radius: var(--radius-card); overflow: hidden; aspect-ratio: 16/9; background: var(--dark-3); }
+  .mapa img { width: 100%; height: 100%; object-fit: cover; opacity: .55; filter: saturate(.6); }
+  .mapa .pin { position: absolute; left: 50%; top: 46%; transform: translate(-50%, -100%); background: var(--gold);
+    color: #0A0A08; padding: .45rem .85rem; border-radius: .55rem; font-size: var(--text-label); font-weight: 700; }
+  .pois { display: grid; gap: .6rem; grid-template-columns: repeat(2, 1fr); margin-top: 1.25rem; }
+  @media (min-width: 700px) { .pois { grid-template-columns: repeat(4, 1fr); } }
+  .poi { display: flex; flex-direction: column; gap: .15rem; padding: .9rem 1rem; border: 1px solid rgba(255,255,255,.08);
+    border-radius: .75rem; background: rgba(255,255,255,.03); }
+  .poi strong { color: var(--on-dark); font-size: var(--text-small); }
+  .poi span { font-size: .75rem; color: var(--on-dark-mute); }
+  .poi em { font-style: normal; color: var(--gold); font-size: .75rem; font-weight: 700; }
+
+  /* como funciona a compra */
+  .passos { display: grid; gap: 1rem; grid-template-columns: 1fr; counter-reset: passo; }
+  @media (min-width: 900px) { .passos { grid-template-columns: repeat(4, 1fr); } }
+  .passo { position: relative; padding: 1.5rem 1.25rem 1.25rem; border: 1px solid rgba(255,255,255,.08);
+    border-radius: var(--radius-card); background: rgba(255,255,255,.02); }
+  .passo::before { counter-increment: passo; content: '0' counter(passo); font-family: var(--serif);
+    font-size: 2rem; color: var(--gold); opacity: .45; display: block; margin-bottom: .5rem; }
+  .passo h3 { font-size: 1.05rem; color: var(--on-dark); margin-bottom: .4rem; }
+  .passo p { font-size: .85rem; color: var(--on-dark-mute); line-height: 1.55; }
+
+  /* footer produto com legal */
+  .pfoot { padding: 2rem 1.25rem calc(2rem + 72px); border-top: 1px solid rgba(255,255,255,.06); background: var(--dark);
+    display: flex; flex-direction: column; align-items: center; gap: 1rem; text-align: center; }
+  .pfoot .legal { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.25rem; }
+  .pfoot a { font-size: var(--text-label); letter-spacing: .12em; text-transform: uppercase; color: var(--on-dark-mute); }
+  .pfoot a:hover { color: var(--on-dark-soft); }
+  .pfoot .fine { font-size: .75rem; color: var(--on-dark-mute); }
+</style>
+</head>
+<body>
+<span class="mock-note">Mockup · Imóvel <a href="index.html">← índice</a></span>
+
+<nav class="pnav">
+  <a class="back" href="pesquisa.html">← Todos os imóveis</a>
+  <a class="contactar" href="#contacto">Contactar</a>
+</nav>
+
+<!-- HERO: preço + CTAs above the fold -->
+<header class="hero">
+  <div class="hero-img"></div>
+  <div class="wrap">
+    <div class="meta reveal">
+      <span class="label">Venda</span>
+      <span class="label tipologia">T4 · Moradia</span>
+    </div>
+    <h1 class="reveal">Moradia com Piscina<br>na Quinta da Fontela</h1>
+    <p class="loc reveal">◈ Esporões · Braga</p>
+    <div class="hero-foot reveal">
+      <div>
+        <div class="price">
+          <span class="label">Preço</span>
+          <strong>495 000 €</strong>
+        </div>
+        <div class="specs-row">
+          <div><strong>4</strong><span>Quartos</span></div>
+          <div><strong>3</strong><span>WC</span></div>
+          <div><strong>240 m²</strong><span>Área</span></div>
+        </div>
+      </div>
+      <div class="hero-ctas">
+        <a class="btn btn-gold" href="#contacto">Agendar visita</a>
+        <a class="btn btn-outline-dark" href="#galeria">Ver galeria ↓</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- DESCRIÇÃO -->
+<section style="background: var(--dark-2);">
+  <div class="wrap desc-grid">
+    <div>
+      <span class="label s-label">Descrição</span>
+      <p class="lead">Moradia isolada de arquitetura contemporânea, com piscina de sal, jardim maduro
+      e garagem dupla. Construída pela Painel Temático com materiais selecionados — microcimento,
+      carvalho francês e caixilharia minimalista — numa parcela de 800 m² virada a poente.</p>
+    </div>
+    <ul class="featlist">
+      <li><span class="k">Quartos</span><span class="v">4 (1 suíte)</span></li>
+      <li><span class="k">Casas de banho</span><span class="v">3</span></li>
+      <li><span class="k">Área bruta</span><span class="v">240 m²</span></li>
+      <li><span class="k">Terreno</span><span class="v">800 m²</span></li>
+      <li><span class="k">Garagem</span><span class="v">2 carros</span></li>
+      <li><span class="k">Certificado energético</span><span class="v">A+</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- GALERIA -->
+<section id="galeria" style="background: var(--dark);">
+  <div class="wrap">
+    <span class="label s-label" style="color: var(--on-dark-mute);">Galeria</span>
+    <h2 style="font-size: var(--text-h2); margin-bottom: 2rem;">12 fotografias</h2>
+    <div class="gal">
+      <figure><img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1600&q=80" alt="Sala de estar com luz natural" loading="lazy"></figure>
+      <figure><img src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?auto=format&fit=crop&w=800&q=80" alt="Cozinha em carvalho" loading="lazy"></figure>
+      <figure><img src="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=800&q=80" alt="Piscina exterior" loading="lazy"></figure>
+      <figure><img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=800&q=80" alt="Quarto principal" loading="lazy"></figure>
+      <figure><img src="https://images.unsplash.com/photo-1600121848594-d8644e57abab?auto=format&fit=crop&w=800&q=80" alt="Detalhe de fachada" loading="lazy"></figure>
+    </div>
+  </div>
+</section>
+
+<!-- ANGARIADOR + CONTACTO -->
+<section id="contacto" style="background: var(--dark-2);">
+  <div class="wrap">
+    <div class="contact-grid">
+      <div>
+        <span class="label s-label">Contacto</span>
+        <h2 style="font-size: var(--text-h2); margin-bottom: 1rem;">Agendar visita privada</h2>
+        <p style="color: var(--on-dark-mute); font-size: var(--text-small); max-width: 34ch;">
+          Visita acompanhada por quem construiu a casa. Resposta no próprio dia.</p>
+
+        <div class="agent" style="margin-top: 1.75rem;">
+          <div class="avatar">H</div>
+          <div>
+            <h3>Hugo Costa</h3>
+            <p class="role">Comercial · construiu este projeto</p>
+            <p class="direct">+351 913 440 800</p>
+          </div>
+        </div>
+
+        <div class="contact-ctas">
+          <a class="btn btn-gold" href="#">📅&ensp;Agendar Visita Privada</a>
+          <a class="btn btn-outline-dark" href="#">✆&ensp;WhatsApp — resposta imediata</a>
+          <a class="btn btn-outline-dark" href="#">☎&ensp;+351 913 440 800</a>
+        </div>
+      </div>
+
+      <form onsubmit="return false;">
+        <p style="font-family: var(--serif); font-size: var(--text-h3); color: var(--on-dark-soft); margin-bottom: 1.5rem;">Pedir informações</p>
+        <div class="f"><label for="nome">Nome</label><input id="nome" placeholder="O seu nome" required></div>
+        <div class="f"><label for="email">Email</label><input id="email" type="email" placeholder="email@exemplo.pt" required></div>
+        <div class="f"><label for="tel">Telefone</label><input id="tel" type="tel" placeholder="+351 9xx xxx xxx"></div>
+        <div class="f"><label for="msg">Mensagem</label><textarea id="msg" placeholder="Tenho interesse nesta moradia…"></textarea></div>
+        <label class="rgpd"><input type="checkbox" required>
+          <span>Autorizo o contacto da Painel Temático e li a <a href="#">Política de Privacidade</a>.</span></label>
+        <button class="btn btn-gold" style="width: 100%;">Enviar pedido</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- LOCALIZAÇÃO + POIs: vender a zona, não só a casa -->
+<section style="background: var(--dark);">
+  <div class="wrap">
+    <span class="label s-label">Localização</span>
+    <h2 style="font-size: var(--text-h2); margin-bottom: .75rem;">Esporões, a 8 minutos do centro</h2>
+    <p style="color: var(--on-dark-mute); font-size: var(--text-small); max-width: 52ch; margin-bottom: 1.75rem;">
+      Freguesia residencial a sul de Braga — escolas, comércio e acesso rápido à A3 sem o ruído da cidade.</p>
+    <div class="mapa">
+      <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=1600&q=80" alt="Mapa da zona (placeholder — versão final: Mapbox com POIs)">
+      <span class="pin">Quinta da Fontela</span>
+    </div>
+    <div class="pois">
+      <div class="poi"><strong>Escola Básica</strong><span>Esporões</span><em>4 min a pé</em></div>
+      <div class="poi"><strong>Supermercado</strong><span>Continente Bom Dia</span><em>3 min de carro</em></div>
+      <div class="poi"><strong>Acesso A3</strong><span>Porto · Guimarães</span><em>6 min</em></div>
+      <div class="poi"><strong>Centro de Braga</strong><span>Avenida Central</span><em>8 min</em></div>
+    </div>
+  </div>
+</section>
+
+<!-- CALCULADORA DE PRESTAÇÃO: transforma o preço em decisão mensal -->
+<section style="background: var(--dark-2);">
+  <div class="wrap calc">
+    <div>
+      <span class="label s-label">Simulação</span>
+      <h2 style="font-size: var(--text-h2); margin-bottom: 1rem;">Quanto fica por mês?</h2>
+      <p style="color: var(--on-dark-soft); font-size: var(--text-small); line-height: 1.7; max-width: 40ch;">
+        Ajuste a entrada e o prazo para ter uma ordem de grandeza da prestação.
+        Na visita, ajudamos com a simulação bancária real.</p>
+    </div>
+    <div class="calc-box">
+      <div class="row">
+        <label>Entrada <output id="o-entrada">99 000 € (20%)</output></label>
+        <input type="range" id="r-entrada" min="10" max="50" value="20" step="5" aria-label="Percentagem de entrada">
+      </div>
+      <div class="row">
+        <label>Prazo <output id="o-prazo">35 anos</output></label>
+        <input type="range" id="r-prazo" min="10" max="40" value="35" step="5" aria-label="Prazo em anos">
+      </div>
+      <div class="row">
+        <label>Taxa (TAN) <output id="o-taxa">3,0 %</output></label>
+        <input type="range" id="r-taxa" min="20" max="55" value="30" step="1" aria-label="Taxa de juro">
+      </div>
+      <div class="calc-result">
+        <span>Prestação estimada</span>
+        <strong id="o-prestacao">— € /mês</strong>
+        <span class="fine">Simulação indicativa, não constitui proposta de crédito.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMO FUNCIONA: reduzir a ansiedade do processo -->
+<section style="background: var(--dark);">
+  <div class="wrap">
+    <span class="label s-label" style="color: var(--on-dark-mute);">Processo</span>
+    <h2 style="font-size: var(--text-h2); margin-bottom: 2rem;">Da visita à chave, sem surpresas</h2>
+    <div class="passos">
+      <div class="passo"><h3>Visita acompanhada</h3><p>Com o comercial que conhece a obra — todas as perguntas respondidas no local.</p></div>
+      <div class="passo"><h3>Proposta e reserva</h3><p>Condições claras por escrito. Reserva com sinal devolvível em 8 dias.</p></div>
+      <div class="passo"><h3>CPCV e financiamento</h3><p>Apoiamos a simulação bancária e a documentação, passo a passo.</p></div>
+      <div class="passo"><h3>Escritura e chave</h3><p>Entrega com vistoria conjunta e garantia de construtor de 5 anos.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- CROSS-SELL: nunca um beco sem saída -->
+<section class="xsell">
+  <div class="wrap">
+    <span class="label s-label" style="color: var(--on-dark-mute);">Continue a explorar</span>
+    <h2 style="font-size: var(--text-h2); margin-bottom: 2rem;">Também lhe pode interessar</h2>
+    <div class="cards">
+      <a class="card" href="#">
+        <div class="ph"><img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=800&q=80" alt="" loading="lazy"></div>
+        <div class="body"><p class="meta">Venda · T3 · Braga</p><h3>Moradia em Lomar</h3><p class="price">385 000 €</p></div>
+      </a>
+      <a class="card" href="#">
+        <div class="ph"><img src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?auto=format&fit=crop&w=800&q=80" alt="" loading="lazy"></div>
+        <div class="body"><p class="meta">Venda · T4 · Braga</p><h3>Última moradia · Esporões</h3><p class="price">465 000 €</p></div>
+      </a>
+      <a class="card" href="projeto-fracoes.html">
+        <div class="ph"><img src="https://images.unsplash.com/photo-1487958449943-2429e8be8625?auto=format&fit=crop&w=800&q=80" alt="" loading="lazy"></div>
+        <div class="body"><p class="meta">Lançamento · 8 frações</p><h3>Trandeiras</h3><p class="price" style="color: var(--on-dark-mute); font-size: var(--text-small);">Desde 240 000 € →</p></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer class="pfoot">
+  <p style="font-family: var(--serif); color: var(--on-dark-soft); letter-spacing: .05em;">PAINEL TEMÁTICO</p>
+  <div class="legal">
+    <a href="#">Imóveis</a><a href="#">Projetos</a><a href="#">Contacto</a>
+    <a href="#">Privacidade</a><a href="#">Livro de Reclamações</a>
+  </div>
+  <p class="fine">© <span id="ano"></span> Painel Temático · AMI 25031 · IMPIC 69636</p>
+</footer>
+
+<!-- LIGHTBOX da galeria -->
+<div class="lb" id="lb" role="dialog" aria-label="Galeria em ecrã completo" onclick="if(event.target===this)fecharLb()">
+  <span class="count" id="lb-count"></span>
+  <button class="close" onclick="fecharLb()" aria-label="Fechar">✕</button>
+  <img class="main" id="lb-img" src="" alt="Fotografia do imóvel">
+  <button class="arrow prev" onclick="lbNav(-1)" aria-label="Anterior">‹</button>
+  <button class="arrow next" onclick="lbNav(1)" aria-label="Seguinte">›</button>
+  <div class="thumbs" id="lb-thumbs"></div>
+</div>
+
+<!-- STICKY BAR mobile: Ligar · WhatsApp · Agendar -->
+<div class="stickybar" id="sticky">
+  <a class="btn btn-outline-dark btn-icon" href="#" aria-label="Ligar">☎</a>
+  <a class="btn btn-outline-dark btn-icon" href="#" aria-label="WhatsApp">✆</a>
+  <a class="btn btn-gold" style="flex: 1;" href="#contacto">Agendar visita</a>
+</div>
+
+<script>
+  document.getElementById('ano').textContent = new Date().getFullYear();
+
+  /* lightbox: constrói-se a partir das imagens reais da galeria */
+  const galImgs = [...document.querySelectorAll('.gal img')];
+  let lbIdx = 0;
+  const lbEl = document.getElementById('lb'), lbImg = document.getElementById('lb-img'),
+        lbCount = document.getElementById('lb-count'), lbThumbs = document.getElementById('lb-thumbs');
+  galImgs.forEach((img, i) => {
+    img.closest('figure').addEventListener('click', () => abrirLb(i));
+    const b = document.createElement('button');
+    b.innerHTML = `<img src="${img.src}" alt="">`;
+    b.addEventListener('click', () => mostrarLb(i));
+    lbThumbs.appendChild(b);
+  });
+  function abrirLb(i) { mostrarLb(i); lbEl.classList.add('open'); document.body.style.overflow = 'hidden'; }
+  function fecharLb() { lbEl.classList.remove('open'); document.body.style.overflow = ''; }
+  function mostrarLb(i) {
+    lbIdx = (i + galImgs.length) % galImgs.length;
+    lbImg.src = galImgs[lbIdx].src;
+    lbCount.textContent = `${lbIdx + 1} / ${galImgs.length}`;
+    [...lbThumbs.children].forEach((b, j) => b.classList.toggle('on', j === lbIdx));
+  }
+  function lbNav(d) { mostrarLb(lbIdx + d); }
+  addEventListener('keydown', e => {
+    if (!lbEl.classList.contains('open')) return;
+    if (e.key === 'Escape') fecharLb();
+    if (e.key === 'ArrowLeft') lbNav(-1);
+    if (e.key === 'ArrowRight') lbNav(1);
+  });
+
+  /* calculadora de prestação (sistema francês) */
+  const PRECO = 495000;
+  const fmt = n => new Intl.NumberFormat('pt-PT', { maximumFractionDigits: 0 }).format(n);
+  function calcular() {
+    const pct = +document.getElementById('r-entrada').value;
+    const anos = +document.getElementById('r-prazo').value;
+    const tan = +document.getElementById('r-taxa').value / 10;
+    const capital = PRECO * (1 - pct / 100);
+    const i = tan / 100 / 12, n = anos * 12;
+    const prestacao = i > 0 ? capital * i / (1 - Math.pow(1 + i, -n)) : capital / n;
+    document.getElementById('o-entrada').textContent = `${fmt(PRECO * pct / 100)} € (${pct}%)`;
+    document.getElementById('o-prazo').textContent = `${anos} anos`;
+    document.getElementById('o-taxa').textContent = `${tan.toFixed(1).replace('.', ',')} %`;
+    document.getElementById('o-prestacao').textContent = `${fmt(prestacao)} € /mês`;
+  }
+  ['r-entrada', 'r-prazo', 'r-taxa'].forEach(id => document.getElementById(id).addEventListener('input', calcular));
+  calcular();
+  // sticky bar entra após 30% de scroll, esconde dentro do formulário
+  const sticky = document.getElementById('sticky');
+  const contacto = document.getElementById('contacto');
+  addEventListener('scroll', () => {
+    const p = scrollY / (document.body.scrollHeight - innerHeight);
+    const inForm = contacto.getBoundingClientRect().top < innerHeight * .5;
+    sticky.classList.toggle('visible', p > 0.12 && !inForm);
+  }, { passive: true });
+</script>
+</body>
+</html>

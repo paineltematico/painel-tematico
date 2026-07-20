@@ -1,0 +1,142 @@
+/* ═══ Painel Temático — Design System v2 · tokens partilhados dos mockups ═══ */
+
+@font-face { font-family: 'Cera Pro'; src: url('fonts/CeraProLight.otf') format('opentype');  font-weight: 300; font-display: swap; }
+@font-face { font-family: 'Cera Pro'; src: url('fonts/CeraProMedium.otf') format('opentype'); font-weight: 400 500; font-display: swap; }
+@font-face { font-family: 'Cera Pro'; src: url('fonts/CeraProBold.otf') format('opentype');   font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Cera Pro'; src: url('fonts/CeraProBlack.otf') format('opentype');  font-weight: 900; font-display: swap; }
+
+:root {
+  /* marca */
+  --brand:       #00545F;
+  --brand-hover: #006B78;
+  --brand-dark:  #1F3F44;
+  --accent:      #4ecdc4;
+
+  /* premium */
+  --gold:      #C9A96E;
+  --gold-soft: rgba(201,169,110,.12);
+  --dark:      #07100f;
+  --dark-2:    #0d1a1c;
+  --dark-3:    #101f22;
+
+  /* neutros claros */
+  --ink:        #1F3F44;
+  --ink-soft:   #4A5A5E;
+  --ink-mute:   #6B7A7E;
+  --paper:      #FFFFFF;
+  --warm:       #F2EEEE;
+  --warm-border:#E8E3E3;
+  --cream:      #FAF8F5;
+
+  /* sobre dark — 3 steps, nunca opacidade livre */
+  --on-dark:      #F5F5F3;
+  --on-dark-soft: #C3C9C7;
+  --on-dark-mute: #8FA09E;
+
+  /* estados de unidade */
+  --disponivel: #C9A96E;
+  --reservado:  #D9B24A;
+  --vendido:    #8FA09E;
+  --embreve:    #7FB6C4;
+
+  /* tipografia */
+  --serif: 'Playfair Display', Georgia, serif;
+  --sans:  'Cera Pro', system-ui, sans-serif;
+  --text-display: clamp(2.5rem, 6vw, 5.5rem);
+  --text-h1: clamp(2rem, 4.5vw, 3.5rem);
+  --text-h2: clamp(1.5rem, 3vw, 2.5rem);
+  --text-h3: clamp(1.25rem, 2vw, 1.75rem);
+  --text-lead: clamp(1.05rem, 1.6vw, 1.35rem);
+  --text-body: 1rem;
+  --text-small: .875rem;
+  --text-label: .75rem;
+
+  /* layout */
+  --section:    clamp(4rem, 10vw, 8rem);
+  --section-sm: clamp(2.5rem, 6vw, 4rem);
+  --radius-card: 1rem;
+  --radius-btn:  .75rem;
+
+  /* elevação */
+  --shadow-card:  0 1px 3px rgba(31,63,68,.06), 0 8px 24px rgba(31,63,68,.07);
+  --shadow-hover: 0 2px 6px rgba(31,63,68,.08), 0 16px 40px rgba(31,63,68,.14);
+  --shadow-gold:  0 8px 32px rgba(201,169,110,.25);
+
+  /* motion */
+  --ease: cubic-bezier(.22, 1, .36, 1);
+  --fast: 150ms; --base: 300ms; --reveal: 700ms;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+body { margin: 0; font-family: var(--sans); font-size: var(--text-body); line-height: 1.6; color: var(--ink); background: var(--paper); }
+h1, h2, h3 { font-family: var(--serif); line-height: 1.1; margin: 0; }
+p { margin: 0; }
+a { text-decoration: none; color: inherit; }
+img { display: block; max-width: 100%; }
+
+/* labels uppercase — piso .75rem, contraste AA garantido pelo token */
+.label { font-size: var(--text-label); font-weight: 600; text-transform: uppercase; letter-spacing: .22em; }
+
+/* ── botões (hierarquia única) ── */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  min-height: 48px; padding: 0 1.5rem; border-radius: var(--radius-btn); border: 0;
+  font-family: var(--sans); font-size: var(--text-small); font-weight: 700; letter-spacing: .03em;
+  cursor: pointer; transition: all var(--fast) var(--ease); }
+.btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+.btn-primary { background: var(--brand); color: #fff; }
+.btn-primary:hover { background: var(--brand-hover); box-shadow: var(--shadow-hover); transform: translateY(-1px); }
+
+.btn-gold { background: var(--gold); color: #0A0A08; }
+.btn-gold:hover { filter: brightness(1.05); box-shadow: var(--shadow-gold); transform: translateY(-1px); }
+
+.btn-outline-dark { background: transparent; color: var(--on-dark-soft); border: 1px solid rgba(255,255,255,.18); }
+.btn-outline-dark:hover { background: rgba(255,255,255,.06); color: var(--on-dark); }
+
+.btn-outline { background: transparent; color: var(--ink); border: 1px solid rgba(31,63,68,.25); }
+.btn-outline:hover { background: var(--warm); }
+
+/* link ghost com sublinhado que cresce */
+.ghost { position: relative; font-weight: 600; font-size: var(--text-small); color: var(--brand); padding-bottom: 2px; }
+.ghost::after { content: ''; position: absolute; left: 0; bottom: 0; height: 1.5px; width: 0; background: currentColor; transition: width 200ms var(--ease); }
+.ghost:hover::after { width: 100%; }
+.ghost.on-dark { color: var(--gold); }
+
+/* badges de estado */
+.badge { display: inline-flex; align-items: center; gap: .4rem; padding: .35rem .8rem; border-radius: 999px;
+  font-size: var(--text-label); font-weight: 700; text-transform: uppercase; letter-spacing: .14em; }
+.badge .dot { width: 6px; height: 6px; border-radius: 999px; background: currentColor; }
+.badge-disponivel { background: var(--gold-soft); color: var(--gold); border: 1px solid rgba(201,169,110,.35); }
+.badge-disponivel .dot { animation: pulse 2s infinite; }
+.badge-reservado { background: rgba(217,178,74,.1); color: var(--reservado); border: 1px solid rgba(217,178,74,.3); }
+.badge-vendido { background: rgba(143,160,158,.1); color: var(--vendido); border: 1px solid rgba(143,160,158,.25); }
+.badge-embreve { background: rgba(127,182,196,.1); color: var(--embreve); border: 1px solid rgba(127,182,196,.3); }
+@keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: .35 } }
+
+/* containers */
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 1.25rem; }
+@media (min-width: 640px) { .wrap { padding: 0 2rem; } }
+
+/* reveals acessíveis: visível por defeito; anima só se motion permitido */
+.reveal { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .reveal { animation: rise var(--reveal) var(--ease) both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(16px) } to { opacity: 1; transform: none } }
+}
+
+/* barra sticky de conversão (mobile) — componente nº1 do funil */
+.stickybar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+  display: flex; gap: .5rem; padding: .65rem .85rem calc(.65rem + env(safe-area-inset-bottom));
+  background: rgba(13,26,28,.95); backdrop-filter: blur(12px); border-top: 1px solid rgba(255,255,255,.08);
+  transform: translateY(110%); transition: transform var(--base) var(--ease); }
+.stickybar.visible { transform: none; }
+.stickybar .btn { min-height: 48px; }
+.stickybar .btn-icon { width: 48px; padding: 0; flex-shrink: 0; font-size: 1.15rem; }
+@media (min-width: 1024px) { .stickybar { display: none; } }
+
+/* nota de mockup */
+.mock-note { position: fixed; top: .75rem; left: .75rem; z-index: 99; background: rgba(7,16,15,.85);
+  color: var(--gold); font-size: .65rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase;
+  padding: .35rem .7rem; border-radius: 999px; border: 1px solid rgba(201,169,110,.4); backdrop-filter: blur(8px); }
+.mock-note a { color: var(--on-dark-soft); margin-left: .5rem; }

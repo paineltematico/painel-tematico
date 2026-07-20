@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup — Pesquisa de Imóveis · Painel Temático</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<style>
+  body { background: var(--cream); }
+
+  /* navbar clara */
+  .nav { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,.94); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--warm-border); }
+  .nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 68px; }
+  .nav .logo { font-family: var(--serif); font-weight: 700; letter-spacing: .04em; color: var(--brand-dark); }
+  .nav .links { display: none; gap: .25rem; }
+  @media (min-width: 900px) { .nav .links { display: flex; } }
+  .nav .links a { padding: .6rem 1rem; border-radius: .5rem; font-size: var(--text-small); font-weight: 500; color: var(--ink-soft); min-height: 44px; display: inline-flex; align-items: center; }
+  .nav .links a:hover { background: var(--warm); color: var(--ink); }
+  .nav .links a.active { color: var(--brand); background: rgba(0,84,95,.08); }
+  .burger { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px;
+    border-radius: .6rem; border: 0; background: transparent; color: var(--brand-dark); font-size: 1.4rem; cursor: pointer; }
+  @media (min-width: 900px) { .burger { display: none; } }
+  .mmenu { position: fixed; inset: 0; z-index: 80; background: var(--dark); display: none; flex-direction: column;
+    padding: 1.1rem 1.5rem calc(2rem + env(safe-area-inset-bottom)); }
+  .mmenu.open { display: flex; }
+  .mmenu .top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2.25rem; }
+  .mmenu .mlogo { font-family: var(--serif); color: #fff; font-weight: 700; }
+  .mmenu .close { width: 44px; height: 44px; border-radius: 999px; border: 1px solid rgba(255,255,255,.2);
+    background: transparent; color: #fff; font-size: 1.1rem; cursor: pointer; }
+  .mmenu nav { flex: 1; display: flex; flex-direction: column; }
+  .mmenu nav a { font-family: var(--serif); font-size: 2rem; color: var(--on-dark-soft); padding: .55rem 0; }
+  .mmenu nav a:hover, .mmenu nav a.on { color: var(--gold); }
+  .mmenu .foot { display: flex; flex-direction: column; gap: .6rem; }
+
+  /* header da listagem */
+  .head { background: var(--paper); border-bottom: 1px solid var(--warm-border); padding: 2rem 0 0; }
+  .head h1 { font-size: var(--text-h1); color: var(--brand-dark); }
+  .head .count { color: var(--ink-mute); font-size: var(--text-small); margin-top: .3rem; }
+
+  /* barra de filtros horizontal (desktop) */
+  .fbar { display: flex; align-items: center; gap: .5rem; padding: 1.25rem 0; overflow-x: auto; }
+  .fbar::-webkit-scrollbar { display: none; }
+  .fchip { min-height: 44px; padding: 0 1.1rem; border-radius: 999px; background: var(--paper); white-space: nowrap;
+    border: 1px solid var(--warm-border); color: var(--ink-soft); font-family: var(--sans); font-size: var(--text-small);
+    font-weight: 600; cursor: pointer; transition: all var(--fast) var(--ease); }
+  .fchip:hover { border-color: var(--brand); color: var(--brand); }
+  .fchip.active { background: var(--brand-dark); border-color: var(--brand-dark); color: #fff; }
+  .fbar .sep { width: 1px; height: 24px; background: var(--warm-border); flex-shrink: 0; }
+  .fbar select { min-height: 44px; border-radius: 999px; border: 1px solid var(--warm-border); background: var(--paper);
+    padding: 0 1rem; font-family: var(--sans); font-size: var(--text-small); font-weight: 600; color: var(--ink-soft); margin-left: auto; }
+
+  main { padding: 2rem 0 5rem; }
+  .grid { display: grid; gap: 1.5rem; grid-template-columns: 1fr; }
+  @media (min-width: 640px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1024px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+
+  /* PropertyCard v2 */
+  .card { background: var(--paper); border-radius: var(--radius-card); overflow: hidden; border: 1px solid var(--warm-border);
+    box-shadow: var(--shadow-card); transition: box-shadow var(--base) var(--ease); display: block; }
+  .card:hover { box-shadow: var(--shadow-hover); }
+  .card .ph { position: relative; aspect-ratio: 4/3; overflow: hidden; background: linear-gradient(135deg, var(--brand-dark), var(--dark-2)); }
+  .card .ph img { width: 100%; height: 100%; object-fit: cover; transition: transform 700ms var(--ease); }
+  .card:hover .ph img { transform: scale(1.03); }
+  .card .tag { position: absolute; top: .8rem; left: .8rem; background: rgba(7,16,15,.78); color: #fff; backdrop-filter: blur(6px);
+    font-size: var(--text-label); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: .35rem .8rem; border-radius: 999px; }
+  .card .tag.gold { background: rgba(201,169,110,.92); color: #0A0A08; left: auto; right: .8rem; }
+  .card .ph .pt { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-family: var(--serif); font-size: 3.5rem; color: rgba(255,255,255,.14); font-weight: 700; }
+  .card .body { padding: 1.15rem 1.3rem 1.4rem; }
+  .card .loc { font-size: var(--text-label); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: .35rem; }
+  .card h3 { font-size: var(--text-h3); color: var(--brand-dark); margin-bottom: .6rem; }
+  .card .feat { display: flex; gap: 1rem; font-size: var(--text-small); color: var(--ink-mute); padding-bottom: .9rem; border-bottom: 1px solid var(--warm-border); }
+  .card .foot { display: flex; align-items: baseline; justify-content: space-between; padding-top: .9rem; }
+  .card .price { font-family: var(--serif); font-weight: 700; font-size: 1.3rem; color: var(--brand); }
+  .card .tip { font-size: var(--text-small); font-weight: 700; color: var(--ink-mute); }
+
+  /* bottom-sheet de filtros (mobile) */
+  .fab { position: fixed; bottom: 1.25rem; left: 50%; transform: translateX(-50%); z-index: 60; box-shadow: var(--shadow-hover); display: inline-flex; }
+  @media (min-width: 900px) { .fab { display: none; } }
+  .sheet { position: fixed; inset: auto 0 0; z-index: 70; background: var(--paper); border-radius: 1.25rem 1.25rem 0 0;
+    padding: 1.5rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom)); box-shadow: 0 -12px 48px rgba(31,63,68,.25);
+    transform: translateY(105%); transition: transform var(--base) var(--ease); max-height: 80svh; overflow: auto; }
+  .sheet.open { transform: none; }
+  .sheet h2 { font-size: var(--text-h3); color: var(--brand-dark); margin-bottom: 1.25rem; }
+  .sheet .grp { margin-bottom: 1.5rem; }
+  .sheet .grp p { font-size: var(--text-label); letter-spacing: .15em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: .6rem; font-weight: 700; }
+  .sheet .opts { display: flex; flex-wrap: wrap; gap: .5rem; }
+  .overlay { position: fixed; inset: 0; z-index: 65; background: rgba(7,16,15,.45); opacity: 0; pointer-events: none; transition: opacity var(--base); }
+  .overlay.open { opacity: 1; pointer-events: auto; }
+</style>
+</head>
+<body>
+<span class="mock-note" style="background:rgba(255,255,255,.9); color: var(--brand); border-color: rgba(0,84,95,.3);">Mockup · Pesquisa <a href="index.html" style="color: var(--ink-mute);">← índice</a></span>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="logo" href="homepage.html">PAINEL TEMÁTICO</a>
+    <div class="links">
+      <a href="homepage.html">Início</a>
+      <a href="#" class="active">Imóveis</a>
+      <a href="projeto-fracoes.html">Projetos</a>
+      <a href="#">Sobre</a>
+      <a href="contacto.html">Contacto</a>
+      <a href="#" style="color: var(--brand); font-weight: 700;">☎ 913 440 800</a>
+    </div>
+    <button class="burger" onclick="toggleMenu(true)" aria-label="Abrir menu">☰</button>
+  </div>
+</nav>
+
+<div class="mmenu" id="mmenu" role="dialog" aria-label="Menu">
+  <div class="top">
+    <span class="mlogo">PAINEL TEMÁTICO</span>
+    <button class="close" onclick="toggleMenu(false)" aria-label="Fechar menu">✕</button>
+  </div>
+  <nav>
+    <a href="#" class="on">Imóveis</a>
+    <a href="projeto-fracoes.html">Projetos</a>
+    <a href="#">Construção</a>
+    <a href="#">Sobre</a>
+    <a href="contacto.html">Contacto</a>
+  </nav>
+  <div class="foot">
+    <a class="btn btn-gold" href="tel:+351913440800">☎&ensp;Ligar agora</a>
+    <a class="btn btn-outline-dark" href="#">✆&ensp;WhatsApp</a>
+  </div>
+</div>
+
+<header class="head">
+  <div class="wrap">
+    <h1>Imóveis para venda</h1>
+    <p class="count"><strong>12 imóveis</strong> · Braga e arredores</p>
+    <div class="fbar">
+      <button class="fchip active">Todos</button>
+      <button class="fchip">Venda</button>
+      <button class="fchip">Arrendamento</button>
+      <span class="sep"></span>
+      <button class="fchip">T2</button>
+      <button class="fchip">T3</button>
+      <button class="fchip">T4+</button>
+      <span class="sep"></span>
+      <button class="fchip">Até 250k €</button>
+      <button class="fchip">250k – 500k €</button>
+      <select aria-label="Ordenar">
+        <option>Mais recentes</option>
+        <option>Preço ↑</option>
+        <option>Preço ↓</option>
+        <option>Área ↓</option>
+      </select>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap grid">
+    <a class="card" href="imovel.html">
+      <div class="ph">
+        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=900&q=80" alt="Moradia com piscina" loading="lazy">
+        <span class="tag">Venda</span><span class="tag gold">Destaque</span>
+      </div>
+      <div class="body">
+        <p class="loc">Esporões · Braga</p>
+        <h3>Moradia com Piscina na Quinta da Fontela</h3>
+        <div class="feat"><span>4 quartos</span><span>3 WC</span><span>240 m²</span></div>
+        <div class="foot"><span class="price">495 000 €</span><span class="tip">T4</span></div>
+      </div>
+    </a>
+
+    <a class="card" href="imovel.html">
+      <div class="ph">
+        <img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=900&q=80" alt="Moradia moderna" loading="lazy">
+        <span class="tag">Venda</span>
+      </div>
+      <div class="body">
+        <p class="loc">Lomar · Braga</p>
+        <h3>Moradia em banda com jardim</h3>
+        <div class="feat"><span>3 quartos</span><span>2 WC</span><span>185 m²</span></div>
+        <div class="foot"><span class="price">385 000 €</span><span class="tip">T3</span></div>
+      </div>
+    </a>
+
+    <a class="card" href="projeto-fracoes.html">
+      <div class="ph">
+        <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=900&q=80" alt="Trandeiras" loading="lazy">
+        <span class="tag gold" style="left:.8rem; right:auto;">Lançamento</span>
+      </div>
+      <div class="body">
+        <p class="loc">Trandeiras · Braga · 5 frações disponíveis</p>
+        <h3>Trandeiras — T2 e T3 novos</h3>
+        <div class="feat"><span>96–148 m²</span><span>Garagem</span><span>Entrega 2027</span></div>
+        <div class="foot"><span class="price">Desde 240 000 €</span><span class="tip">T2·T3</span></div>
+      </div>
+    </a>
+
+    <a class="card" href="imovel.html">
+      <div class="ph">
+        <img src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=900&q=80" alt="Apartamento" loading="lazy">
+        <span class="tag">Arrendamento</span>
+      </div>
+      <div class="body">
+        <p class="loc">Centro · Braga</p>
+        <h3>Apartamento renovado no centro histórico</h3>
+        <div class="feat"><span>1 quarto</span><span>1 WC</span><span>62 m²</span></div>
+        <div class="foot"><span class="price">850 € /mês</span><span class="tip">T1</span></div>
+      </div>
+    </a>
+
+    <a class="card" href="imovel.html">
+      <div class="ph"><span class="pt">PT</span><span class="tag">Venda</span></div>
+      <div class="body">
+        <p class="loc">Merelim · Braga</p>
+        <h3>Moradia térrea — fotos brevemente</h3>
+        <div class="feat"><span>3 quartos</span><span>2 WC</span><span>160 m²</span></div>
+        <div class="foot"><span class="price">Sob consulta</span><span class="tip">T3</span></div>
+      </div>
+    </a>
+
+    <a class="card" href="imovel.html">
+      <div class="ph">
+        <img src="https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=900&q=80" alt="Moradia com piscina" loading="lazy">
+        <span class="tag">Venda</span>
+      </div>
+      <div class="body">
+        <p class="loc">Escudeiros · Braga</p>
+        <h3>Moradia isolada com vista serra</h3>
+        <div class="feat"><span>4 quartos</span><span>3 WC</span><span>210 m²</span></div>
+        <div class="foot"><span class="price">440 000 €</span><span class="tip">T4</span></div>
+      </div>
+    </a>
+  </div>
+</main>
+
+<!-- mobile: filtros em bottom-sheet -->
+<button class="btn btn-primary fab" onclick="toggleSheet(true)">Filtros · Ordenar</button>
+<div class="overlay" id="ov" onclick="toggleSheet(false)"></div>
+<div class="sheet" id="sheet" role="dialog" aria-label="Filtros">
+  <h2>Filtrar imóveis</h2>
+  <div class="grp"><p>Negócio</p><div class="opts"><button class="fchip active">Todos</button><button class="fchip">Venda</button><button class="fchip">Arrendamento</button></div></div>
+  <div class="grp"><p>Tipologia</p><div class="opts"><button class="fchip">T0</button><button class="fchip">T1</button><button class="fchip">T2</button><button class="fchip">T3</button><button class="fchip">T4+</button></div></div>
+  <div class="grp"><p>Preço</p><div class="opts"><button class="fchip">Até 250k</button><button class="fchip">250–500k</button><button class="fchip">500k–1M</button><button class="fchip">+1M</button></div></div>
+  <button class="btn btn-primary" style="width:100%" onclick="toggleSheet(false)">Ver 12 resultados</button>
+</div>
+
+<script>
+  function toggleSheet(open) {
+    document.getElementById('sheet').classList.toggle('open', open);
+    document.getElementById('ov').classList.toggle('open', open);
+  }
+  function toggleMenu(open) {
+    document.getElementById('mmenu').classList.toggle('open', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+  }
+  addEventListener('keydown', e => { if (e.key === 'Escape') { toggleMenu(false); toggleSheet(false); } });
+  document.querySelectorAll('.fchip').forEach(c => c.addEventListener('click', e => {
+    const group = c.closest('.opts, .fbar');
+    if (group) group.querySelectorAll('.fchip').forEach(x => x !== c && x.classList.remove('active'));
+    c.classList.toggle('active');
+  }));
+</script>
+</body>
+</html>

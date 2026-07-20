@@ -64,9 +64,16 @@ git commit -m "descrição"
 git push          # publica no Vercel automaticamente
 ```
 
+## Histórico
+- Ver `HISTORY.md` na raiz — registo por sessão (o que mudou, porquê, pendentes).
+- **No fim de cada sessão:** adicionar uma entrada nova no topo do `HISTORY.md`.
+
+## Tabelas adicionais
+- `oportunidades` + `oportunidade_atividades` — pré-leads com follow-up (só super_admin). RLS ativo sem políticas públicas.
+
 ## Pendente / A fazer
+- **Na Vercel (só o dono):** `CRON_SECRET` (valor no `.env.local`) → redeploy, para os lembretes de oportunidades.
+- **Na Vercel (quando houver IDs):** `NEXT_PUBLIC_GA_ID`, `NEXT_PUBLIC_META_PIXEL_ID`.
 - Imagens reais: `/public/images/contacto-hero.jpg` (página de contacto)
-- Conteúdo real: projetos Esporões, Merelim, Lomar
+- Conteúdo real: imóveis de Braga + projetos Esporões, Merelim, Lomar
 - Domínio próprio (ex: paineltematico.pt) → ligar no Vercel
-- Email de notificação de leads (Resend API)
-- Google Analytics / Meta Pixel

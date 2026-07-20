@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockups UX/UI — Painel Temático · Design System v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<style>
+  body { background: var(--dark); color: var(--on-dark); min-height: 100svh; }
+  header { padding: var(--section-sm) 0 2rem; text-align: center; }
+  header .label { color: var(--gold); }
+  header h1 { font-size: var(--text-h1); margin: .75rem 0; }
+  header p { color: var(--on-dark-mute); max-width: 52ch; margin: 0 auto; font-size: var(--text-small); }
+  .grid { display: grid; gap: 1.25rem; grid-template-columns: 1fr; padding-bottom: var(--section-sm); }
+  @media (min-width: 700px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1100px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+  .item { border: 1px solid rgba(255,255,255,.09); border-radius: var(--radius-card); padding: 1.5rem;
+    background: var(--dark-2); transition: all var(--base) var(--ease); display: block; }
+  .item:hover { border-color: rgba(201,169,110,.4); transform: translateY(-2px); box-shadow: 0 16px 48px rgba(0,0,0,.4); }
+  .item .num { font-family: var(--serif); font-size: 2rem; color: var(--gold); opacity: .5; }
+  .item h2 { font-size: var(--text-h3); margin: .5rem 0; color: var(--on-dark); }
+  .item p { color: var(--on-dark-mute); font-size: var(--text-small); line-height: 1.55; }
+  .item .go { display: inline-block; margin-top: 1rem; color: var(--gold); font-weight: 700; font-size: var(--text-small); }
+  .prio { display: inline-block; margin-left: .5rem; font-size: .65rem; letter-spacing: .15em; text-transform: uppercase;
+    color: var(--gold); border: 1px solid rgba(201,169,110,.4); border-radius: 999px; padding: .2rem .6rem; vertical-align: middle; }
+  footer { text-align: center; padding: 2rem; color: var(--on-dark-mute); font-size: .78rem; border-top: 1px solid rgba(255,255,255,.06); }
+</style>
+</head>
+<body>
+<header>
+  <span class="label">Painel Temático · Design System v2 · Julho 2026</span>
+  <h1>Mockups navegáveis</h1>
+  <p>Seis superfícies redesenhadas segundo a auditoria FABLE. Redimensiona a janela para ver o comportamento
+  mobile (375px) e desktop. Documentos: <code>AUDITORIA-UXUI-2026-07.md</code> e <code>DESIGN-SYSTEM.md</code>.</p>
+</header>
+
+<div class="wrap grid">
+  <a class="item" href="imovel.html">
+    <span class="num">01</span><span class="prio">Prioridade do funil</span>
+    <h2>Página de Imóvel</h2>
+    <p>A landing page real. Preço e CTA above-the-fold, barra sticky mobile, localização com
+    pontos de interesse, calculadora de prestação interativa, processo "da visita à chave",
+    angariador, formulário RGPD e cross-sell.</p>
+    <span class="go">Abrir →</span>
+  </a>
+  <a class="item" href="projeto-fracoes.html">
+    <span class="num">02</span><span class="prio">Lançamentos</span>
+    <h2>Projeto + Guia de Frações</h2>
+    <p>Trandeiras como piloto: filtros, cards por fração com 4 estados, comparador lado-a-lado
+    real (máx. 3), planta com overlay, acabamentos de construtor, FAQ de lançamento e
+    captura de lead por fração.</p>
+    <span class="go">Abrir →</span>
+  </a>
+  <a class="item" href="pesquisa.html">
+    <span class="num">03</span>
+    <h2>Pesquisa / Listagem</h2>
+    <p>Filtros horizontais com ordenação, bottom-sheet mobile, PropertyCard v2 e
+    lançamentos integrados na grelha.</p>
+    <span class="go">Abrir →</span>
+  </a>
+  <a class="item" href="homepage.html">
+    <span class="num">04</span>
+    <h2>Homepage</h2>
+    <p>Hero com imagem premium (corrige o vídeo 404), stats de construtor, ponte visual
+    para o mundo dark dos projetos e bloco de confiança com testemunho.</p>
+    <span class="go">Abrir →</span>
+  </a>
+  <a class="item" href="contacto.html">
+    <span class="num">05</span>
+    <h2>Contacto</h2>
+    <p>Formulário com assunto e RGPD, contacto direto em evidência, morada com mapa
+    e callback "ligamos nós".</p>
+    <span class="go">Abrir →</span>
+  </a>
+  <a class="item" href="menu-footer.html">
+    <span class="num">06</span>
+    <h2>Menu & Footer</h2>
+    <p>Navbar em dois estados com telefone visível, menu mobile de ecrã completo com stagger,
+    e footer v2 com coluna legal completa.</p>
+    <span class="go">Abrir →</span>
+  </a>
+  <a class="item" href="avaliacao.html">
+    <span class="num">07</span><span class="prio">Angariação</span>
+    <h2>Avaliação Gratuita (wizard)</h2>
+    <p>O funil do vendedor: 4 passos com barra de progresso, opções de um toque, prova
+    social de construtor e sucesso que encaminha para os imóveis — alimenta o inventário.</p>
+    <span class="go">Abrir →</span>
+  </a>
+  <a class="item" href="componentes.html">
+    <span class="num">08</span><span class="prio">Design System</span>
+    <h2>Componentes (styleguide vivo)</h2>
+    <p>Paleta com contrastes calculados, escala tipográfica fluida, botões dos dois temas,
+    badges de estado, PropertyCard v2, formulários e catálogo de microinterações.</p>
+    <span class="go">Abrir →</span>
+  </a>
+</div>
+
+<footer>Mockups estáticos — nenhum código do site foi alterado. · Painel Temático</footer>
+</body>
+</html>

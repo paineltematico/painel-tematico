@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup — Homepage · Painel Temático</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<style>
+  /* nav transparente → sólida */
+  .nav { position: fixed; inset: 0 0 auto; z-index: 50; transition: all var(--base) var(--ease); }
+  .nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 72px; }
+  .nav .logo { font-family: var(--serif); font-weight: 700; letter-spacing: .04em; color: #fff; transition: color var(--base); }
+  .nav .links { display: none; gap: .25rem; align-items: center; }
+  @media (min-width: 900px) { .nav .links { display: flex; } }
+  .nav .links a { padding: .6rem 1rem; border-radius: .5rem; font-size: var(--text-small); font-weight: 500;
+    color: rgba(255,255,255,.85); min-height: 44px; display: inline-flex; align-items: center; transition: all var(--fast); }
+  .nav .links a:hover { background: rgba(255,255,255,.12); color: #fff; }
+  .nav .cta { margin-left: .75rem; }
+  .nav.solid { background: rgba(255,255,255,.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--warm-border); }
+  .nav.solid .logo { color: var(--brand-dark); }
+  .nav.solid .links a { color: var(--ink-soft); }
+  .nav.solid .links a:hover { background: var(--warm); color: var(--ink); }
+
+  /* hamburger + menu mobile ecrã completo */
+  .burger { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px;
+    border-radius: .6rem; border: 0; background: transparent; color: #fff; font-size: 1.4rem; cursor: pointer; }
+  .nav.solid .burger { color: var(--brand-dark); }
+  @media (min-width: 900px) { .burger { display: none; } }
+  .mmenu { position: fixed; inset: 0; z-index: 80; background: var(--dark); display: none; flex-direction: column;
+    padding: 1.1rem 1.5rem 2rem; padding-bottom: calc(2rem + env(safe-area-inset-bottom)); }
+  .mmenu.open { display: flex; }
+  .mmenu .top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2.25rem; }
+  .mmenu .logo { font-family: var(--serif); color: #fff; font-weight: 700; }
+  .mmenu .close { width: 44px; height: 44px; border-radius: 999px; border: 1px solid rgba(255,255,255,.2);
+    background: transparent; color: #fff; font-size: 1.1rem; cursor: pointer; }
+  .mmenu nav { flex: 1; display: flex; flex-direction: column; }
+  .mmenu nav a { font-family: var(--serif); font-size: 2rem; color: var(--on-dark-soft); padding: .55rem 0;
+    display: flex; align-items: baseline; gap: .75rem; }
+  .mmenu nav a:hover { color: var(--gold); }
+  .mmenu nav a small { font-family: var(--sans); font-size: .7rem; letter-spacing: .2em; color: var(--on-dark-mute); text-transform: uppercase; }
+  .mmenu .foot { display: flex; flex-direction: column; gap: .6rem; }
+  @media (prefers-reduced-motion: no-preference) {
+    .mmenu.open nav a { opacity: 0; transform: translateY(12px); animation: rise 450ms var(--ease) both; }
+    .mmenu.open nav a:nth-child(1) { animation-delay: 50ms } .mmenu.open nav a:nth-child(2) { animation-delay: 110ms }
+    .mmenu.open nav a:nth-child(3) { animation-delay: 170ms } .mmenu.open nav a:nth-child(4) { animation-delay: 230ms }
+    .mmenu.open nav a:nth-child(5) { animation-delay: 290ms }
+  }
+
+  /* HERO 100svh com imagem premium (corrige o vídeo 404) */
+  .hero { position: relative; min-height: 100svh; display: flex; align-items: flex-end; overflow: hidden; }
+  .hero-img { position: absolute; inset: 0; background: var(--brand-dark) url('https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1800&q=80') center/cover; }
+  .hero::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(7,16,15,.9), rgba(7,16,15,.25) 55%, rgba(7,16,15,.5)); }
+  .hero .wrap { position: relative; z-index: 2; width: 100%; padding-bottom: 3rem; }
+  .hero .kicker { color: var(--gold); margin-bottom: 1rem; display: block; }
+  .hero h1 { font-size: var(--text-display); color: #fff; font-weight: 700; letter-spacing: -.02em; max-width: 14ch; margin-bottom: 1rem; }
+  .hero .sub { color: rgba(255,255,255,.85); font-size: var(--text-lead); font-weight: 300; max-width: 40ch; margin-bottom: 2rem; }
+
+  /* pesquisa integrada no hero */
+  .search { display: flex; flex-direction: column; gap: .6rem; background: rgba(255,255,255,.97); border-radius: var(--radius-card);
+    padding: .75rem; box-shadow: var(--shadow-hover); max-width: 720px; }
+  @media (min-width: 700px) { .search { flex-direction: row; } }
+  .search input, .search select { min-height: 52px; border: 1px solid var(--warm-border); border-radius: .65rem;
+    padding: 0 1rem; font-family: var(--sans); font-size: var(--text-small); color: var(--ink); flex: 1; }
+  .search input:focus, .search select:focus { outline: 2px solid var(--brand); outline-offset: -1px; }
+  .search .btn { min-height: 52px; }
+
+  section { padding: var(--section) 0; }
+  .kick { color: var(--brand); margin-bottom: .75rem; display: block; }
+  h2.sec { font-size: var(--text-h1); color: var(--brand-dark); }
+
+  /* stats de construtor (substitui "3+ imóveis") */
+  .stats { background: var(--brand-dark); padding: var(--section-sm) 0; }
+  .stats .wrap { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; }
+  @media (min-width: 900px) { .stats .wrap { grid-template-columns: repeat(4, 1fr); } }
+  .stats strong { font-family: var(--serif); font-size: clamp(2rem, 4vw, 3rem); color: var(--gold); display: block; }
+  .stats span { font-size: var(--text-small); color: rgba(255,255,255,.75); }
+
+  /* destaque */
+  .sechead { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; margin-bottom: 2.25rem; }
+  .cards { display: grid; gap: 1.5rem; grid-template-columns: 1fr; }
+  @media (min-width: 640px) { .cards { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1024px) { .cards { grid-template-columns: repeat(3, 1fr); } }
+  .card { background: var(--paper); border-radius: var(--radius-card); overflow: hidden; border: 1px solid var(--warm-border);
+    box-shadow: var(--shadow-card); transition: box-shadow var(--base) var(--ease); display: block; }
+  .card:hover { box-shadow: var(--shadow-hover); }
+  .card .ph { position: relative; aspect-ratio: 4/3; overflow: hidden; }
+  .card .ph img { width: 100%; height: 100%; object-fit: cover; transition: transform 700ms var(--ease); }
+  .card:hover .ph img { transform: scale(1.03); }
+  .card .tag { position: absolute; top: .8rem; left: .8rem; background: rgba(7,16,15,.78); color: #fff;
+    font-size: var(--text-label); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: .35rem .8rem; border-radius: 999px; }
+  .card .body { padding: 1.15rem 1.3rem 1.4rem; }
+  .card .loc { font-size: var(--text-label); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: .35rem; }
+  .card h3 { font-size: var(--text-h3); color: var(--brand-dark); margin-bottom: .75rem; }
+  .card .price { font-family: var(--serif); font-weight: 700; font-size: 1.3rem; color: var(--brand); }
+
+  /* projetos strip (dark bridge para o mundo produto) */
+  .projetos { background: var(--dark-2); }
+  .projetos h2 { color: var(--on-dark); }
+  .projetos .kick { color: var(--gold); }
+  .pstrip { display: grid; gap: 1.25rem; grid-template-columns: 1fr; }
+  @media (min-width: 900px) { .pstrip { grid-template-columns: repeat(3, 1fr); } }
+  .pcard { position: relative; border-radius: var(--radius-card); overflow: hidden; min-height: 380px; display: flex; align-items: flex-end; }
+  .pcard img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 900ms var(--ease); }
+  .pcard:hover img { transform: scale(1.04); }
+  .pcard::after { content:''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(7,16,15,.92), rgba(7,16,15,.05) 60%); }
+  .pcard .body { position: relative; z-index: 2; padding: 1.5rem; width: 100%; }
+  .pcard h3 { font-size: 1.75rem; color: #fff; margin: .5rem 0 .25rem; }
+  .pcard .meta { color: var(--on-dark-mute); font-size: var(--text-small); }
+
+  /* confiança: construtor + promotor */
+  .trust { background: var(--cream); }
+  .trust .grid2 { display: grid; gap: 2.5rem; }
+  @media (min-width: 1024px) { .trust .grid2 { grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; } }
+  .trust img { border-radius: var(--radius-card); aspect-ratio: 4/3; object-fit: cover; width: 100%; }
+  .trust .lead { font-family: var(--serif); font-size: var(--text-lead); color: var(--ink); line-height: 1.7; margin: 1rem 0 1.5rem; }
+  .trust blockquote { margin: 2rem 0 0; padding: 1.5rem; background: var(--paper); border-left: 3px solid var(--gold);
+    border-radius: 0 var(--radius-card) var(--radius-card) 0; box-shadow: var(--shadow-card); }
+  .trust blockquote p { font-family: var(--serif); font-style: italic; color: var(--ink); }
+  .trust cite { display: block; margin-top: .75rem; font-size: var(--text-small); color: var(--ink-mute); font-style: normal; }
+
+  /* CTA final */
+  .cta { background: var(--brand-dark); text-align: center; }
+  .cta h2 { color: #fff; font-size: var(--text-h1); max-width: 20ch; margin: 0 auto 1rem; }
+  .cta p { color: rgba(255,255,255,.8); max-width: 44ch; margin: 0 auto 2rem; }
+  .cta .row { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; }
+  .cta .btn-gold { box-shadow: var(--shadow-gold); }
+
+  /* footer v2 */
+  footer { background: var(--dark); color: var(--on-dark-soft); padding: var(--section-sm) 0 2rem; }
+  footer .cols { display: grid; gap: 2.5rem; grid-template-columns: 1fr; margin-bottom: 3rem; }
+  @media (min-width: 900px) { footer .cols { grid-template-columns: 2fr 1fr 1fr 1fr; } }
+  footer h4 { font-size: var(--text-label); letter-spacing: .2em; text-transform: uppercase; color: var(--on-dark); margin: 0 0 1rem; }
+  footer ul { list-style: none; margin: 0; padding: 0; }
+  footer li { margin-bottom: .6rem; }
+  footer a { font-size: var(--text-small); color: var(--on-dark-mute); }
+  footer a:hover { color: var(--on-dark); }
+  footer .brand { font-family: var(--serif); font-size: 1.25rem; color: var(--on-dark); letter-spacing: .05em; margin-bottom: 1rem; }
+  footer .legal { border-top: 1px solid rgba(255,255,255,.08); padding-top: 1.5rem; display: flex; flex-wrap: wrap;
+    justify-content: space-between; gap: 1rem; font-size: .78rem; color: var(--on-dark-mute); }
+  footer .legal .lnks { display: flex; flex-wrap: wrap; gap: 1.25rem; }
+</style>
+</head>
+<body>
+<span class="mock-note">Mockup · Homepage <a href="index.html">← índice</a></span>
+
+<nav class="nav" id="nav">
+  <div class="wrap">
+    <a class="logo" href="#">PAINEL TEMÁTICO</a>
+    <div class="links">
+      <a href="pesquisa.html">Imóveis</a>
+      <a href="projeto-fracoes.html">Projetos</a>
+      <a href="#">Construção</a>
+      <a href="#">Sobre</a>
+      <a href="contacto.html">Contacto</a>
+      <a href="tel:+351913440800" style="font-weight:700;">☎ 913 440 800</a>
+      <a class="btn btn-gold cta" href="pesquisa.html" style="min-height:44px;">Ver Imóveis</a>
+    </div>
+    <button class="burger" onclick="toggleMenu(true)" aria-label="Abrir menu">☰</button>
+  </div>
+</nav>
+
+<!-- menu mobile ecrã completo -->
+<div class="mmenu" id="mmenu" role="dialog" aria-label="Menu">
+  <div class="top">
+    <span class="logo">PAINEL TEMÁTICO</span>
+    <button class="close" onclick="toggleMenu(false)" aria-label="Fechar menu">✕</button>
+  </div>
+  <nav>
+    <a href="pesquisa.html">Imóveis <small>12 disponíveis</small></a>
+    <a href="projeto-fracoes.html">Projetos <small>lançamento Trandeiras</small></a>
+    <a href="#">Construção</a>
+    <a href="#">Sobre</a>
+    <a href="contacto.html">Contacto</a>
+  </nav>
+  <div class="foot">
+    <a class="btn btn-gold" href="tel:+351913440800">☎&ensp;Ligar agora</a>
+    <a class="btn btn-outline-dark" href="#">✆&ensp;WhatsApp</a>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="hero-img"></div>
+  <div class="wrap">
+    <span class="label kicker reveal">Construção & Promoção Imobiliária · Braga</span>
+    <h1 class="reveal">Construímos o que vendemos.</h1>
+    <p class="sub reveal">Projetos de assinatura própria e imóveis selecionados — com o detalhe de quem
+    acompanha cada obra do primeiro tijolo à entrega da chave.</p>
+    <form class="search reveal" action="pesquisa.html">
+      <input type="search" placeholder="Cidade, zona ou tipologia…" aria-label="Pesquisar">
+      <select aria-label="Tipo de negócio"><option>Comprar</option><option>Arrendar</option></select>
+      <button class="btn btn-primary">Pesquisar</button>
+    </form>
+  </div>
+</header>
+
+<!-- stats de CONSTRUTOR, não de inventário -->
+<section class="stats">
+  <div class="wrap">
+    <div><strong>18</strong><span>anos a construir em Braga</span></div>
+    <div><strong>240+</strong><span>famílias instaladas</span></div>
+    <div><strong>32 000 m²</strong><span>construídos e entregues</span></div>
+    <div><strong>7</strong><span>projetos em curso</span></div>
+  </div>
+</section>
+
+<!-- destaque -->
+<section>
+  <div class="wrap">
+    <div class="sechead">
+      <div>
+        <span class="label kick">Imóveis em destaque</span>
+        <h2 class="sec">Oportunidades selecionadas</h2>
+      </div>
+      <a class="ghost" href="pesquisa.html">Ver todos →</a>
+    </div>
+    <div class="cards">
+      <a class="card" href="imovel.html">
+        <div class="ph"><img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=900&q=80" alt="" loading="lazy"><span class="tag">Venda</span></div>
+        <div class="body"><p class="loc">Esporões · Braga</p><h3>Moradia com Piscina</h3><p class="price">495 000 €</p></div>
+      </a>
+      <a class="card" href="imovel.html">
+        <div class="ph"><img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=900&q=80" alt="" loading="lazy"><span class="tag">Venda</span></div>
+        <div class="body"><p class="loc">Lomar · Braga</p><h3>Moradia em banda com jardim</h3><p class="price">385 000 €</p></div>
+      </a>
+      <a class="card" href="projeto-fracoes.html">
+        <div class="ph"><img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=900&q=80" alt="" loading="lazy"><span class="tag" style="background: rgba(201,169,110,.92); color:#0A0A08;">Lançamento</span></div>
+        <div class="body"><p class="loc">Trandeiras · Braga</p><h3>T2 e T3 novos — 5 disponíveis</h3><p class="price">Desde 240 000 €</p></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- projetos: a ponte para o mundo dark premium -->
+<section class="projetos">
+  <div class="wrap">
+    <div class="sechead">
+      <div>
+        <span class="label kick">Empreendimentos</span>
+        <h2 class="sec" style="color: var(--on-dark);">Assinatura Painel Temático</h2>
+      </div>
+      <a class="ghost on-dark" href="projeto-fracoes.html">Todos os projetos →</a>
+    </div>
+    <div class="pstrip">
+      <a class="pcard" href="projeto-fracoes.html">
+        <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=900&q=80" alt="" loading="lazy">
+        <div class="body"><span class="badge badge-disponivel"><span class="dot"></span>Lançamento</span><h3>Trandeiras</h3><p class="meta">8 frações · desde 240 000 €</p></div>
+      </a>
+      <a class="pcard" href="#">
+        <img src="https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=900&q=80" alt="" loading="lazy">
+        <div class="body"><span class="badge badge-disponivel"><span class="dot"></span>Última unidade</span><h3>Esporões</h3><p class="meta">7 moradias · 1 disponível</p></div>
+      </a>
+      <a class="pcard" href="#">
+        <img src="https://images.unsplash.com/photo-1487958449943-2429e8be8625?auto=format&fit=crop&w=900&q=80" alt="" loading="lazy">
+        <div class="body"><span class="badge badge-embreve">Pré-registo</span><h3>Merelim</h3><p class="meta">9 unidades · 5 brevemente</p></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- confiança -->
+<section class="trust">
+  <div class="wrap grid2">
+    <div>
+      <span class="label kick">Porquê a Painel Temático</span>
+      <h2 class="sec">O construtor é quem lhe entrega a chave</h2>
+      <p class="lead">Não intermediamos promessas — construímos casas. Acompanhamos cada projeto
+      do terreno à escritura, com obra documentada mês a mês e materiais escolhidos um a um.</p>
+      <a class="btn btn-primary" href="#">Conhecer a equipa</a>
+      <blockquote>
+        <p>"Vimos a nossa casa nascer nas atualizações de obra. Quando recebemos a chave, já a conhecíamos."</p>
+        <cite>— Família Rodrigues · Moradia em Esporões, 2025</cite>
+      </blockquote>
+    </div>
+    <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80" alt="Interior de obra entregue" loading="lazy">
+  </div>
+</section>
+
+<!-- CTA avaliação -->
+<section class="cta">
+  <div class="wrap">
+    <h2>Tem um imóvel para vender?</h2>
+    <p>Avaliação gratuita pela equipa que conhece o valor real da construção em Braga.</p>
+    <div class="row">
+      <a class="btn btn-gold" href="#">Pedir avaliação gratuita</a>
+      <a class="btn btn-outline-dark" href="pesquisa.html">Ver imóveis disponíveis</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <p class="brand">PAINEL TEMÁTICO</p>
+        <p style="font-size: var(--text-small); max-width: 30ch; color: var(--on-dark-mute);">Construção e promoção imobiliária em Braga. Média gama, execução premium.</p>
+        <p style="margin-top:1rem; font-size: var(--text-small);">☎ +351 913 440 800<br>✉ geral@paineltematico.pt</p>
+      </div>
+      <div><h4>Navegação</h4><ul><li><a href="pesquisa.html">Imóveis</a></li><li><a href="projeto-fracoes.html">Projetos</a></li><li><a href="#">Construção</a></li><li><a href="#">Sobre</a></li><li><a href="contacto.html">Contacto</a></li></ul></div>
+      <div><h4>Comprar</h4><ul><li><a href="#">Apartamentos T2</a></li><li><a href="#">Apartamentos T3</a></li><li><a href="#">Moradias</a></li><li><a href="#">Lançamentos</a></li></ul></div>
+      <div><h4>Legal</h4><ul><li><a href="#">Política de Privacidade</a></li><li><a href="#">Termos e Condições</a></li><li><a href="#">Livro de Reclamações</a></li><li><a href="#">RGPD</a></li></ul></div>
+    </div>
+    <div class="legal">
+      <span>© <span id="ano"></span> Painel Temático · AMI 25031 · IMPIC 69636</span>
+      <div class="lnks"><a href="#">Instagram</a><a href="#">Facebook</a></div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('ano').textContent = new Date().getFullYear();
+  const nav = document.getElementById('nav');
+  addEventListener('scroll', () => nav.classList.toggle('solid', scrollY > 40), { passive: true });
+  function toggleMenu(open) {
+    document.getElementById('mmenu').classList.toggle('open', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+  }
+  addEventListener('keydown', e => { if (e.key === 'Escape') toggleMenu(false); });
+</script>
+</body>
+</html>

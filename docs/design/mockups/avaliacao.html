@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup — Avaliação Gratuita · Painel Temático</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<style>
+  body { background: var(--cream); }
+  .nav { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,.94); backdrop-filter: blur(12px); border-bottom: 1px solid var(--warm-border); }
+  .nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 68px; }
+  .nav .logo { font-family: var(--serif); font-weight: 700; color: var(--brand-dark); letter-spacing: .04em; }
+  .nav a.tel { font-size: var(--text-small); font-weight: 700; color: var(--brand); min-height: 44px; display: inline-flex; align-items: center; }
+
+  .hero { background: var(--brand-dark); padding: var(--section-sm) 0; }
+  .hero h1 { color: #fff; font-size: var(--text-h1); margin: .5rem 0; }
+  .hero p { color: rgba(255,255,255,.8); max-width: 46ch; }
+  .hero .label { color: var(--gold); }
+
+  main { padding: var(--section-sm) 0 var(--section); }
+  .grid { display: grid; gap: 2.5rem; }
+  @media (min-width: 1024px) { .grid { grid-template-columns: 7fr 4fr; gap: 4rem; align-items: start; } }
+
+  /* wizard */
+  .wizard { background: var(--paper); border: 1px solid var(--warm-border); border-radius: var(--radius-card); padding: 2rem; box-shadow: var(--shadow-card); }
+  .progress { display: flex; align-items: center; gap: .5rem; margin-bottom: 2rem; }
+  .progress .step { flex: 1; display: flex; flex-direction: column; gap: .5rem; }
+  .progress .bar { height: 3px; border-radius: 99px; background: var(--warm-border); overflow: hidden; }
+  .progress .bar i { display: block; height: 100%; width: 0; background: var(--brand); transition: width var(--base) var(--ease); }
+  .progress .step.done .bar i, .progress .step.on .bar i { width: 100%; }
+  .progress .step.on .bar i { background: var(--gold); }
+  .progress span { font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-mute); font-weight: 700; }
+  .progress .step.on span { color: var(--brand-dark); }
+
+  .painel { display: none; }
+  .painel.on { display: block; }
+  .painel h2 { font-size: var(--text-h3); color: var(--brand-dark); margin-bottom: .4rem; }
+  .painel .sub { color: var(--ink-mute); font-size: var(--text-small); margin-bottom: 1.5rem; }
+
+  .opts { display: grid; gap: .6rem; grid-template-columns: repeat(2, 1fr); margin-bottom: 1.5rem; }
+  @media (min-width: 700px) { .opts.c3 { grid-template-columns: repeat(3, 1fr); } }
+  .opt { min-height: 56px; padding: .9rem 1rem; border-radius: .75rem; border: 1px solid var(--warm-border);
+    background: var(--paper); font-family: var(--sans); font-size: var(--text-small); font-weight: 600; color: var(--ink-soft);
+    cursor: pointer; text-align: left; transition: all var(--fast) var(--ease); }
+  .opt:hover { border-color: var(--brand); }
+  .opt.sel { border-color: var(--brand); background: rgba(0,84,95,.06); color: var(--brand); }
+  .opt small { display: block; font-weight: 400; color: var(--ink-mute); margin-top: .15rem; }
+
+  label { display: block; font-size: var(--text-label); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-mute); margin-bottom: .45rem; }
+  input, select { width: 100%; min-height: 48px; padding: .75rem .9rem; border-radius: .65rem; border: 1px solid var(--warm-border);
+    font-family: var(--sans); font-size: var(--text-small); color: var(--ink); background: var(--paper); margin-bottom: 1.1rem; }
+  input:focus, select:focus { outline: 2px solid var(--brand); outline-offset: -1px; }
+  .duo { display: grid; gap: 0 1rem; grid-template-columns: 1fr 1fr; }
+
+  .nav-btns { display: flex; justify-content: space-between; gap: 1rem; margin-top: .5rem; }
+  .rgpd { display: flex; gap: .6rem; align-items: flex-start; font-size: .8rem; color: var(--ink-mute); margin: .5rem 0 1.25rem; }
+  .rgpd input { width: 18px; height: 18px; min-height: 18px; margin-top: 2px; accent-color: var(--brand); }
+  .rgpd a { color: var(--brand); text-decoration: underline; }
+
+  .sucesso { text-align: center; padding: 2rem 0; }
+  .sucesso .ic { width: 64px; height: 64px; border-radius: 999px; background: rgba(0,84,95,.08); color: var(--brand);
+    display: flex; align-items: center; justify-content: center; font-size: 1.75rem; margin: 0 auto 1.25rem; }
+  .sucesso h2 { font-size: var(--text-h2); color: var(--brand-dark); margin-bottom: .6rem; }
+  .sucesso p { color: var(--ink-soft); font-size: var(--text-small); max-width: 38ch; margin: 0 auto 1.5rem; }
+
+  /* lateral de confiança */
+  .side .block { background: var(--paper); border: 1px solid var(--warm-border); border-radius: var(--radius-card);
+    padding: 1.5rem; margin-bottom: 1.25rem; box-shadow: var(--shadow-card); }
+  .side h3 { font-size: var(--text-label); letter-spacing: .2em; text-transform: uppercase; color: var(--ink-mute); font-family: var(--sans); font-weight: 700; margin-bottom: 1rem; }
+  .side li { font-size: var(--text-small); color: var(--ink-soft); margin-bottom: .75rem; list-style: none; display: flex; gap: .6rem; }
+  .side ul { margin: 0; padding: 0; }
+  .side li::before { content: '✓'; color: var(--gold); font-weight: 700; }
+  .side blockquote { margin: 0; font-family: var(--serif); font-style: italic; color: var(--ink); font-size: 1.05rem; line-height: 1.6; }
+  .side cite { display: block; margin-top: .75rem; font-size: .8rem; color: var(--ink-mute); font-style: normal; }
+</style>
+</head>
+<body>
+<span class="mock-note" style="background:rgba(255,255,255,.9); color: var(--brand); border-color: rgba(0,84,95,.3);">Mockup · Avaliação <a href="index.html" style="color: var(--ink-mute);">← índice</a></span>
+
+<nav class="nav">
+  <div class="wrap">
+    <a class="logo" href="homepage.html">PAINEL TEMÁTICO</a>
+    <a class="tel" href="tel:+351913440800">☎ 913 440 800</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="label">Avaliação gratuita · sem compromisso</span>
+    <h1>Quanto vale a sua casa?</h1>
+    <p>Quem constrói sabe o custo real de cada metro quadrado. Avaliação fundamentada em 48h, feita pela equipa que conhece o mercado de Braga por dentro.</p>
+  </div>
+</header>
+
+<main>
+  <div class="wrap grid">
+    <div class="wizard">
+      <div class="progress" id="prog">
+        <div class="step on"><div class="bar"><i></i></div><span>1 · Imóvel</span></div>
+        <div class="step"><div class="bar"><i></i></div><span>2 · Detalhes</span></div>
+        <div class="step"><div class="bar"><i></i></div><span>3 · Objetivo</span></div>
+        <div class="step"><div class="bar"><i></i></div><span>4 · Contacto</span></div>
+      </div>
+
+      <!-- PASSO 1 -->
+      <div class="painel on" data-p="1">
+        <h2>O que quer avaliar?</h2>
+        <p class="sub">Uma pergunta de cada vez — demora menos de 2 minutos.</p>
+        <div class="opts c3">
+          <button class="opt sel">Apartamento</button>
+          <button class="opt">Moradia</button>
+          <button class="opt">Terreno</button>
+        </div>
+        <label for="morada">Morada ou zona</label>
+        <input id="morada" placeholder="Rua, freguesia ou cidade">
+        <div class="nav-btns"><span></span><button class="btn btn-primary" onclick="irPara(2)">Continuar →</button></div>
+      </div>
+
+      <!-- PASSO 2 -->
+      <div class="painel" data-p="2">
+        <h2>Conte-nos os detalhes</h2>
+        <p class="sub">Só o essencial para uma primeira estimativa séria.</p>
+        <div class="duo">
+          <div><label for="tip">Tipologia</label><select id="tip"><option>T1</option><option selected>T2</option><option>T3</option><option>T4+</option></select></div>
+          <div><label for="area">Área aprox. (m²)</label><input id="area" type="number" placeholder="120"></div>
+        </div>
+        <label>Estado geral</label>
+        <div class="opts c3">
+          <button class="opt">Para renovar</button>
+          <button class="opt sel">Bom estado</button>
+          <button class="opt">Renovado / novo</button>
+        </div>
+        <div class="nav-btns"><button class="btn btn-outline" onclick="irPara(1)">← Voltar</button><button class="btn btn-primary" onclick="irPara(3)">Continuar →</button></div>
+      </div>
+
+      <!-- PASSO 3 -->
+      <div class="painel" data-p="3">
+        <h2>Qual é o seu objetivo?</h2>
+        <p class="sub">Ajusta a nossa recomendação — vender bem é diferente de vender depressa.</p>
+        <div class="opts">
+          <button class="opt sel">Vender nos próximos meses <small>quero começar já</small></button>
+          <button class="opt">Vender, sem pressa <small>ao valor certo</small></button>
+          <button class="opt">Só quero saber o valor <small>curiosidade / partilhas</small></button>
+          <button class="opt">Trocar de casa <small>vender + comprar</small></button>
+        </div>
+        <div class="nav-btns"><button class="btn btn-outline" onclick="irPara(2)">← Voltar</button><button class="btn btn-primary" onclick="irPara(4)">Continuar →</button></div>
+      </div>
+
+      <!-- PASSO 4 -->
+      <div class="painel" data-p="4">
+        <h2>Onde entregamos a avaliação?</h2>
+        <p class="sub">Enviamos a análise e ligamos a explicar — sem pressão, sem spam.</p>
+        <label for="nome">Nome</label><input id="nome" placeholder="O seu nome">
+        <div class="duo">
+          <div><label for="tel2">Telefone</label><input id="tel2" type="tel" placeholder="+351 9xx xxx xxx"></div>
+          <div><label for="hora">Melhor horário</label><select id="hora"><option>Qualquer hora</option><option>Manhã</option><option>Tarde</option><option>Fim do dia</option></select></div>
+        </div>
+        <label class="rgpd"><input type="checkbox"> <span>Autorizo o contacto da Painel Temático e li a <a href="#">Política de Privacidade</a>.</span></label>
+        <div class="nav-btns"><button class="btn btn-outline" onclick="irPara(3)">← Voltar</button><button class="btn btn-gold" onclick="irPara(5)">Pedir avaliação gratuita</button></div>
+      </div>
+
+      <!-- SUCESSO -->
+      <div class="painel" data-p="5">
+        <div class="sucesso">
+          <div class="ic">✓</div>
+          <h2>Pedido recebido!</h2>
+          <p>A nossa equipa vai analisar o mercado da sua zona e liga-lhe em 48h com a avaliação fundamentada.</p>
+          <a class="btn btn-primary" href="pesquisa.html">Entretanto, veja os nossos imóveis →</a>
+        </div>
+      </div>
+    </div>
+
+    <aside class="side">
+      <div class="block">
+        <h3>Porquê connosco</h3>
+        <ul>
+          <li>Sabemos o custo real de construção — avaliamos com fundamento, não com otimismo</li>
+          <li>18 anos de mercado em Braga</li>
+          <li>Análise entregue em 48h, gratuita e sem compromisso</li>
+          <li>Se quiser vender, tratamos de tudo — AMI 25031</li>
+        </ul>
+      </div>
+      <div class="block">
+        <blockquote>"Avaliaram 15 mil euros acima da agência anterior — e venderam em 6 semanas ao valor pedido."</blockquote>
+        <cite>— Proprietário em Lomar · 2025</cite>
+      </div>
+      <div class="block" style="background: var(--brand-dark); border: 0;">
+        <h3 style="color: rgba(255,255,255,.6);">Prefere falar já?</h3>
+        <a class="btn btn-gold" href="tel:+351913440800" style="width: 100%;">☎&ensp;913 440 800</a>
+      </div>
+    </aside>
+  </div>
+</main>
+
+<script>
+  function irPara(n) {
+    document.querySelectorAll('.painel').forEach(p => p.classList.toggle('on', +p.dataset.p === n));
+    document.querySelectorAll('#prog .step').forEach((s, i) => {
+      s.classList.toggle('done', i + 1 < n);
+      s.classList.toggle('on', i + 1 === n);
+    });
+    document.querySelector('.wizard').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+  /* seleção visual das opções */
+  document.querySelectorAll('.opts').forEach(g =>
+    g.querySelectorAll('.opt').forEach(o => o.addEventListener('click', () => {
+      g.querySelectorAll('.opt').forEach(x => x.classList.remove('sel'));
+      o.classList.add('sel');
+    })));
+</script>
+</body>
+</html>
