@@ -29,7 +29,7 @@ Tem duas partes no mesmo codebase:
 - Bucket de fotos: `media` (público) — pastas: `imoveis/`, `projetos/`, `equipa/`, `artigos/`, `atualizacoes/`
 
 ## GitHub
-- Repo: `https://github.com/paineltematico/painel-tematico`
+- Repo: `https://github.com/paineltematico/website`
 - Branch principal: `main`
 
 ## Estrutura de autenticação
