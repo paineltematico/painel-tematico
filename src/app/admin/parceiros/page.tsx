@@ -174,7 +174,11 @@ export default function ParceirosPage() {
       }),
     })
     setSaving(false)
-    if (!res.ok) { setFormError('Erro ao guardar. Tente novamente.'); return }
+    if (!res.ok) {
+      const detalhe = await res.json().then(d => d?.error).catch(() => null)
+      setFormError(detalhe ? `Erro ao guardar: ${detalhe}` : 'Erro ao guardar. Tente novamente.')
+      return
+    }
     const data = await res.json()
     if (!verArquivados) setParceiros(ps => [data as Parceiro, ...ps])
     setForm(EMPTY_FORM)

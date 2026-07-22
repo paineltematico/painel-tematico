@@ -205,7 +205,6 @@ export type Parceiro = {
   ami: string | null
   notas: string | null
   ativo: boolean
-  token_visita: string | null
   arquivado: boolean
   arquivado_em: string | null
   arquivado_por: string | null

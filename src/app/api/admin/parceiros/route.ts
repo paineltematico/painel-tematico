@@ -44,7 +44,6 @@ export async function POST(req: NextRequest) {
       email: body.email || null,
       telefone: body.telefone || null,
       notas: null,
-      token_visita: null,
       ativo: true,
     })
     .select('*, visitas_parceiros(id)')
